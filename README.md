@@ -1,3 +1,8 @@
+<picture>
+  <source media="(prefers-color-scheme: dark)" srcset="docs-public/readme/logo-dark.svg">
+  <img src="docs-public/readme/logo-light.svg" width="240" alt="mago">
+</picture>
+
 # Mago Studio
 
 [![CI](https://github.com/MagoStudio/MagoStudio/actions/workflows/ci.yml/badge.svg)](https://github.com/MagoStudio/MagoStudio/actions/workflows/ci.yml)
@@ -8,6 +13,8 @@
 [![Node](https://img.shields.io/badge/node-24.15-339933?logo=node.js&logoColor=white)](.nvmrc)
 [![Platforms](https://img.shields.io/badge/platforms-Windows%20%7C%20macOS%20%7C%20Linux-informational)](https://github.com/MagoStudio/MagoStudio/releases/latest)
 
+https://github.com/user-attachments/assets/67de7956-997a-455a-98b9-85b8215bbc78
+
 The local-first desktop edition of the [Mago](https://mago.studio) AI video editor.
 Your projects and your videos stay on your machine. Renders run on your own GPU through
 ComfyUI, or in Mago Cloud when you sign in.
@@ -16,14 +23,58 @@ A Mago Cloud render uploads only what that render needs: the Shot, its source vi
 reference images and masks. The rest of the Project stays local. See
 [docs-public/architecture.md](docs-public/architecture.md#3-local--cloud-wiring).
 
-## Vision, mission, goal
+## Contents
 
-- **Vision**: AI filmmaking that belongs to the people making the film — their media,
-  their hardware, their choice of model.
-- **Mission**: bring the full Mago editor to the desktop, local-first, with open-weight
-  models running on the user's own GPU and the cloud as an option, never a requirement.
-- **Goal**: a free, open-source app that works with no account and no network, and
-  renders the same Projects locally or in Mago Cloud.
+- [Features](#features)
+- [Screenshots](#screenshots)
+- [Made with Mago](#made-with-mago)
+- [Install](#install)
+- [Run from source](#run-from-source)
+- [Documentation](#documentation)
+- [Security](#security)
+- [License](#license)
+
+## Features
+
+- **Mago Director.** Script to video: script, cast, shot list and storyboards, then
+  consistent scenes where each Shot picks up from the previous one.
+- **Mago Transform.** Footage in, restyled footage out, frame-accurate. Work on specific
+  frame ranges, edit only part of a video with masks, relight, replace characters.
+- **More than clips.** Versioning, real review tools and a frame-accurate pipeline.
+- **Local models.** Runs on ComfyUI, with a plug-and-play bundled version, or connect
+  your own install. Render on your GPU, with cloud models in the same app when you need
+  them. Free to run on your own GPU; cloud models are paid and need a Mago account.
+- **Made to be changed.** The code is written to be changed by AI agents. Point Claude
+  at the repo and describe what you need, or add the next video model the day it comes
+  out.
+
+## Screenshots
+
+<table>
+  <tr>
+    <td width="50%"><img src="docs-public/readme/projects.jpg" alt="Projects: your whole season in one place"></td>
+    <td width="50%"><img src="docs-public/readme/assets.jpg" alt="Mago Director assets: cast once, reuse everywhere"></td>
+  </tr>
+  <tr>
+    <td width="50%"><img src="docs-public/readme/shots.jpg" alt="Mago Director shots: from script to finished shots"></td>
+    <td width="50%"><img src="docs-public/readme/editor.jpg" alt="Editor: shots, layers and AI renders on one timeline"></td>
+  </tr>
+</table>
+
+## Made with Mago
+
+<table>
+  <tr>
+    <td align="center" width="33%"><video src="https://github.com/user-attachments/assets/6689c498-a83c-4b40-a5d1-8bc9350087f0" controls width="100%"></video><br>MIFA 2026 trailer</td>
+    <td align="center" width="33%"><video src="https://github.com/user-attachments/assets/e3f02418-7ee2-4990-aa93-4df40a591bdf" controls width="100%"></video><br>Mago Transform: before and after</td>
+    <td align="center" width="33%"><video src="https://github.com/user-attachments/assets/64078157-651d-4502-a9a5-f4f418b304be" controls width="100%"></video><br>Mago Transform: vertical dialogue</td>
+  </tr>
+  <tr>
+    <td align="center" width="33%"><video src="https://github.com/user-attachments/assets/cfd1fed6-3078-426d-9885-1d9bb839f2a3" controls width="100%"></video><br>Caesar, Ep. 32: The Winter Crossing</td>
+    <td align="center" width="33%"><video src="https://github.com/user-attachments/assets/9111cd5e-8c98-421b-8680-ed74fc764f7b" controls width="100%"></video><br>Leo's Magic Bean, Ep. 1</td>
+    <td align="center" width="33%"><video src="https://github.com/user-attachments/assets/840af4a0-01ea-473c-94b3-5489049ce58b" controls width="100%"></video><br>Ep. 2: The Wall</td>
+  </tr>
+</table>
 
 ## Install
 

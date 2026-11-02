@@ -1,4 +1,3 @@
-/** Matches the delivered H.264 master quality from MagoRenderer. */
 export const LOCAL_VIDEO_RENDER_CRF = 20;
 
 /**
