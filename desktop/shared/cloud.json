@@ -1,0 +1,12 @@
+{
+  "rendererHost": "desktop.app.mago.studio",
+  "clerkPublishableKey": "pk_live_Y2xlcmsuYXBwLm1hZ28uc3R1ZGlvJA",
+  "backendUrl": "https://app.mago.studio/api/v02",
+  "mediaHosts": ["https://img.clerk.com", "https://images.clerk.dev"],
+  "signInNavigationHosts": ["accounts.google.com"],
+  "cloudStatusUrl": "https://mago-state-25qdhq4f4q-uc.a.run.app/state",
+  "cloudStorageHosts": [
+    "mago-s3-prod.s3.eu-north-1.amazonaws.com",
+    "mago-s3-prod.s3.amazonaws.com"
+  ]
+}

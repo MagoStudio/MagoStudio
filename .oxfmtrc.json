@@ -1,0 +1,19 @@
+{
+  "singleQuote": false,
+  "trailingComma": "none",
+  "printWidth": 80,
+  "sortPackageJson": false,
+  "ignorePatterns": [],
+  "sortImports": {
+    "newlinesBetween": true,
+    "groups": [
+      ["value-builtin", "type-builtin"],
+      ["value-external", "type-external"],
+      ["value-internal", "type-internal"],
+      ["value-parent", "type-parent"],
+      ["value-sibling", "type-sibling"],
+      ["value-index", "type-index"],
+      "unknown"
+    ]
+  }
+}

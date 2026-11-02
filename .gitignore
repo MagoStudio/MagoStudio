@@ -1,0 +1,104 @@
+# See https://help.github.com/articles/ignoring-files/ for more about ignoring files.
+
+
+# dependencies
+/node_modules
+/.pnp
+.pnp.js
+.yarn/install-state.gz
+
+# testing
+/coverage
+/.vitest/
+
+# next.js
+/.next/
+/out/
+
+# production
+/build
+
+# dev server log (teed by `npm run dev`)
+.dev-server.log
+
+
+# misc
+.DS_Store
+*.pem
+
+# debug
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# local env files
+.env*.local
+.env
+
+# vercel
+.vercel
+
+# typescript
+*.tsbuildinfo
+next-env.d.ts
+node_modules/
+/test-results/
+/playwright-report/
+/blob-report/
+/playwright/.cache/
+/real-account-e2e-report.json
+/real-account-e2e-receipt.md
+
+.cursor/
+.idea/
+
+.cursorignore
+.cursorindexingignore
+.vscode/launch.json
+.auth/
+
+tests/.auth
+test/.auth
+
+.secrets
+.env.local.backup*
+
+*storybook.log
+storybook-static
+
+
+.scratch/
+
+
+# Screenshots captured by a visual-verification pass. Evidence for a review, not
+# repository content.
+tests/screenshots/
+
+# Mago Studio desktop build and runtime outputs
+/desktop-dist/
+/release/
+/release-branded/
+*.p12
+*.pfx
+*.key
+credentials.vault*
+*.sqlite
+*.sqlite3
+*.sqlite3-shm
+*.sqlite3-wal
+*.db
+*.db-shm
+*.db-wal
+/.mago/
+/desktop/shared/cloud.generated.json
+/.analysis
+
+# Python bytecode (scripts/castingParity)
+__pycache__/
+*.pyc
+# Editor swap files
+*.swp
+*.swo
+
+# Local Python parity-check dependencies
+/.uv-cache/

@@ -1,0 +1,55 @@
+name: CI
+
+on:
+  pull_request:
+    branches: [main]
+    paths:
+      - "**"
+      - "!.github/workflows/**"
+      - ".github/workflows/ci.yml"
+      - "!build-assets/**"
+      - "!**/*.md"
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v6
+
+      - uses: actions/setup-node@v6
+        with:
+          node-version-file: .nvmrc
+          cache: npm
+
+      - run: npm ci
+      - run: npm run lint
+      - run: npm run type-check
+      - run: npm run build:desktop
+      - run: npm run test:coverage
+      - name: Check coverage thresholds
+        run: |
+          node -e "
+            const summary = require('./coverage/coverage-summary.json');
+            const thresholds = { lines: 35, branches: 23, functions: 28, statements: 34 };
+            let failed = false;
+            for (const [key, min] of Object.entries(thresholds)) {
+              const actual = summary.total[key].pct;
+              if (actual < min) {
+                console.error('Coverage for ' + key + ' (' + actual + '%) is below threshold (' + min + '%)');
+                failed = true;
+              } else {
+                console.log('✓ ' + key + ': ' + actual + '% >= ' + min + '%');
+              }
+            }
+            if (failed) process.exit(1);
+            console.log('All coverage thresholds passed.');
+          "
+      - run: npm run build:web

@@ -1,0 +1,297 @@
+{
+  "plugins": ["react", "typescript", "nextjs", "unicorn", "import"],
+  "options": { "typeAware": true },
+  "jsPlugins": [
+    "eslint-plugin-react-you-might-not-need-an-effect",
+    "eslint-plugin-react-compiler",
+    "eslint-plugin-storybook",
+    "eslint-plugin-unused-imports",
+    {
+      "name": "better-tailwindcss",
+      "specifier": "eslint-plugin-better-tailwindcss"
+    },
+    "./oxlint-rules/index.js"
+  ],
+  "categories": {
+    "correctness": "error"
+  },
+  "rules": {
+    "react/react-in-jsx-scope": "off",
+    "no-unused-vars": "off",
+    "no-useless-escape": "off",
+    "no-unused-expressions": "off",
+    "typescript/no-wrapper-object-types": "off",
+    "no-empty-pattern": "off",
+    "unicorn/no-useless-length-check": "off",
+    "unicorn/no-useless-fallback-in-spread": "off",
+    "unicorn/no-new-array": "off",
+    "react-hooks/rules-of-hooks": "error",
+    "react-hooks/exhaustive-deps": "warn",
+    "nextjs/no-img-element": "off",
+    "import/no-default-export": "error",
+    "import/no-named-as-default-member": "off",
+    "import/no-named-as-default": "off",
+    "import/named": "off",
+    "react-compiler/react-compiler": "error",
+    "local/no-arbitrary-z-index": "error",
+    "local/no-cross-domain-internal-imports": "error",
+    "local/no-subjectless-boolean-name": "error",
+    "react-you-might-not-need-an-effect/no-derived-state": "warn",
+    "react-you-might-not-need-an-effect/no-chain-state-updates": "warn",
+    "react-you-might-not-need-an-effect/no-event-handler": "warn",
+    "react-you-might-not-need-an-effect/no-adjust-state-on-prop-change": "warn",
+    "react-you-might-not-need-an-effect/no-reset-all-state-on-prop-change": "warn",
+    "react-you-might-not-need-an-effect/no-pass-live-state-to-parent": "warn",
+    "react-you-might-not-need-an-effect/no-pass-data-to-parent": "warn",
+    "react-you-might-not-need-an-effect/no-external-store-subscription": "warn",
+    "react-you-might-not-need-an-effect/no-initialize-state": "warn",
+    "better-tailwindcss/no-conflicting-classes": "error",
+    "better-tailwindcss/no-unknown-classes": "error",
+    "unused-imports/no-unused-imports": "error",
+    "no-restricted-imports": [
+      "error",
+      {
+        "patterns": [
+          {
+            "group": [
+              "@/*/app/*",
+              "@/app/*",
+              "./app/*",
+              "../app/*",
+              "../**/app/*"
+            ],
+            "message": "Please use TypeScript path alias @app/* instead of relative imports"
+          },
+          {
+            "group": [
+              "@app/models",
+              "@/*/models/*",
+              "@/models/*",
+              "./models/*",
+              "../models/*",
+              "../**/models/*"
+            ],
+            "message": "Please use TypeScript path alias @models/* instead of relative imports"
+          },
+          {
+            "group": [
+              "@app/assets",
+              "@/*/assets/*",
+              "@/assets/*",
+              "../**/assets/*"
+            ],
+            "message": "Please use TypeScript path alias @assets/* instead of relative imports"
+          },
+          {
+            "group": [
+              "@/components",
+              "@/*/components/*",
+              "@/components/*",
+              "./components/*",
+              "../components/*",
+              "../**/components/*"
+            ],
+            "message": "Please use TypeScript path alias @components/* instead of relative imports"
+          },
+          {
+            "group": [
+              "@/blocks",
+              "@/*/blocks/*",
+              "@/blocks/*",
+              "./blocks/*",
+              "../blocks/*",
+              "../**/blocks/*"
+            ],
+            "message": "Please use TypeScript path alias @blocks/* instead of relative imports"
+          },
+          {
+            "group": [
+              "@app/config",
+              "@/*/config/*",
+              "@/config/*",
+              "./config/*",
+              "../config/*",
+              "../**/config/*"
+            ],
+            "message": "Please use TypeScript path alias @config/* instead of relative imports"
+          },
+          {
+            "group": [
+              "@app/context",
+              "@/*/context/*",
+              "@/context/*",
+              "./context/*",
+              "../context/*",
+              "../**/context/*"
+            ],
+            "message": "Please use TypeScript path alias @context/* instead of relative imports"
+          },
+          {
+            "group": [
+              "@app/(authenticated)/(home)",
+              "@/*/(authenticated)/(home)/*",
+              "@/(authenticated)/(home)/*",
+              "./(authenticated)/(home)/*",
+              "../(authenticated)/(home)/*",
+              "../**/(authenticated)/(home)/*"
+            ],
+            "message": "Please use TypeScript path alias @home/* instead of relative imports"
+          },
+          {
+            "group": [
+              "@app/styles",
+              "@/*/styles/*",
+              "@/styles/*",
+              "./styles/*",
+              "../styles/*",
+              "../**/styles/*"
+            ],
+            "message": "Please use TypeScript path alias @styles/* instead of relative imports"
+          },
+          {
+            "group": [
+              "@app/common/utils",
+              "@/*/common/utils",
+              "@/common/utils",
+              "./common/utils",
+              "../common/utils",
+              "../**/common/utils"
+            ],
+            "message": "Please use TypeScript path alias @utils instead of relative imports"
+          },
+          {
+            "group": ["./domains/*", "../domains/*", "../**/domains/*"],
+            "message": "Please use TypeScript path alias @domains/* instead of relative imports to the domains folder"
+          },
+          {
+            "group": ["./tests/*", "../tests/*", "../**/tests/*"],
+            "message": "Please use TypeScript path alias @tests/* instead of relative imports to the tests folder"
+          }
+        ]
+      }
+    ],
+    "no-magic-numbers": [
+      "error",
+      {
+        "ignore": [0, 1, 2, -1, 1000],
+        "ignoreArrayIndexes": true,
+        "ignoreDefaultValues": false,
+        "enforceConst": false,
+        "detectObjects": false,
+        "ignoreEnums": true,
+        "ignoreNumericLiteralTypes": true,
+        "ignoreReadonlyClassProperties": true,
+        "ignoreTypeIndexes": true
+      }
+    ]
+  },
+  "overrides": [
+    {
+      "files": ["oxlint-rules/**/*.js"],
+      "rules": {
+        "import/no-default-export": "off"
+      }
+    },
+    {
+      "files": ["oxlint-rules/no-arbitrary-z-index.test.ts"],
+      "rules": {
+        "local/no-arbitrary-z-index": "off"
+      }
+    },
+    {
+      "files": [
+        "src/app/**/page.tsx",
+        "src/app/**/layout.tsx",
+        "src/app/**/template.tsx",
+        "src/app/**/error.tsx",
+        "src/app/**/global-error.tsx",
+        "src/app/**/not-found.tsx",
+        "src/app/**/loading.tsx",
+        "src/app/providers.tsx"
+      ],
+      "rules": {
+        "import/no-default-export": "off"
+      }
+    },
+    {
+      "files": [
+        "**/*.test.ts",
+        "**/*.test.tsx",
+        "**/*.spec.ts",
+        "**/*.spec.tsx",
+        "src/app/models/**/*",
+        "**/*.schema.ts",
+        "src/app/(authenticated)/(home)/components/Navbar/Img2ImgModalV2/**/*"
+      ],
+      "rules": {
+        "no-magic-numbers": "off"
+      }
+    },
+    {
+      "files": [
+        "**/*.test.ts",
+        "**/*.test.tsx",
+        "**/*.spec.ts",
+        "**/*.spec.tsx"
+      ],
+      "rules": {
+        "typescript/unbound-method": "off"
+      }
+    },
+    {
+      "files": [
+        ".storybook/**/*.{js,jsx,ts,tsx,mdx}",
+        "src/stories/**/*.{ts,tsx,mdx}",
+        "**/*.stories.{js,jsx,ts,tsx,mdx}"
+      ],
+      "rules": {
+        "import/no-default-export": "off",
+        "no-magic-numbers": "off"
+      }
+    },
+    {
+      "files": [
+        "**/*.stories.{ts,tsx,js,jsx,mjs,cjs}",
+        "**/*.story.{ts,tsx,js,jsx,mjs,cjs}"
+      ],
+      "rules": {
+        "storybook/await-interactions": "error",
+        "storybook/context-in-play-function": "error",
+        "storybook/default-exports": "error",
+        "storybook/hierarchy-separator": "warn",
+        "storybook/no-redundant-story-name": "warn",
+        "storybook/no-renderer-packages": "error",
+        "storybook/prefer-pascal-case": "warn",
+        "storybook/story-exports": "error",
+        "storybook/use-storybook-expect": "error",
+        "storybook/use-storybook-testing-library": "error"
+      }
+    },
+    {
+      "files": [".storybook/main.{js,cjs,mjs,ts}"],
+      "rules": {
+        "storybook/no-uninstalled-addons": "error"
+      }
+    }
+  ],
+  "settings": {
+    "next": {
+      "rootDir": ["."]
+    },
+    "react": {},
+    "better-tailwindcss": {
+      "entryPoint": "src/app/globals.css"
+    }
+  },
+  "ignorePatterns": [
+    ".next/**",
+    "node_modules/**",
+    "out/**",
+    "public/**",
+    "*.config.js",
+    "*.config.mjs",
+    "*.config.ts",
+    "tests/**",
+    "tests-playwright/**"
+  ]
+}

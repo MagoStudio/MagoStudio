@@ -1,0 +1,332 @@
+@import "tailwindcss";
+
+/* Tailwind theme configuration */
+@import "./styles/tailwind-theme.css";
+
+/* App color variables */
+@import "./styles/dark.css";
+
+@utility text-balance {
+  text-wrap: balance;
+}
+
+@utility animate-pulse-opacity {
+  animation: pulse-opacity 2.5s ease-in-out infinite;
+}
+
+@utility animate-dot-fade {
+  animation: dot-fade 1.4s infinite both;
+}
+
+/* Onboarding step crossfade: incoming content fades in + slides up
+   from 80px, outgoing content fades out. Shared by the content-swap wrapper and
+   the onboarding modal entrance. */
+@utility animate-fade-slide-in {
+  animation: fade-slide-in 300ms ease-out both;
+}
+
+@utility animate-fade-out {
+  animation: fade-out 300ms ease-out both;
+}
+
+@layer utilities {
+  /* CLERK */
+
+  /* Logo */
+  .cl-logoImage {
+    @apply select-none;
+  }
+
+  /* Avatar */
+  .cl-button[data-variant="outline"],
+  .cl-button[data-variant="outline"]:focus,
+  .cl-button:focus {
+    @apply shadow-none;
+  }
+
+  .cl-avatarBox {
+    @apply h-[26px] w-[26px];
+  }
+
+  .cl-internal-gpirto {
+    @apply hidden;
+  }
+
+  /* Card */
+  .cl-cardBox {
+    @apply shadow-none w-full;
+  }
+
+  .cl-cardBox.cl-signIn-start {
+    @apply w-full sm:w-137;
+  }
+
+  .cl-signUp-start,
+  .cl-signIn-start {
+    @apply bg-transparent border-none shadow-none;
+  }
+
+  .cl-card.cl-signUp-start,
+  .cl-card.cl-signIn-start {
+    @apply gap-3 py-12 px-14 pb-5;
+  }
+
+  @media (max-width: 400px) {
+    .cl-card.cl-signUp-start,
+    .cl-card.cl-signIn-start {
+      @apply gap-3 py-6 px-6 pb-5;
+    }
+  }
+
+  /* Title */
+  .cl-headerTitle {
+    @apply mb-1 text-xl font-medium select-none;
+  }
+
+  .cl-headerSubtitle {
+    @apply mb-2 text-md text-glyph-secondary select-none;
+  }
+
+  .cl-footerActionText,
+  .cl-footerActionLink {
+    @apply select-none;
+  }
+
+  .cl-footerActionText {
+    @apply text-glyph-secondary;
+  }
+
+  .cl-footerActionLink {
+    @apply text-glyph-primary-on-pic;
+  }
+
+  /* Main */
+  .cl-main {
+    @apply gap-0;
+  }
+
+  #clerk-captcha {
+    @apply m-0 mt-4;
+  }
+
+  /* Input */
+  .cl-formFieldLabel {
+    @apply text-glyph-secondary select-none;
+  }
+
+  .cl-formFieldInput {
+    @apply pr-2.5 pl-3 py-2 h-10 rounded-sm border border-element-primary bg-element-primary font-normal text-glyph-secondary text-md;
+  }
+
+  .cl-formFieldInput[data-variant="default"] {
+    @apply border border-glyph-tertiary shadow-none;
+  }
+
+  .cl-formFieldInput[data-variant="default"]:hover,
+  .cl-formFieldInput:hover {
+    @apply border border-glyph-action-main text-glyph-primary shadow-none;
+  }
+
+  .cl-formFieldInput[data-variant="default"]:focus-within {
+    @apply border border-glyph-action-main;
+  }
+
+  .cl-formFieldInput:focus,
+  .cl-formFieldInput[data-variant="default"]:focus-within {
+    @apply outline-hidden shadow-none;
+  }
+
+  .cl-form {
+    @apply gap-4;
+  }
+
+  /* Card Footer */
+  .cl-footer {
+    @apply pt-0 bg-none;
+  }
+
+  /* Primary Button */
+  .cl-formButtonPrimary {
+    @apply bg-transparent;
+  }
+
+  .cl-formButtonPrimary[data-variant="solid"]::after {
+    @apply content-none;
+  }
+
+  .cl-formButtonPrimary .cl-buttonArrowIcon {
+    @apply hidden;
+  }
+
+  /* Social Button */
+  .cl-button.cl-socialButtonsBlockButton,
+  .cl-formButtonPrimary[data-variant="solid"][data-color="primary"] {
+    @apply h-(--height-button-lg) border border-glyph-tertiary shadow-none;
+  }
+
+  .cl-button.cl-socialButtonsBlockButton:hover,
+  .cl-formButtonPrimary[data-variant="solid"][data-color="primary"]:hover {
+    @apply border-glyph-primary bg-transparent;
+  }
+
+  .cl-button.cl-socialButtonsBlockButton:focus,
+  .cl-formButtonPrimary[data-variant="solid"][data-color="primary"]:focus {
+    @apply shadow-none;
+  }
+
+  .cl-socialButtonsBlockButtonText,
+  .cl-formButtonPrimary {
+    @apply text-md text-glyph-secondary;
+  }
+
+  .cl-socialButtonsBlockButtonText:hover,
+  .cl-formButtonPrimary:hover {
+    @apply text-glyph-primary;
+  }
+
+  img.cl-socialButtonsProviderIcon {
+    @apply w-5 max-w-5;
+  }
+
+  /* Divider */
+  .cl-dividerRow {
+    @apply mt-3 mb-2;
+  }
+
+  .cl-dividerText {
+    @apply select-none;
+  }
+
+  /* SIMPLE BAR */
+}
+
+@layer utilities {
+  body {
+    color: #fff;
+    background: #000;
+    @apply overflow-hidden;
+    height: 100%;
+  }
+}
+
+@layer utilities {
+  @keyframes pulse-opacity {
+    0%,
+    100% {
+      opacity: 1;
+    }
+    50% {
+      opacity: 0.4;
+    }
+  }
+
+  @keyframes dot-fade {
+    0% {
+      opacity: 0.2;
+      transform: translateY(0);
+    }
+    20% {
+      opacity: 1;
+      transform: translateY(-3px);
+    }
+    40%,
+    100% {
+      opacity: 0.2;
+      transform: translateY(0);
+    }
+  }
+
+  @keyframes fade-slide-in {
+    from {
+      opacity: 0;
+      transform: translateY(80px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
+  @keyframes fade-out {
+    from {
+      opacity: 1;
+    }
+    to {
+      opacity: 0;
+    }
+  }
+}
+
+@layer base {
+  html {
+    @apply font-lato;
+    height: 100%;
+  }
+
+  /* Hide number input spinners */
+  input[type="number"]::-webkit-outer-spin-button,
+  input[type="number"]::-webkit-inner-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+  }
+
+  input[type="number"] {
+    -moz-appearance: textfield;
+    appearance: textfield;
+  }
+
+  /* Interactive cursor policy */
+  button,
+  summary,
+  select,
+  label[for],
+  label:has(input[type="checkbox"]),
+  label:has(input[type="radio"]),
+  input[type="checkbox"],
+  input[type="radio"],
+  input[type="submit"],
+  input[type="button"],
+  input[type="reset"],
+  [role="button"],
+  [role="menuitem"],
+  [role="menuitemcheckbox"],
+  [role="menuitemradio"],
+  [role="option"],
+  [role="row"],
+  [role="tab"],
+  [role="switch"],
+  [role="checkbox"],
+  [role="radio"],
+  [role="link"] {
+    cursor: pointer;
+  }
+
+  button:disabled,
+  input:disabled,
+  button[aria-disabled="true"],
+  summary[aria-disabled="true"],
+  select[aria-disabled="true"],
+  [role="button"][aria-disabled="true"],
+  [role="menuitem"][aria-disabled="true"],
+  [role="menuitemcheckbox"][aria-disabled="true"],
+  [role="menuitemradio"][aria-disabled="true"],
+  [role="option"][aria-disabled="true"],
+  [role="tab"][aria-disabled="true"],
+  [role="switch"][aria-disabled="true"],
+  [role="checkbox"][aria-disabled="true"],
+  [role="radio"][aria-disabled="true"],
+  [role="link"][aria-disabled="true"] {
+    cursor: default;
+  }
+
+  /* Focus outline policy */
+  :focus,
+  :focus-visible {
+    outline: none;
+  }
+}
+
+.cl-card.cl-signIn-start,
+.cl-card.cl-signUp-start {
+  background-color: #141414 !important;
+}

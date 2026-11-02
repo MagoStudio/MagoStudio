@@ -1,0 +1,13 @@
+import { Img2ImgType } from "../schemas";
+
+import { ModelAdapter } from "./types";
+
+type QwenData = Extract<Img2ImgType, { model: "qwen" }>;
+
+export const qwenAdapter: ModelAdapter<QwenData> = {
+  buildSettings: (data) => ({
+    qwen_image_edit_setup: data.qwen_image_edit_setup
+  }),
+  computeCost: (data) => data.generationCost,
+  availableInRelaxedMode: false
+};

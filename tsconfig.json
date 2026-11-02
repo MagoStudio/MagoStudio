@@ -1,0 +1,69 @@
+{
+  "compilerOptions": {
+    "lib": ["dom", "dom.iterable", "esnext"],
+    "allowJs": true,
+    "skipLibCheck": true,
+    "strict": true,
+    "noEmit": true,
+    "esModuleInterop": true,
+    "module": "esnext",
+    "moduleResolution": "bundler",
+    "moduleSuffixes": [".local", ""],
+    "resolveJsonModule": true,
+    "isolatedModules": true,
+    "jsx": "react-jsx",
+    "incremental": true,
+    "sourceMap": true,
+    "plugins": [
+      {
+        "name": "next"
+      }
+    ],
+    "types": [
+      "node",
+      "react",
+      "react-dom",
+      "vitest/globals",
+      "@testing-library/jest-dom"
+    ],
+    "paths": {
+      "@app/*": ["./src/app/*"],
+      "@assets/*": ["./src/app/assets/*"],
+      "@components/*": ["./src/components/*"],
+      "@config/*": ["./src/app/config/*"],
+      "@context/*": ["./src/app/context/*"],
+      "@domains/*": ["./src/domains/*"],
+      "@home/*": ["./src/app/(authenticated)/(home)/*"],
+      "@hooks/*": ["./src/app/hooks/*"],
+      "@models/*": ["./src/app/models/*"],
+      "@platform/*": ["./src/platform/*"],
+      "@states/*": ["./src/states/*"],
+      "@store/*": ["./src/store/*"],
+      "@styles/*": ["./src/app/styles/*"],
+      "@tailwind-config": ["./tailwind.config.js"],
+      "@tests/*": ["./tests/*"],
+      "@utils": ["./src/app/common/utils"],
+      "@utils/*": ["./src/app/utils/*"],
+      "@constants": ["./src/constants"],
+      "@schemas/*": ["./src/schemas/*"],
+      "@/*": ["./src/*"]
+    },
+    "target": "ES2017"
+  },
+  "include": [
+    "next-env.d.ts",
+    "**/*.ts",
+    "**/*.tsx",
+    ".next/types/**/*.ts",
+    ".next/dev/types/**/*.ts"
+  ],
+  "exclude": [
+    ".next",
+    "desktop",
+    "desktop-dist",
+    "forge.config.ts",
+    "out",
+    "node_modules",
+    "storybook-static"
+  ]
+}

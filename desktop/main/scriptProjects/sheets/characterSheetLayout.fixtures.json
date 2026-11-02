@@ -1,0 +1,395 @@
+{
+  "source": {
+    "backend_revision": "591a0697cc81c1f20c73e3e7eb3a301528243122"
+  },
+  "prompts": [
+    {
+      "appearance": "A grey cat with green eyes.",
+      "bodyPlan": null,
+      "frame": null,
+      "expected": "One single uninterrupted image, made in one shot, in front of one seamless, unmarked light-grey backdrop that runs behind everyone without a break, under one soft light, with matching soft shadows on the floor. Four of the same individual are shown side by side in one row on one continuous floor, with a clear gap of empty floor between each, at least half a body-width wide. From left to right: the first has its whole body facing the camera, so the camera sees its front; the second has its whole body turned diagonally, halfway between facing the camera and facing the side, so the camera sees its front and one side at an angle; the third has its whole body turned toward the left edge of the picture, parallel to the backdrop, so the camera sees exactly its side, its whole body from end to end; the fourth has its whole body facing directly away from the camera, so the camera sees only its back. Each one in its own natural pose, all the same size in the picture, with exactly the anatomy and proportions described below and nothing added, the whole body visible, none overlapping another or cut off at the edge. They are the identical individual: the same colours, features and build in every view.\n\nEvery distinctive feature described below is clearly visible in each view where it would show.\n\nThe individual: A grey cat with green eyes."
+    },
+    {
+      "appearance": "A grey cat with green eyes.",
+      "bodyPlan": null,
+      "frame": [576, 1024],
+      "expected": "One single uninterrupted image, made in one shot, in front of one seamless, unmarked light-grey backdrop that runs behind everyone without a break, under one soft light, with matching soft shadows on the floor. Three of the same individual are shown side by side in one row across the middle of the picture, with a clear gap of empty floor between each, at least half a body-width wide. From left to right: the first has its whole body facing the camera, so the camera sees its front; the second has its whole body turned toward the left edge of the picture, parallel to the backdrop, so the camera sees exactly its side, its whole body from end to end; the third has its whole body facing directly away from the camera, so the camera sees only its back. They are small in the picture, leaving plenty of empty backdrop above and below them. Each one in its own natural pose, all the same size in the picture, with exactly the anatomy and proportions described below and nothing added, the whole body visible, none overlapping another or cut off at the edge. They are the identical individual: the same colours, features and build in every view.\n\nEvery distinctive feature described below is clearly visible in each view where it would show.\n\nThe individual: A grey cat with green eyes."
+    },
+    {
+      "appearance": "A grey cat with green eyes.",
+      "bodyPlan": null,
+      "frame": [1024, 576],
+      "expected": "One single uninterrupted image, made in one shot, in front of one seamless, unmarked light-grey backdrop that runs behind everyone without a break, under one soft light, with matching soft shadows on the floor. Four of the same individual are shown side by side in one row on one continuous floor, with a clear gap of empty floor between each, at least half a body-width wide. From left to right: the first has its whole body facing the camera, so the camera sees its front; the second has its whole body turned diagonally, halfway between facing the camera and facing the side, so the camera sees its front and one side at an angle; the third has its whole body turned toward the left edge of the picture, parallel to the backdrop, so the camera sees exactly its side, its whole body from end to end; the fourth has its whole body facing directly away from the camera, so the camera sees only its back. Each one in its own natural pose, all the same size in the picture, with exactly the anatomy and proportions described below and nothing added, the whole body visible, none overlapping another or cut off at the edge. They are the identical individual: the same colours, features and build in every view.\n\nEvery distinctive feature described below is clearly visible in each view where it would show.\n\nThe individual: A grey cat with green eyes."
+    },
+    {
+      "appearance": "A grey cat with green eyes.",
+      "bodyPlan": null,
+      "frame": [512, 512],
+      "expected": "One single uninterrupted image, made in one shot, in front of one seamless, unmarked light-grey backdrop that runs behind everyone without a break, under one soft light, with matching soft shadows on the floor. Three of the same individual are shown side by side in one row across the middle of the picture, with a clear gap of empty floor between each, at least half a body-width wide. From left to right: the first has its whole body facing the camera, so the camera sees its front; the second has its whole body turned toward the left edge of the picture, parallel to the backdrop, so the camera sees exactly its side, its whole body from end to end; the third has its whole body facing directly away from the camera, so the camera sees only its back. They are small in the picture, leaving plenty of empty backdrop above and below them. Each one in its own natural pose, all the same size in the picture, with exactly the anatomy and proportions described below and nothing added, the whole body visible, none overlapping another or cut off at the edge. They are the identical individual: the same colours, features and build in every view.\n\nEvery distinctive feature described below is clearly visible in each view where it would show.\n\nThe individual: A grey cat with green eyes."
+    },
+    {
+      "appearance": "A grey cat with green eyes.",
+      "bodyPlan": "upright",
+      "frame": null,
+      "expected": "One single uninterrupted image, made in one shot, in front of one seamless, unmarked light-grey backdrop that runs behind everyone without a break, under one soft light, with matching soft shadows on the floor. Four of the same individual are shown side by side in one row on one continuous floor, with a clear gap of empty floor between each, at least half a body-width wide. From left to right: the first has its whole body facing the camera, so the camera sees its front; the second has its whole body turned diagonally, halfway between facing the camera and facing the side, so the camera sees its front and one side at an angle; the third has its whole body turned toward the left edge of the picture, parallel to the backdrop, so the camera sees exactly its side, its whole body from end to end; the fourth has its whole body facing directly away from the camera, so the camera sees only its back. Each one in its own natural pose, all the same size in the picture, with exactly the anatomy and proportions described below and nothing added, the whole body visible, none overlapping another or cut off at the edge. They are the identical individual: the same colours, features and build in every view.\n\nEvery distinctive feature described below is clearly visible in each view where it would show.\n\nThe individual: A grey cat with green eyes."
+    },
+    {
+      "appearance": "A grey cat with green eyes.",
+      "bodyPlan": "upright",
+      "frame": [576, 1024],
+      "expected": "One single uninterrupted image, made in one shot, in front of one seamless, unmarked light-grey backdrop that runs behind everyone without a break, under one soft light, with matching soft shadows on the floor. Four of the same individual are shown side by side in one row on one continuous floor, with a clear gap of empty floor between each, at least half a body-width wide. From left to right: the first has its whole body facing the camera, so the camera sees its front; the second has its whole body turned diagonally, halfway between facing the camera and facing the side, so the camera sees its front and one side at an angle; the third has its whole body turned toward the left edge of the picture, parallel to the backdrop, so the camera sees exactly its side, its whole body from end to end; the fourth has its whole body facing directly away from the camera, so the camera sees only its back. Each one in its own natural pose, all the same size in the picture, with exactly the anatomy and proportions described below and nothing added, the whole body visible, none overlapping another or cut off at the edge. They are the identical individual: the same colours, features and build in every view.\n\nEvery distinctive feature described below is clearly visible in each view where it would show.\n\nThe individual: A grey cat with green eyes."
+    },
+    {
+      "appearance": "A grey cat with green eyes.",
+      "bodyPlan": "upright",
+      "frame": [1024, 576],
+      "expected": "One single uninterrupted image, made in one shot, in front of one seamless, unmarked light-grey backdrop that runs behind everyone without a break, under one soft light, with matching soft shadows on the floor. Four of the same individual are shown side by side in one row on one continuous floor, with a clear gap of empty floor between each, at least half a body-width wide. From left to right: the first has its whole body facing the camera, so the camera sees its front; the second has its whole body turned diagonally, halfway between facing the camera and facing the side, so the camera sees its front and one side at an angle; the third has its whole body turned toward the left edge of the picture, parallel to the backdrop, so the camera sees exactly its side, its whole body from end to end; the fourth has its whole body facing directly away from the camera, so the camera sees only its back. Each one in its own natural pose, all the same size in the picture, with exactly the anatomy and proportions described below and nothing added, the whole body visible, none overlapping another or cut off at the edge. They are the identical individual: the same colours, features and build in every view.\n\nEvery distinctive feature described below is clearly visible in each view where it would show.\n\nThe individual: A grey cat with green eyes."
+    },
+    {
+      "appearance": "A grey cat with green eyes.",
+      "bodyPlan": "upright",
+      "frame": [512, 512],
+      "expected": "One single uninterrupted image, made in one shot, in front of one seamless, unmarked light-grey backdrop that runs behind everyone without a break, under one soft light, with matching soft shadows on the floor. Four of the same individual are shown side by side in one row on one continuous floor, with a clear gap of empty floor between each, at least half a body-width wide. From left to right: the first has its whole body facing the camera, so the camera sees its front; the second has its whole body turned diagonally, halfway between facing the camera and facing the side, so the camera sees its front and one side at an angle; the third has its whole body turned toward the left edge of the picture, parallel to the backdrop, so the camera sees exactly its side, its whole body from end to end; the fourth has its whole body facing directly away from the camera, so the camera sees only its back. Each one in its own natural pose, all the same size in the picture, with exactly the anatomy and proportions described below and nothing added, the whole body visible, none overlapping another or cut off at the edge. They are the identical individual: the same colours, features and build in every view.\n\nEvery distinctive feature described below is clearly visible in each view where it would show.\n\nThe individual: A grey cat with green eyes."
+    },
+    {
+      "appearance": "A grey cat with green eyes.",
+      "bodyPlan": "four_legged",
+      "frame": null,
+      "expected": "One single uninterrupted image, made in one shot, in front of one seamless, unmarked light-grey backdrop that runs behind everyone without a break, under one soft light, with matching soft shadows on the floor. Four of the same individual are shown side by side in one row on one continuous floor, with a clear gap of empty floor between each, at least half a body-width wide. From left to right: the first has its whole body facing the camera, so the camera sees its front; the second has its whole body turned diagonally, halfway between facing the camera and facing the side, so the camera sees its front and one side at an angle; the third has its whole body turned toward the left edge of the picture, parallel to the backdrop, so the camera sees exactly its side, its whole body from end to end; the fourth has its whole body facing directly away from the camera, so the camera sees only its back. Each one in its own natural pose, all the same size in the picture, with exactly the anatomy and proportions described below and nothing added, the whole body visible, none overlapping another or cut off at the edge. They are the identical individual: the same colours, features and build in every view.\n\nEvery distinctive feature described below is clearly visible in each view where it would show.\n\nThe individual: A grey cat with green eyes."
+    },
+    {
+      "appearance": "A grey cat with green eyes.",
+      "bodyPlan": "four_legged",
+      "frame": [576, 1024],
+      "expected": "One single uninterrupted image, made in one shot, in front of one seamless, unmarked light-grey backdrop that runs behind everyone without a break, under one soft light, with matching soft shadows on the floor. Three of the same individual are shown side by side in one row across the middle of the picture, with a clear gap of empty floor between each, at least half a body-width wide. From left to right: the first has its whole body facing the camera, so the camera sees its front; the second has its whole body turned toward the left edge of the picture, parallel to the backdrop, so the camera sees exactly its side, its whole body from end to end; the third has its whole body facing directly away from the camera, so the camera sees only its back. They are small in the picture, leaving plenty of empty backdrop above and below them. Each one in its own natural pose, all the same size in the picture, with exactly the anatomy and proportions described below and nothing added, the whole body visible, none overlapping another or cut off at the edge. They are the identical individual: the same colours, features and build in every view.\n\nEvery distinctive feature described below is clearly visible in each view where it would show.\n\nThe individual: A grey cat with green eyes."
+    },
+    {
+      "appearance": "A grey cat with green eyes.",
+      "bodyPlan": "four_legged",
+      "frame": [1024, 576],
+      "expected": "One single uninterrupted image, made in one shot, in front of one seamless, unmarked light-grey backdrop that runs behind everyone without a break, under one soft light, with matching soft shadows on the floor. Four of the same individual are shown side by side in one row on one continuous floor, with a clear gap of empty floor between each, at least half a body-width wide. From left to right: the first has its whole body facing the camera, so the camera sees its front; the second has its whole body turned diagonally, halfway between facing the camera and facing the side, so the camera sees its front and one side at an angle; the third has its whole body turned toward the left edge of the picture, parallel to the backdrop, so the camera sees exactly its side, its whole body from end to end; the fourth has its whole body facing directly away from the camera, so the camera sees only its back. Each one in its own natural pose, all the same size in the picture, with exactly the anatomy and proportions described below and nothing added, the whole body visible, none overlapping another or cut off at the edge. They are the identical individual: the same colours, features and build in every view.\n\nEvery distinctive feature described below is clearly visible in each view where it would show.\n\nThe individual: A grey cat with green eyes."
+    },
+    {
+      "appearance": "A grey cat with green eyes.",
+      "bodyPlan": "four_legged",
+      "frame": [512, 512],
+      "expected": "One single uninterrupted image, made in one shot, in front of one seamless, unmarked light-grey backdrop that runs behind everyone without a break, under one soft light, with matching soft shadows on the floor. Three of the same individual are shown side by side in one row across the middle of the picture, with a clear gap of empty floor between each, at least half a body-width wide. From left to right: the first has its whole body facing the camera, so the camera sees its front; the second has its whole body turned toward the left edge of the picture, parallel to the backdrop, so the camera sees exactly its side, its whole body from end to end; the third has its whole body facing directly away from the camera, so the camera sees only its back. They are small in the picture, leaving plenty of empty backdrop above and below them. Each one in its own natural pose, all the same size in the picture, with exactly the anatomy and proportions described below and nothing added, the whole body visible, none overlapping another or cut off at the edge. They are the identical individual: the same colours, features and build in every view.\n\nEvery distinctive feature described below is clearly visible in each view where it would show.\n\nThe individual: A grey cat with green eyes."
+    },
+    {
+      "appearance": "Full-body character turnaround/reference sheet, multiple consistent angles (front, back), a courier.",
+      "bodyPlan": null,
+      "frame": null,
+      "expected": "One single uninterrupted image, made in one shot, in front of one seamless, unmarked light-grey backdrop that runs behind everyone without a break, under one soft light, with matching soft shadows on the floor. Four of the same individual are shown side by side in one row on one continuous floor, with a clear gap of empty floor between each, at least half a body-width wide. From left to right: the first has its whole body facing the camera, so the camera sees its front; the second has its whole body turned diagonally, halfway between facing the camera and facing the side, so the camera sees its front and one side at an angle; the third has its whole body turned toward the left edge of the picture, parallel to the backdrop, so the camera sees exactly its side, its whole body from end to end; the fourth has its whole body facing directly away from the camera, so the camera sees only its back. Each one in its own natural pose, all the same size in the picture, with exactly the anatomy and proportions described below and nothing added, the whole body visible, none overlapping another or cut off at the edge. They are the identical individual: the same colours, features and build in every view.\n\nEvery distinctive feature described below is clearly visible in each view where it would show.\n\nThe individual: /, a courier."
+    },
+    {
+      "appearance": "Full-body character turnaround/reference sheet, multiple consistent angles (front, back), a courier.",
+      "bodyPlan": null,
+      "frame": [576, 1024],
+      "expected": "One single uninterrupted image, made in one shot, in front of one seamless, unmarked light-grey backdrop that runs behind everyone without a break, under one soft light, with matching soft shadows on the floor. Three of the same individual are shown side by side in one row across the middle of the picture, with a clear gap of empty floor between each, at least half a body-width wide. From left to right: the first has its whole body facing the camera, so the camera sees its front; the second has its whole body turned toward the left edge of the picture, parallel to the backdrop, so the camera sees exactly its side, its whole body from end to end; the third has its whole body facing directly away from the camera, so the camera sees only its back. They are small in the picture, leaving plenty of empty backdrop above and below them. Each one in its own natural pose, all the same size in the picture, with exactly the anatomy and proportions described below and nothing added, the whole body visible, none overlapping another or cut off at the edge. They are the identical individual: the same colours, features and build in every view.\n\nEvery distinctive feature described below is clearly visible in each view where it would show.\n\nThe individual: /, a courier."
+    },
+    {
+      "appearance": "Full-body character turnaround/reference sheet, multiple consistent angles (front, back), a courier.",
+      "bodyPlan": null,
+      "frame": [1024, 576],
+      "expected": "One single uninterrupted image, made in one shot, in front of one seamless, unmarked light-grey backdrop that runs behind everyone without a break, under one soft light, with matching soft shadows on the floor. Four of the same individual are shown side by side in one row on one continuous floor, with a clear gap of empty floor between each, at least half a body-width wide. From left to right: the first has its whole body facing the camera, so the camera sees its front; the second has its whole body turned diagonally, halfway between facing the camera and facing the side, so the camera sees its front and one side at an angle; the third has its whole body turned toward the left edge of the picture, parallel to the backdrop, so the camera sees exactly its side, its whole body from end to end; the fourth has its whole body facing directly away from the camera, so the camera sees only its back. Each one in its own natural pose, all the same size in the picture, with exactly the anatomy and proportions described below and nothing added, the whole body visible, none overlapping another or cut off at the edge. They are the identical individual: the same colours, features and build in every view.\n\nEvery distinctive feature described below is clearly visible in each view where it would show.\n\nThe individual: /, a courier."
+    },
+    {
+      "appearance": "Full-body character turnaround/reference sheet, multiple consistent angles (front, back), a courier.",
+      "bodyPlan": null,
+      "frame": [512, 512],
+      "expected": "One single uninterrupted image, made in one shot, in front of one seamless, unmarked light-grey backdrop that runs behind everyone without a break, under one soft light, with matching soft shadows on the floor. Three of the same individual are shown side by side in one row across the middle of the picture, with a clear gap of empty floor between each, at least half a body-width wide. From left to right: the first has its whole body facing the camera, so the camera sees its front; the second has its whole body turned toward the left edge of the picture, parallel to the backdrop, so the camera sees exactly its side, its whole body from end to end; the third has its whole body facing directly away from the camera, so the camera sees only its back. They are small in the picture, leaving plenty of empty backdrop above and below them. Each one in its own natural pose, all the same size in the picture, with exactly the anatomy and proportions described below and nothing added, the whole body visible, none overlapping another or cut off at the edge. They are the identical individual: the same colours, features and build in every view.\n\nEvery distinctive feature described below is clearly visible in each view where it would show.\n\nThe individual: /, a courier."
+    },
+    {
+      "appearance": "Full-body character turnaround/reference sheet, multiple consistent angles (front, back), a courier.",
+      "bodyPlan": "upright",
+      "frame": null,
+      "expected": "One single uninterrupted image, made in one shot, in front of one seamless, unmarked light-grey backdrop that runs behind everyone without a break, under one soft light, with matching soft shadows on the floor. Four of the same individual are shown side by side in one row on one continuous floor, with a clear gap of empty floor between each, at least half a body-width wide. From left to right: the first has its whole body facing the camera, so the camera sees its front; the second has its whole body turned diagonally, halfway between facing the camera and facing the side, so the camera sees its front and one side at an angle; the third has its whole body turned toward the left edge of the picture, parallel to the backdrop, so the camera sees exactly its side, its whole body from end to end; the fourth has its whole body facing directly away from the camera, so the camera sees only its back. Each one in its own natural pose, all the same size in the picture, with exactly the anatomy and proportions described below and nothing added, the whole body visible, none overlapping another or cut off at the edge. They are the identical individual: the same colours, features and build in every view.\n\nEvery distinctive feature described below is clearly visible in each view where it would show.\n\nThe individual: /, a courier."
+    },
+    {
+      "appearance": "Full-body character turnaround/reference sheet, multiple consistent angles (front, back), a courier.",
+      "bodyPlan": "upright",
+      "frame": [576, 1024],
+      "expected": "One single uninterrupted image, made in one shot, in front of one seamless, unmarked light-grey backdrop that runs behind everyone without a break, under one soft light, with matching soft shadows on the floor. Four of the same individual are shown side by side in one row on one continuous floor, with a clear gap of empty floor between each, at least half a body-width wide. From left to right: the first has its whole body facing the camera, so the camera sees its front; the second has its whole body turned diagonally, halfway between facing the camera and facing the side, so the camera sees its front and one side at an angle; the third has its whole body turned toward the left edge of the picture, parallel to the backdrop, so the camera sees exactly its side, its whole body from end to end; the fourth has its whole body facing directly away from the camera, so the camera sees only its back. Each one in its own natural pose, all the same size in the picture, with exactly the anatomy and proportions described below and nothing added, the whole body visible, none overlapping another or cut off at the edge. They are the identical individual: the same colours, features and build in every view.\n\nEvery distinctive feature described below is clearly visible in each view where it would show.\n\nThe individual: /, a courier."
+    },
+    {
+      "appearance": "Full-body character turnaround/reference sheet, multiple consistent angles (front, back), a courier.",
+      "bodyPlan": "upright",
+      "frame": [1024, 576],
+      "expected": "One single uninterrupted image, made in one shot, in front of one seamless, unmarked light-grey backdrop that runs behind everyone without a break, under one soft light, with matching soft shadows on the floor. Four of the same individual are shown side by side in one row on one continuous floor, with a clear gap of empty floor between each, at least half a body-width wide. From left to right: the first has its whole body facing the camera, so the camera sees its front; the second has its whole body turned diagonally, halfway between facing the camera and facing the side, so the camera sees its front and one side at an angle; the third has its whole body turned toward the left edge of the picture, parallel to the backdrop, so the camera sees exactly its side, its whole body from end to end; the fourth has its whole body facing directly away from the camera, so the camera sees only its back. Each one in its own natural pose, all the same size in the picture, with exactly the anatomy and proportions described below and nothing added, the whole body visible, none overlapping another or cut off at the edge. They are the identical individual: the same colours, features and build in every view.\n\nEvery distinctive feature described below is clearly visible in each view where it would show.\n\nThe individual: /, a courier."
+    },
+    {
+      "appearance": "Full-body character turnaround/reference sheet, multiple consistent angles (front, back), a courier.",
+      "bodyPlan": "upright",
+      "frame": [512, 512],
+      "expected": "One single uninterrupted image, made in one shot, in front of one seamless, unmarked light-grey backdrop that runs behind everyone without a break, under one soft light, with matching soft shadows on the floor. Four of the same individual are shown side by side in one row on one continuous floor, with a clear gap of empty floor between each, at least half a body-width wide. From left to right: the first has its whole body facing the camera, so the camera sees its front; the second has its whole body turned diagonally, halfway between facing the camera and facing the side, so the camera sees its front and one side at an angle; the third has its whole body turned toward the left edge of the picture, parallel to the backdrop, so the camera sees exactly its side, its whole body from end to end; the fourth has its whole body facing directly away from the camera, so the camera sees only its back. Each one in its own natural pose, all the same size in the picture, with exactly the anatomy and proportions described below and nothing added, the whole body visible, none overlapping another or cut off at the edge. They are the identical individual: the same colours, features and build in every view.\n\nEvery distinctive feature described below is clearly visible in each view where it would show.\n\nThe individual: /, a courier."
+    },
+    {
+      "appearance": "Full-body character turnaround/reference sheet, multiple consistent angles (front, back), a courier.",
+      "bodyPlan": "four_legged",
+      "frame": null,
+      "expected": "One single uninterrupted image, made in one shot, in front of one seamless, unmarked light-grey backdrop that runs behind everyone without a break, under one soft light, with matching soft shadows on the floor. Four of the same individual are shown side by side in one row on one continuous floor, with a clear gap of empty floor between each, at least half a body-width wide. From left to right: the first has its whole body facing the camera, so the camera sees its front; the second has its whole body turned diagonally, halfway between facing the camera and facing the side, so the camera sees its front and one side at an angle; the third has its whole body turned toward the left edge of the picture, parallel to the backdrop, so the camera sees exactly its side, its whole body from end to end; the fourth has its whole body facing directly away from the camera, so the camera sees only its back. Each one in its own natural pose, all the same size in the picture, with exactly the anatomy and proportions described below and nothing added, the whole body visible, none overlapping another or cut off at the edge. They are the identical individual: the same colours, features and build in every view.\n\nEvery distinctive feature described below is clearly visible in each view where it would show.\n\nThe individual: /, a courier."
+    },
+    {
+      "appearance": "Full-body character turnaround/reference sheet, multiple consistent angles (front, back), a courier.",
+      "bodyPlan": "four_legged",
+      "frame": [576, 1024],
+      "expected": "One single uninterrupted image, made in one shot, in front of one seamless, unmarked light-grey backdrop that runs behind everyone without a break, under one soft light, with matching soft shadows on the floor. Three of the same individual are shown side by side in one row across the middle of the picture, with a clear gap of empty floor between each, at least half a body-width wide. From left to right: the first has its whole body facing the camera, so the camera sees its front; the second has its whole body turned toward the left edge of the picture, parallel to the backdrop, so the camera sees exactly its side, its whole body from end to end; the third has its whole body facing directly away from the camera, so the camera sees only its back. They are small in the picture, leaving plenty of empty backdrop above and below them. Each one in its own natural pose, all the same size in the picture, with exactly the anatomy and proportions described below and nothing added, the whole body visible, none overlapping another or cut off at the edge. They are the identical individual: the same colours, features and build in every view.\n\nEvery distinctive feature described below is clearly visible in each view where it would show.\n\nThe individual: /, a courier."
+    },
+    {
+      "appearance": "Full-body character turnaround/reference sheet, multiple consistent angles (front, back), a courier.",
+      "bodyPlan": "four_legged",
+      "frame": [1024, 576],
+      "expected": "One single uninterrupted image, made in one shot, in front of one seamless, unmarked light-grey backdrop that runs behind everyone without a break, under one soft light, with matching soft shadows on the floor. Four of the same individual are shown side by side in one row on one continuous floor, with a clear gap of empty floor between each, at least half a body-width wide. From left to right: the first has its whole body facing the camera, so the camera sees its front; the second has its whole body turned diagonally, halfway between facing the camera and facing the side, so the camera sees its front and one side at an angle; the third has its whole body turned toward the left edge of the picture, parallel to the backdrop, so the camera sees exactly its side, its whole body from end to end; the fourth has its whole body facing directly away from the camera, so the camera sees only its back. Each one in its own natural pose, all the same size in the picture, with exactly the anatomy and proportions described below and nothing added, the whole body visible, none overlapping another or cut off at the edge. They are the identical individual: the same colours, features and build in every view.\n\nEvery distinctive feature described below is clearly visible in each view where it would show.\n\nThe individual: /, a courier."
+    },
+    {
+      "appearance": "Full-body character turnaround/reference sheet, multiple consistent angles (front, back), a courier.",
+      "bodyPlan": "four_legged",
+      "frame": [512, 512],
+      "expected": "One single uninterrupted image, made in one shot, in front of one seamless, unmarked light-grey backdrop that runs behind everyone without a break, under one soft light, with matching soft shadows on the floor. Three of the same individual are shown side by side in one row across the middle of the picture, with a clear gap of empty floor between each, at least half a body-width wide. From left to right: the first has its whole body facing the camera, so the camera sees its front; the second has its whole body turned toward the left edge of the picture, parallel to the backdrop, so the camera sees exactly its side, its whole body from end to end; the third has its whole body facing directly away from the camera, so the camera sees only its back. They are small in the picture, leaving plenty of empty backdrop above and below them. Each one in its own natural pose, all the same size in the picture, with exactly the anatomy and proportions described below and nothing added, the whole body visible, none overlapping another or cut off at the edge. They are the identical individual: the same colours, features and build in every view.\n\nEvery distinctive feature described below is clearly visible in each view where it would show.\n\nThe individual: /, a courier."
+    },
+    {
+      "appearance": "The individual: A robot.",
+      "bodyPlan": null,
+      "frame": null,
+      "expected": "One single uninterrupted image, made in one shot, in front of one seamless, unmarked light-grey backdrop that runs behind everyone without a break, under one soft light, with matching soft shadows on the floor. Four of the same individual are shown side by side in one row on one continuous floor, with a clear gap of empty floor between each, at least half a body-width wide. From left to right: the first has its whole body facing the camera, so the camera sees its front; the second has its whole body turned diagonally, halfway between facing the camera and facing the side, so the camera sees its front and one side at an angle; the third has its whole body turned toward the left edge of the picture, parallel to the backdrop, so the camera sees exactly its side, its whole body from end to end; the fourth has its whole body facing directly away from the camera, so the camera sees only its back. Each one in its own natural pose, all the same size in the picture, with exactly the anatomy and proportions described below and nothing added, the whole body visible, none overlapping another or cut off at the edge. They are the identical individual: the same colours, features and build in every view.\n\nEvery distinctive feature described below is clearly visible in each view where it would show.\n\nThe individual: A robot."
+    },
+    {
+      "appearance": "The individual: A robot.",
+      "bodyPlan": null,
+      "frame": [576, 1024],
+      "expected": "One single uninterrupted image, made in one shot, in front of one seamless, unmarked light-grey backdrop that runs behind everyone without a break, under one soft light, with matching soft shadows on the floor. Three of the same individual are shown side by side in one row across the middle of the picture, with a clear gap of empty floor between each, at least half a body-width wide. From left to right: the first has its whole body facing the camera, so the camera sees its front; the second has its whole body turned toward the left edge of the picture, parallel to the backdrop, so the camera sees exactly its side, its whole body from end to end; the third has its whole body facing directly away from the camera, so the camera sees only its back. They are small in the picture, leaving plenty of empty backdrop above and below them. Each one in its own natural pose, all the same size in the picture, with exactly the anatomy and proportions described below and nothing added, the whole body visible, none overlapping another or cut off at the edge. They are the identical individual: the same colours, features and build in every view.\n\nEvery distinctive feature described below is clearly visible in each view where it would show.\n\nThe individual: A robot."
+    },
+    {
+      "appearance": "The individual: A robot.",
+      "bodyPlan": null,
+      "frame": [1024, 576],
+      "expected": "One single uninterrupted image, made in one shot, in front of one seamless, unmarked light-grey backdrop that runs behind everyone without a break, under one soft light, with matching soft shadows on the floor. Four of the same individual are shown side by side in one row on one continuous floor, with a clear gap of empty floor between each, at least half a body-width wide. From left to right: the first has its whole body facing the camera, so the camera sees its front; the second has its whole body turned diagonally, halfway between facing the camera and facing the side, so the camera sees its front and one side at an angle; the third has its whole body turned toward the left edge of the picture, parallel to the backdrop, so the camera sees exactly its side, its whole body from end to end; the fourth has its whole body facing directly away from the camera, so the camera sees only its back. Each one in its own natural pose, all the same size in the picture, with exactly the anatomy and proportions described below and nothing added, the whole body visible, none overlapping another or cut off at the edge. They are the identical individual: the same colours, features and build in every view.\n\nEvery distinctive feature described below is clearly visible in each view where it would show.\n\nThe individual: A robot."
+    },
+    {
+      "appearance": "The individual: A robot.",
+      "bodyPlan": null,
+      "frame": [512, 512],
+      "expected": "One single uninterrupted image, made in one shot, in front of one seamless, unmarked light-grey backdrop that runs behind everyone without a break, under one soft light, with matching soft shadows on the floor. Three of the same individual are shown side by side in one row across the middle of the picture, with a clear gap of empty floor between each, at least half a body-width wide. From left to right: the first has its whole body facing the camera, so the camera sees its front; the second has its whole body turned toward the left edge of the picture, parallel to the backdrop, so the camera sees exactly its side, its whole body from end to end; the third has its whole body facing directly away from the camera, so the camera sees only its back. They are small in the picture, leaving plenty of empty backdrop above and below them. Each one in its own natural pose, all the same size in the picture, with exactly the anatomy and proportions described below and nothing added, the whole body visible, none overlapping another or cut off at the edge. They are the identical individual: the same colours, features and build in every view.\n\nEvery distinctive feature described below is clearly visible in each view where it would show.\n\nThe individual: A robot."
+    },
+    {
+      "appearance": "The individual: A robot.",
+      "bodyPlan": "upright",
+      "frame": null,
+      "expected": "One single uninterrupted image, made in one shot, in front of one seamless, unmarked light-grey backdrop that runs behind everyone without a break, under one soft light, with matching soft shadows on the floor. Four of the same individual are shown side by side in one row on one continuous floor, with a clear gap of empty floor between each, at least half a body-width wide. From left to right: the first has its whole body facing the camera, so the camera sees its front; the second has its whole body turned diagonally, halfway between facing the camera and facing the side, so the camera sees its front and one side at an angle; the third has its whole body turned toward the left edge of the picture, parallel to the backdrop, so the camera sees exactly its side, its whole body from end to end; the fourth has its whole body facing directly away from the camera, so the camera sees only its back. Each one in its own natural pose, all the same size in the picture, with exactly the anatomy and proportions described below and nothing added, the whole body visible, none overlapping another or cut off at the edge. They are the identical individual: the same colours, features and build in every view.\n\nEvery distinctive feature described below is clearly visible in each view where it would show.\n\nThe individual: A robot."
+    },
+    {
+      "appearance": "The individual: A robot.",
+      "bodyPlan": "upright",
+      "frame": [576, 1024],
+      "expected": "One single uninterrupted image, made in one shot, in front of one seamless, unmarked light-grey backdrop that runs behind everyone without a break, under one soft light, with matching soft shadows on the floor. Four of the same individual are shown side by side in one row on one continuous floor, with a clear gap of empty floor between each, at least half a body-width wide. From left to right: the first has its whole body facing the camera, so the camera sees its front; the second has its whole body turned diagonally, halfway between facing the camera and facing the side, so the camera sees its front and one side at an angle; the third has its whole body turned toward the left edge of the picture, parallel to the backdrop, so the camera sees exactly its side, its whole body from end to end; the fourth has its whole body facing directly away from the camera, so the camera sees only its back. Each one in its own natural pose, all the same size in the picture, with exactly the anatomy and proportions described below and nothing added, the whole body visible, none overlapping another or cut off at the edge. They are the identical individual: the same colours, features and build in every view.\n\nEvery distinctive feature described below is clearly visible in each view where it would show.\n\nThe individual: A robot."
+    },
+    {
+      "appearance": "The individual: A robot.",
+      "bodyPlan": "upright",
+      "frame": [1024, 576],
+      "expected": "One single uninterrupted image, made in one shot, in front of one seamless, unmarked light-grey backdrop that runs behind everyone without a break, under one soft light, with matching soft shadows on the floor. Four of the same individual are shown side by side in one row on one continuous floor, with a clear gap of empty floor between each, at least half a body-width wide. From left to right: the first has its whole body facing the camera, so the camera sees its front; the second has its whole body turned diagonally, halfway between facing the camera and facing the side, so the camera sees its front and one side at an angle; the third has its whole body turned toward the left edge of the picture, parallel to the backdrop, so the camera sees exactly its side, its whole body from end to end; the fourth has its whole body facing directly away from the camera, so the camera sees only its back. Each one in its own natural pose, all the same size in the picture, with exactly the anatomy and proportions described below and nothing added, the whole body visible, none overlapping another or cut off at the edge. They are the identical individual: the same colours, features and build in every view.\n\nEvery distinctive feature described below is clearly visible in each view where it would show.\n\nThe individual: A robot."
+    },
+    {
+      "appearance": "The individual: A robot.",
+      "bodyPlan": "upright",
+      "frame": [512, 512],
+      "expected": "One single uninterrupted image, made in one shot, in front of one seamless, unmarked light-grey backdrop that runs behind everyone without a break, under one soft light, with matching soft shadows on the floor. Four of the same individual are shown side by side in one row on one continuous floor, with a clear gap of empty floor between each, at least half a body-width wide. From left to right: the first has its whole body facing the camera, so the camera sees its front; the second has its whole body turned diagonally, halfway between facing the camera and facing the side, so the camera sees its front and one side at an angle; the third has its whole body turned toward the left edge of the picture, parallel to the backdrop, so the camera sees exactly its side, its whole body from end to end; the fourth has its whole body facing directly away from the camera, so the camera sees only its back. Each one in its own natural pose, all the same size in the picture, with exactly the anatomy and proportions described below and nothing added, the whole body visible, none overlapping another or cut off at the edge. They are the identical individual: the same colours, features and build in every view.\n\nEvery distinctive feature described below is clearly visible in each view where it would show.\n\nThe individual: A robot."
+    },
+    {
+      "appearance": "The individual: A robot.",
+      "bodyPlan": "four_legged",
+      "frame": null,
+      "expected": "One single uninterrupted image, made in one shot, in front of one seamless, unmarked light-grey backdrop that runs behind everyone without a break, under one soft light, with matching soft shadows on the floor. Four of the same individual are shown side by side in one row on one continuous floor, with a clear gap of empty floor between each, at least half a body-width wide. From left to right: the first has its whole body facing the camera, so the camera sees its front; the second has its whole body turned diagonally, halfway between facing the camera and facing the side, so the camera sees its front and one side at an angle; the third has its whole body turned toward the left edge of the picture, parallel to the backdrop, so the camera sees exactly its side, its whole body from end to end; the fourth has its whole body facing directly away from the camera, so the camera sees only its back. Each one in its own natural pose, all the same size in the picture, with exactly the anatomy and proportions described below and nothing added, the whole body visible, none overlapping another or cut off at the edge. They are the identical individual: the same colours, features and build in every view.\n\nEvery distinctive feature described below is clearly visible in each view where it would show.\n\nThe individual: A robot."
+    },
+    {
+      "appearance": "The individual: A robot.",
+      "bodyPlan": "four_legged",
+      "frame": [576, 1024],
+      "expected": "One single uninterrupted image, made in one shot, in front of one seamless, unmarked light-grey backdrop that runs behind everyone without a break, under one soft light, with matching soft shadows on the floor. Three of the same individual are shown side by side in one row across the middle of the picture, with a clear gap of empty floor between each, at least half a body-width wide. From left to right: the first has its whole body facing the camera, so the camera sees its front; the second has its whole body turned toward the left edge of the picture, parallel to the backdrop, so the camera sees exactly its side, its whole body from end to end; the third has its whole body facing directly away from the camera, so the camera sees only its back. They are small in the picture, leaving plenty of empty backdrop above and below them. Each one in its own natural pose, all the same size in the picture, with exactly the anatomy and proportions described below and nothing added, the whole body visible, none overlapping another or cut off at the edge. They are the identical individual: the same colours, features and build in every view.\n\nEvery distinctive feature described below is clearly visible in each view where it would show.\n\nThe individual: A robot."
+    },
+    {
+      "appearance": "The individual: A robot.",
+      "bodyPlan": "four_legged",
+      "frame": [1024, 576],
+      "expected": "One single uninterrupted image, made in one shot, in front of one seamless, unmarked light-grey backdrop that runs behind everyone without a break, under one soft light, with matching soft shadows on the floor. Four of the same individual are shown side by side in one row on one continuous floor, with a clear gap of empty floor between each, at least half a body-width wide. From left to right: the first has its whole body facing the camera, so the camera sees its front; the second has its whole body turned diagonally, halfway between facing the camera and facing the side, so the camera sees its front and one side at an angle; the third has its whole body turned toward the left edge of the picture, parallel to the backdrop, so the camera sees exactly its side, its whole body from end to end; the fourth has its whole body facing directly away from the camera, so the camera sees only its back. Each one in its own natural pose, all the same size in the picture, with exactly the anatomy and proportions described below and nothing added, the whole body visible, none overlapping another or cut off at the edge. They are the identical individual: the same colours, features and build in every view.\n\nEvery distinctive feature described below is clearly visible in each view where it would show.\n\nThe individual: A robot."
+    },
+    {
+      "appearance": "The individual: A robot.",
+      "bodyPlan": "four_legged",
+      "frame": [512, 512],
+      "expected": "One single uninterrupted image, made in one shot, in front of one seamless, unmarked light-grey backdrop that runs behind everyone without a break, under one soft light, with matching soft shadows on the floor. Three of the same individual are shown side by side in one row across the middle of the picture, with a clear gap of empty floor between each, at least half a body-width wide. From left to right: the first has its whole body facing the camera, so the camera sees its front; the second has its whole body turned toward the left edge of the picture, parallel to the backdrop, so the camera sees exactly its side, its whole body from end to end; the third has its whole body facing directly away from the camera, so the camera sees only its back. They are small in the picture, leaving plenty of empty backdrop above and below them. Each one in its own natural pose, all the same size in the picture, with exactly the anatomy and proportions described below and nothing added, the whole body visible, none overlapping another or cut off at the edge. They are the identical individual: the same colours, features and build in every view.\n\nEvery distinctive feature described below is clearly visible in each view where it would show.\n\nThe individual: A robot."
+    }
+  ],
+  "sizes": [
+    {
+      "kind": "character",
+      "size": [],
+      "expected": []
+    },
+    {
+      "kind": "character",
+      "size": [576, 1024],
+      "expected": [1024, 576]
+    },
+    {
+      "kind": "character",
+      "size": [1024, 576],
+      "expected": [1024, 576]
+    },
+    {
+      "kind": "character",
+      "size": [512, 512],
+      "expected": [512, 512]
+    },
+    {
+      "kind": "environment",
+      "size": [],
+      "expected": []
+    },
+    {
+      "kind": "environment",
+      "size": [576, 1024],
+      "expected": [576, 1024]
+    },
+    {
+      "kind": "environment",
+      "size": [1024, 576],
+      "expected": [1024, 576]
+    },
+    {
+      "kind": "environment",
+      "size": [512, 512],
+      "expected": [512, 512]
+    },
+    {
+      "kind": "prop",
+      "size": [],
+      "expected": []
+    },
+    {
+      "kind": "prop",
+      "size": [576, 1024],
+      "expected": [576, 1024]
+    },
+    {
+      "kind": "prop",
+      "size": [1024, 576],
+      "expected": [1024, 576]
+    },
+    {
+      "kind": "prop",
+      "size": [512, 512],
+      "expected": [512, 512]
+    },
+    {
+      "kind": null,
+      "size": [],
+      "expected": []
+    },
+    {
+      "kind": null,
+      "size": [576, 1024],
+      "expected": [576, 1024]
+    },
+    {
+      "kind": null,
+      "size": [1024, 576],
+      "expected": [1024, 576]
+    },
+    {
+      "kind": null,
+      "size": [512, 512],
+      "expected": [512, 512]
+    }
+  ],
+  "settings": [
+    {
+      "kind": "character",
+      "input": {
+        "width": 576,
+        "height": 1024
+      },
+      "expected": {
+        "width": 1024,
+        "height": 576
+      }
+    },
+    {
+      "kind": "character",
+      "input": {
+        "image_size": "portrait_16_9"
+      },
+      "expected": {
+        "image_size": "landscape_16_9"
+      }
+    },
+    {
+      "kind": "character",
+      "input": {
+        "image_size": {
+          "width": 576,
+          "height": 1024
+        }
+      },
+      "expected": {
+        "image_size": {
+          "width": 1024,
+          "height": 576
+        }
+      }
+    },
+    {
+      "kind": "character",
+      "input": {
+        "aspect_ratio": "9:16"
+      },
+      "expected": {
+        "aspect_ratio": "16:9"
+      }
+    },
+    {
+      "kind": "environment",
+      "input": {
+        "width": 576,
+        "height": 1024
+      },
+      "expected": {
+        "width": 576,
+        "height": 1024
+      }
+    },
+    {
+      "kind": "environment",
+      "input": {
+        "image_size": "portrait_16_9"
+      },
+      "expected": {
+        "image_size": "portrait_16_9"
+      }
+    },
+    {
+      "kind": "environment",
+      "input": {
+        "image_size": {
+          "width": 576,
+          "height": 1024
+        }
+      },
+      "expected": {
+        "image_size": {
+          "width": 576,
+          "height": 1024
+        }
+      }
+    },
+    {
+      "kind": "environment",
+      "input": {
+        "aspect_ratio": "9:16"
+      },
+      "expected": {
+        "aspect_ratio": "9:16"
+      }
+    }
+  ]
+}

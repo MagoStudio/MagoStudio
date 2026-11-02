@@ -1,0 +1,575 @@
+@theme inline {
+  /* ==================== COLORS ==================== */
+  /* Base colors */
+  --color-inherit: inherit;
+  --color-transparent: transparent;
+  --color-black: var(--color-black);
+  --color-white: var(--color-white);
+  --color-backdrop: var(--color-backdrop);
+
+  /* Primary */
+  --color-primary: var(--color-primary);
+  --color-primary-opacity-80: var(--color-primary-opacity-80);
+
+  /* Secondary */
+  --color-secondary: var(--color-secondary);
+  --color-secondary-opacity-80: var(--color-secondary-opacity-80);
+
+  /* Severity colors */
+  --color-severity-error: var(--color-severity-error);
+  --color-severity-error-hover: var(--color-severity-error-hover);
+  --color-severity-error-opacity-80: var(--color-severity-error-opacity-80);
+
+  --color-severity-success: var(--color-severity-success);
+  --color-severity-success-hover: var(--color-severity-success-hover);
+  --color-severity-success-opacity-80: var(--color-severity-success-opacity-80);
+
+  --color-severity-warning: var(--color-severity-warning);
+  --color-severity-warning-hover: var(--color-severity-warning-hover);
+  --color-severity-warning-opacity-80: var(--color-severity-warning-opacity-80);
+
+  --color-severity-info: var(--color-severity-info);
+  --color-severity-info-hover: var(--color-severity-info-hover);
+  --color-severity-info-opacity-80: var(--color-severity-info-opacity-80);
+
+  /* Code */
+  --color-code-100: var(--color-code-100);
+  --color-code-200: var(--color-code-200);
+  --color-code-300: var(--color-code-300);
+  --color-code-400: var(--color-code-400);
+
+  /* Element colors */
+  --color-element-primary: var(--color-element-primary);
+  --color-element-primary-active: var(--color-element-primary-active);
+  --color-element-primary-on-pic: var(--color-element-primary-on-pic);
+  --color-element-primary-opacity-80: var(--color-element-primary-opacity-80);
+
+  --color-element-secondary: var(--color-element-secondary);
+  --color-element-secondary-opacity-80: var(
+    --color-element-secondary-opacity-80
+  );
+  --color-element-secondary-active: var(--color-element-secondary-active);
+  --color-element-secondary-active-opacity-80: var(
+    --color-element-secondary-active-opacity-80
+  );
+
+  --color-element-tertiary: var(--color-element-tertiary);
+  --color-element-tertiary-opacity-80: var(--color-element-tertiary-opacity-80);
+  --color-element-tertiary-active: var(--color-element-tertiary-active);
+
+  --color-element-additional-active-transparent: var(
+    --color-element-additional-active-transparent
+  );
+  --color-element-additional-active: var(--color-element-additional-active);
+  --color-element-additional-active-opacity-80: var(
+    --color-element-additional-active-opacity-80
+  );
+
+  --color-element-in-progress: var(--color-element-in-progress);
+  --color-element-in-progress-opacity-80: var(
+    --color-element-in-progress-opacity-80
+  );
+
+  --color-element-on-image: var(--color-element-on-image);
+  --color-element-on-image-opacity-80: var(--color-element-on-image-opacity-80);
+
+  --color-element-for-hover: var(--color-element-for-hover);
+  --color-element-error: var(--color-element-error);
+  --color-element-mask: var(--color-element-mask);
+  --color-element-info: var(--color-element-info);
+  --color-element-info-opacity-80: var(--color-element-info-opacity-80);
+  --color-element-success: var(--color-element-success);
+  --color-element-success-opacity-80: var(--color-element-success-opacity-80);
+  --color-element-warning: var(--color-element-warning);
+
+  /* Glyph colors */
+  --color-glyph-primary: var(--color-glyph-primary);
+  --color-glyph-primary-opacity-80: var(--color-glyph-primary-opacity-80);
+
+  --color-glyph-stroke: var(--color-glyph-stroke);
+  --color-glyph-stroke-2: var(--color-glyph-stroke-2);
+
+  --color-glyph-secondary: var(--color-glyph-secondary);
+  --color-glyph-secondary-opacity-30: var(--color-glyph-secondary-opacity-30);
+  --color-glyph-secondary-opacity-80: var(--color-glyph-secondary-opacity-80);
+
+  --color-glyph-tertiary: var(--color-glyph-tertiary);
+  --color-glyph-tertiary-opacity-70: var(--color-glyph-tertiary-opacity-70);
+  --color-glyph-tertiary-opacity-80: var(--color-glyph-tertiary-opacity-80);
+
+  --color-glyph-action-main: var(--color-glyph-action-main);
+  --color-glyph-action-main-opacity-20: var(
+    --color-glyph-action-main-opacity-20
+  );
+  --color-glyph-action-main-opacity-30: var(
+    --color-glyph-action-main-opacity-30
+  );
+  --color-glyph-action-main-opacity-80: var(
+    --color-glyph-action-main-opacity-80
+  );
+
+  --color-glyph-action-secondary: var(--color-glyph-action-secondary);
+  --color-glyph-action-secondary-opacity-80: var(
+    --color-glyph-action-secondary-opacity-80
+  );
+
+  --color-glyph-invert-main: var(--color-glyph-invert-main);
+  --color-glyph-invert-main-opacity-80: var(
+    --color-glyph-invert-main-opacity-80
+  );
+
+  --color-glyph-primary-on-pic: var(--color-glyph-primary-on-pic);
+  --color-glyph-primary-on-pic-opacity-80: var(
+    --color-glyph-primary-on-pic-opacity-80
+  );
+
+  --color-glyph-disabled: var(--color-glyph-disabled);
+  --color-glyph-disabled-opacity-50: var(--color-glyph-disabled-opacity-50);
+  --color-glyph-disabled-opacity-70: var(--color-glyph-disabled-opacity-70);
+  --color-glyph-disabled-opacity-80: var(--color-glyph-disabled-opacity-80);
+
+  --color-glyph-error: var(--color-glyph-error);
+  --color-glyph-error-opacity-80: var(--color-glyph-error-opacity-80);
+  --color-glyph-error-hover: var(--color-glyph-error-hover);
+  --color-glyph-error-hover-opacity-80: var(
+    --color-glyph-error-hover-opacity-80
+  );
+
+  --color-glyph-success: var(--color-glyph-success);
+  --color-glyph-success-opacity-10: var(--color-glyph-success-opacity-10);
+  --color-glyph-success-opacity-80: var(--color-glyph-success-opacity-80);
+  --color-glyph-success-hover: var(--color-glyph-success-hover);
+
+  --color-glyph-warning: var(--color-glyph-warning);
+  --color-glyph-warning-opacity-80: var(--color-glyph-warning-opacity-80);
+  --color-glyph-warning-hover: var(--color-glyph-warning-hover);
+
+  /* Surface colors */
+  --color-surface-background: var(--color-surface-background);
+
+  --color-surface-primary: var(--color-surface-primary);
+  --color-surface-primary-opacity-80: var(--color-surface-primary-opacity-80);
+
+  --color-surface-secondary: var(--color-surface-secondary);
+  --color-surface-secondary-opacity-80: var(
+    --color-surface-secondary-opacity-80
+  );
+  --color-surface-secondary-opacity-90: var(
+    --color-surface-secondary-opacity-90
+  );
+
+  --color-surface-on-image: var(--color-surface-on-image);
+  --color-surface-on-image-opacity-80: var(--color-surface-on-image-opacity-80);
+
+  --color-surface-bg-100: var(--color-surface-bg-100);
+  --color-surface-bg-100-opacity-80: var(--color-surface-bg-100-opacity-80);
+
+  --color-surface-bg-200: var(--color-surface-bg-200);
+  --color-surface-bg-200-opacity-80: var(--color-surface-bg-200-opacity-80);
+
+  --color-surface-bg-300: var(--color-surface-bg-300);
+  --color-surface-bg-300-opacity-80: var(--color-surface-bg-300-opacity-80);
+
+  --color-surface-bg-400: var(--color-surface-bg-400);
+
+  --color-surface-bg-500: var(--color-surface-bg-500);
+
+  --color-surface-modal-backdrop: var(--color-surface-modal-backdrop);
+
+  /* Gradient colors */
+  --color-gradient-primary-start: var(--color-gradient-primary-start);
+  --color-gradient-primary-end: var(--color-gradient-primary-end);
+  --color-gradient-secondary-start: var(--color-gradient-secondary-start);
+  --color-gradient-secondary-end: var(--color-gradient-secondary-end);
+
+  /* Layer colors */
+  --color-layer-01: var(--color-layer-01);
+
+  /* Shadows with var() references */
+  --shadow-glassmorphism: var(--shadow-glassmorphism);
+  --shadow-glyph-action-primary: var(--shadow-glyph-action-primary);
+  --shadow-popover: 0px -1px 0px 0px var(--color-surface-bg-100-opacity-80);
+}
+
+@theme {
+  /* ==================== BREAKPOINTS ==================== */
+  --breakpoint-sm: 640px;
+  --breakpoint-md: 768px;
+  --breakpoint-lg: 1280px;
+  --breakpoint-xl: 1392px;
+
+  /* ==================== FONT FAMILIES ==================== */
+  --font-lato: "Lato", ui-sans-serif, system-ui, sans-serif;
+  --font-spaceGrotesk: "Space Grotesk", ui-sans-serif, system-ui, sans-serif;
+  --font-inter: "Inter", ui-sans-serif, system-ui, sans-serif;
+  --font-syne: "Syne", ui-sans-serif, system-ui, sans-serif;
+  --font-instrumentSerif: "Instrument Serif", ui-serif, Georgia, serif;
+  --font-screenplay:
+    var(--font-courier-prime), "Courier New", Courier, monospace;
+
+  /* ==================== FONT SIZES ==================== */
+  --text-2xs: 11px;
+  --text-2xs--line-height: 14px;
+
+  --text-xs: 12px;
+  --text-xs--line-height: 14px;
+
+  --text-sm: 13px;
+  --text-sm--line-height: 20px;
+
+  --text-md: 15px;
+  --text-md--line-height: 24px;
+
+  --text-lg: 20px;
+  --text-lg--line-height: 34px;
+
+  --text-xl: 24px;
+  --text-xl--line-height: 32px;
+  --text-xl--letter-spacing: -0.01em;
+
+  --text-2xl: 40px;
+  --text-2xl--line-height: 40px;
+  --text-2xl--letter-spacing: -0.03em;
+
+  --text-3xl: 72px;
+  --text-3xl--line-height: 72px;
+  --text-3xl--letter-spacing: -0.01em;
+
+  --text-4xl: 110px;
+  --text-4xl--line-height: 110px;
+  --text-4xl--letter-spacing: -0.01em;
+
+  /* Icon font sizes (for legacy compatibility) */
+  --font-size-icon-xs: 0.75rem;
+  --font-size-icon-sm: 0.75rem;
+  --font-size-icon-md: 0.875rem;
+  --font-size-icon-lg: 1.25rem;
+  --font-size-icon-xl: 1.5rem;
+  --font-size-icon-xxl: 2.25rem;
+
+  /* ==================== BOX SHADOWS ==================== */
+  --shadow-none: none;
+  --shadow-lg: 0px 8px 18px 0px #000000;
+  --shadow-modal: 8px 23px 24px 5px rgba(0, 0, 0, 0.35);
+  --shadow-payment-card: 0 -1px 0 0 #666fff;
+
+  /* ==================== SPACING ==================== */
+  --spacing-navbar-height: 3.25rem;
+
+  /* ==================== WIDTH ==================== */
+  --width-app-sidebar: 204px;
+  --width-drawer: 400px;
+  --width-shots-panel: 480px;
+
+  --width-notification: 24rem;
+  --width-timeline: 620px;
+  --width-timeline-container: 536px;
+  --width-track: 458px;
+  --width-timeline-tools: 520px;
+  --width-asset-library-thumbnail: 9.375rem;
+  --width-track-settings: 400px;
+  --width-img2img-settings: 400px;
+  --width-timeline-widgets: 4rem;
+  --width-track-widget: 5.25rem;
+  --width-timeline-slider-thumb: 0.5rem;
+  --width-img2img-gen-img-panel: 280px;
+  --width-scrollbar: 0.5rem;
+  --width-cursor: 0.75rem;
+
+  /* Icon widths */
+  --width-icon-xxs: 0.625rem;
+  --width-icon-xxs-icon: 0.625rem;
+  --width-icon-xs: 1.5rem;
+  --width-icon-xs-icon: 0.75rem;
+  --width-icon-sm: 2rem;
+  --width-icon-sm-icon: 1rem;
+  --width-icon-md: 2.25rem;
+  --width-icon-md-icon: 1rem;
+  --width-icon-lg: 2.5rem;
+  --width-icon-lg-icon: 1.25rem;
+  --width-icon-xl: 2.75rem;
+  --width-icon-xl-icon: 1.5rem;
+  --width-icon-2xl: 3rem;
+  --width-icon-2xl-icon: 1.5rem;
+  --width-icon-3xl: 3.5rem;
+  --width-icon-3xl-icon: 1.75rem;
+  --width-icon-4xl: 5rem;
+  --width-icon-4xl-icon: 2.5rem;
+
+  /* Checkbox widths */
+  --width-checkbox-md: 1.125rem;
+
+  /* Decorator widths */
+  --width-decorator-2xs: 0.625rem;
+  --width-decorator-xs: 0.75rem;
+  --width-decorator-sm: 1rem;
+  --width-decorator-md: 1.5rem;
+  --width-decorator-lg: 2rem;
+  --width-decorator-xl: 2.5rem;
+  --width-decorator-2xl: 3rem;
+  --width-decorator-3xl: 3.5rem;
+  --width-decorator-4xl: 4rem;
+
+  /* ==================== HEIGHT ==================== */
+  /* Button heights */
+  --height-button-2xs: 1rem;
+  --height-button-xs: 1.5rem;
+  --height-button-sm: 1.5rem;
+  --height-button-md: 2rem;
+  --height-button-lg: 2.25rem;
+  --height-button-xl: 2.5rem;
+  --height-button-2xl: 3.5rem;
+
+  /* Layout heights */
+  --height-drawer-title-container: 5.5rem;
+  --height-asset-library-thumbnail: 5.25rem;
+  --height-ruler: 2rem;
+  --height-projects-header: 8rem;
+  --height-rangeSlider: 1.5rem;
+  --height-toolbar: 3.25rem;
+  --height-track-container: 6.5rem;
+  --height-track: 5rem;
+  --height-track-settings: 1.5rem;
+  --height-timeline-track-gap: 0.75rem;
+  --height-track-content: 4.75rem;
+  --height-settings-disclosure: 3rem;
+  --height-timeline-header: 3.75rem;
+  --height-timeline: 4.25rem;
+  --height-navbar: 3.25rem;
+  --height-secondary-navbar: 3rem;
+  --height-full-minus-navbar: calc(100vh - 3.25rem);
+  --height-full-minus-img2img-navbar: calc(100vh - 6.5rem);
+  --height-tabs-tablist: 3.25rem;
+
+  /* ==================== MAX WIDTH ==================== */
+  --max-width-home-page: 87rem;
+
+  /* ==================== Z-INDEX ==================== */
+  --z-index-tooltip: 600;
+  --z-index-popover: 500;
+  --z-index-toast: 400;
+  --z-index-nested-modal: 350;
+  --z-index-modal: 300;
+  --z-index-help-button: 200;
+  --z-index-menu: 100;
+
+  /* ==================== ANIMATIONS ==================== */
+  --animate-slideDown: slideDown 2s ease-out forwards;
+  --animate-slideUp: slideUp 2s ease-out forwards;
+  --animate-heroSlideDown: heroSlideDown 1.5s ease-out forwards;
+  --animate-heroSlideUp: heroSlideUp 1.5s ease-out forwards;
+  --animate-status-color-change: status-color-change 1.5s infinite ease-in-out;
+  --animate-status-pulse: status-pulse 1.5s infinite ease-in-out;
+  --animate-mago-shimmer: mago-shimmer 4.5s linear infinite;
+  --animate-circular-progress-spin: circular-progress-spin 1.2s steps(24, end)
+    infinite;
+  --animate-notificationSlideIn: notificationSlideIn 450ms ease-in-out both;
+}
+
+/* ==================== KEYFRAMES ==================== */
+@keyframes slideDown {
+  0% {
+    transform: translateY(-50px);
+  }
+
+  50% {
+    transform: translateY(0);
+  }
+
+  100% {
+    transform: translateY(0);
+  }
+}
+
+@keyframes slideUp {
+  0% {
+    transform: translateY(50px);
+  }
+
+  50% {
+    transform: translateY(0);
+  }
+
+  100% {
+    transform: translateY(0);
+  }
+}
+
+@keyframes heroSlideDown {
+  0% {
+    transform: translateY(-50px);
+    opacity: 0;
+  }
+
+  100% {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+@keyframes heroSlideUp {
+  0% {
+    transform: translateY(50px);
+    opacity: 0;
+  }
+
+  100% {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+@keyframes status-color-change {
+  0%,
+  100% {
+    background-color: #353535;
+  }
+
+  50% {
+    background-color: currentColor;
+  }
+}
+
+@keyframes status-pulse {
+  0%,
+  100% {
+    opacity: 0.3;
+    transform: scale(1);
+  }
+
+  50% {
+    opacity: 0.75;
+    transform: scale(1.25);
+  }
+}
+
+@keyframes circular-progress-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@keyframes mago-shimmer {
+  0% {
+    transform: translateX(-100%);
+  }
+
+  100% {
+    transform: translateX(100%);
+  }
+}
+
+@keyframes notificationSlideIn {
+  from {
+    transform: translateY(150%);
+  }
+
+  to {
+    transform: translateY(0);
+  }
+}
+
+/* ==================== CUSTOM UTILITIES ==================== */
+@utility scrollbar-custom {
+  &::-webkit-scrollbar {
+    height: var(--width-scrollbar);
+    width: var(--width-scrollbar);
+    background-color: transparent;
+  }
+
+  &::-webkit-scrollbar-thumb {
+    border-radius: var(--radius-lg);
+    background-color: var(--color-element-primary-active);
+    border: 1px solid var(--color-element-primary-active);
+  }
+
+  &::-webkit-scrollbar-track {
+    border-radius: var(--radius-lg);
+    background-color: transparent;
+  }
+
+  &::-webkit-scrollbar-corner {
+    background-color: transparent;
+  }
+
+  scrollbar-width: thin;
+  scrollbar-color: var(--color-element-primary-active) transparent;
+
+  &:hover::-webkit-scrollbar-thumb,
+  &:focus::-webkit-scrollbar-thumb {
+    background-color: var(--color-glyph-tertiary);
+    border: 1px solid var(--color-glyph-tertiary);
+  }
+
+  &:hover,
+  &:focus {
+    scrollbar-color: var(--color-glyph-tertiary) transparent;
+  }
+}
+
+/* Background images */
+@utility bg-gradient-radial {
+  background-image: radial-gradient(var(--tw-gradient-stops));
+}
+
+@utility bg-gradient-conic {
+  background-image: conic-gradient(
+    from 180deg at 50% 50%,
+    var(--tw-gradient-stops)
+  );
+}
+
+@utility bg-gradient-100 {
+  background-image: linear-gradient(to right, #332af5, #ff523b);
+}
+
+@utility bg-gradient-200 {
+  background-image: linear-gradient(
+    66deg,
+    rgba(11, 13, 30, 0.3) 30.84%,
+    rgba(101, 111, 255, 0.3) 92.76%
+  );
+}
+
+@utility bg-card-gradient {
+  background-image: linear-gradient(
+    66deg,
+    rgba(11, 13, 30, 0.3) 30.84%,
+    rgba(101, 111, 255, 0.3) 92.76%
+  );
+}
+
+@utility bg-home-gradient {
+  background-image: linear-gradient(
+    67deg,
+    rgba(3, 5, 26, 0.3433),
+    rgba(17, 32, 249, 0.61)
+  );
+}
+
+@utility bg-gradient-primary-hover {
+  background-image:
+    linear-gradient(0deg, rgba(255, 255, 255, 0.1), rgba(255, 255, 255, 0.1)),
+    linear-gradient(90deg, #5638a3 0%, #1120f9 100%);
+}
+
+@utility scrollbar-contrast {
+  &::-webkit-scrollbar {
+    height: 0.75rem;
+    width: 0.75rem;
+    background-color: var(--color-surface-primary);
+  }
+
+  &::-webkit-scrollbar-thumb {
+    border-radius: var(--radius-lg);
+    background-color: var(--color-glyph-primary);
+  }
+
+  &::-webkit-scrollbar-track {
+    border-radius: var(--radius-lg);
+    background-color: var(--color-surface-primary);
+  }
+
+  scrollbar-width: auto;
+  scrollbar-color: var(--color-glyph-primary) var(--color-surface-primary);
+}

@@ -1,0 +1,16 @@
+# Mago Studio
+
+> Local-first desktop edition of the Mago AI video editor. Electron shell around a static Next.js frontend, local SQLite library, renders on the user's own GPU through ComfyUI or in Mago Cloud after sign-in. AGPL-3.0-only.
+
+Read these before scanning source files. The code wins when it disagrees with a doc.
+
+## Docs
+
+- [Technical reference](docs-public/technical-reference.md): codebase map, data model, render paths, models, config, commands, invariants
+- [Architecture diagrams](docs-public/architecture.md): processes, app modes, local / cloud wiring, Project kinds, model families, installers
+- [Manual setup](docs-public/manual-setup.md): ComfyUI, node pack and model download links with target folders
+- [Domain vocabulary](CONTEXT.md): canonical terms (Project, Shot, Track, Cloud Mirror Project, Script Project)
+
+## Optional
+
+- [Setup wizard behaviour](docs-public/installer-user-stories.md)

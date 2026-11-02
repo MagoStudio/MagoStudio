@@ -1,0 +1,3 @@
+export const PROGRESS_UPDATE_INTERVAL = 500;
+export const PROGRESS_INCREMENT = 5;
+export const MAX_ENCODING_PROGRESS = 90;

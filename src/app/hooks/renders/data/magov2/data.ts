@@ -1,0 +1,1 @@
+export const FIRSTFRAME_MODEL_MIN_STEPS = 4;

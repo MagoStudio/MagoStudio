@@ -1,0 +1,24 @@
+#!/bin/sh
+
+echo "Running pre-push checks... 🔍"
+
+echo "Running lint check..."
+npm run lint || {
+    echo "❌ Lint check failed. Please fix the issues before pushing."
+    exit 1
+}
+
+echo "Running type check..."
+npm run type-check || {
+    echo "❌ Type check failed. Please fix the type errors before pushing."
+    exit 1
+}
+
+echo "Running unit tests..."
+npm run test || {
+    echo "❌ Unit tests failed. Please fix the unit tests before pushing."
+    exit 1
+}
+
+echo "✅ All checks passed! Proceeding with push..."
+exit 0

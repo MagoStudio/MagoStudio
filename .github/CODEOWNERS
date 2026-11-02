@@ -1,0 +1,6 @@
+# Changes here can affect Windows or macOS code signing or what runs in CI with
+# release credentials.
+/.github/            @Sxela
+/forge.config.ts     @Sxela
+/package.json        @Sxela
+/package-lock.json   @Sxela

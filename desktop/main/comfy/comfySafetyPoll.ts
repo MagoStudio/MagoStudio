@@ -1,0 +1,1 @@
+export const COMFY_SAFETY_POLL_INTERVAL_MS = 30_000;
