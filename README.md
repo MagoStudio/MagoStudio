@@ -13,7 +13,7 @@
 [![Node](https://img.shields.io/badge/node-24.15-339933?logo=node.js&logoColor=white)](.nvmrc)
 [![Platforms](https://img.shields.io/badge/platforms-Windows%20%7C%20macOS%20%7C%20Linux-informational)](https://github.com/MagoStudio/MagoStudio/releases/latest)
 
-https://github.com/user-attachments/assets/67de7956-997a-455a-98b9-85b8215bbc78
+https://github.com/user-attachments/assets/b85e4ffa-5d25-4cfa-be3e-74c8dd6f8a6c
 
 The local-first desktop edition of the [Mago](https://mago.studio) AI video editor.
 Your projects and your videos stay on your machine. Renders run on your own GPU through
@@ -65,14 +65,14 @@ reference images and masks. The rest of the Project stays local. See
 
 <table>
   <tr>
-    <td align="center" width="33%"><video src="https://github.com/user-attachments/assets/6689c498-a83c-4b40-a5d1-8bc9350087f0" controls width="100%"></video><br>MIFA 2026 trailer</td>
-    <td align="center" width="33%"><video src="https://github.com/user-attachments/assets/e3f02418-7ee2-4990-aa93-4df40a591bdf" controls width="100%"></video><br>Mago Transform: before and after</td>
-    <td align="center" width="33%"><video src="https://github.com/user-attachments/assets/64078157-651d-4502-a9a5-f4f418b304be" controls width="100%"></video><br>Mago Transform: vertical dialogue</td>
+    <td align="center" width="33%"><video src="https://github.com/user-attachments/assets/25470041-1362-47d3-a369-960bf04617fd" controls width="100%"></video><br>MIFA 2026 trailer</td>
+    <td align="center" width="33%"><video src="https://github.com/user-attachments/assets/6a6730ac-6b3a-43bb-8cdc-5aab527e7d70" controls width="100%"></video><br>Mago Transform: before and after</td>
+    <td align="center" width="33%"><video src="https://github.com/user-attachments/assets/bff82dd8-4ae0-4dc3-aa62-d7a7d18404e1" controls width="100%"></video><br>Mago Transform: vertical dialogue</td>
   </tr>
   <tr>
-    <td align="center" width="33%"><video src="https://github.com/user-attachments/assets/cfd1fed6-3078-426d-9885-1d9bb839f2a3" controls width="100%"></video><br>Caesar, Ep. 32: The Winter Crossing</td>
-    <td align="center" width="33%"><video src="https://github.com/user-attachments/assets/9111cd5e-8c98-421b-8680-ed74fc764f7b" controls width="100%"></video><br>Leo's Magic Bean, Ep. 1</td>
-    <td align="center" width="33%"><video src="https://github.com/user-attachments/assets/840af4a0-01ea-473c-94b3-5489049ce58b" controls width="100%"></video><br>Ep. 2: The Wall</td>
+    <td align="center" width="33%"><video src="https://github.com/user-attachments/assets/465cf3fe-0bd2-4450-ac5c-7ba6ac076b3b" controls width="100%"></video><br>Caesar, Ep. 32: The Winter Crossing</td>
+    <td align="center" width="33%"><video src="https://github.com/user-attachments/assets/5c867bf7-98c7-401e-b6ff-c5dd46bd0c0d" controls width="100%"></video><br>Leo's Magic Bean, Ep. 1</td>
+    <td align="center" width="33%"><video src="https://github.com/user-attachments/assets/17c5827b-496a-488f-b4d7-65216c00ea16" controls width="100%"></video><br>Ep. 2: The Wall</td>
   </tr>
 </table>
 
