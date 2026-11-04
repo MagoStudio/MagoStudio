@@ -30,9 +30,15 @@ flowchart LR
     M -- "PUT presigned URL · download output" --> S3[("Mago Cloud storage")]
 ```
 
-**The renderer origin is real HTTPS.** A host-resolver rule maps
+**Cloud sign-in uses a real HTTPS listener.** A host-resolver rule maps
 `desktop.app.mago.studio` to a loopback TLS listener (port 47821) with a pinned
 per-install certificate. Clerk needs a genuine subdomain to sign in.
+
+**Offline startup does not need a network listener.** Electron serves the bundled
+UI directly at the same HTTPS origin, preserving browser storage without DNS,
+certificates, or a loopback port. If cloud startup fails, the app offers **Work
+offline** before opening this path. Switching back to sign-in removes the direct
+file handler so OAuth uses Chromium's normal networking again.
 
 **One frontend, two builds.** Files named `*.local.ts(x)` shadow their cloud twin at build
 time (`next.config.mjs`), so the same component tree runs in the web app and on the desktop.

@@ -425,7 +425,7 @@ On the FE these are always **Shots** (and **Folders**). The product surface is t
 
 ### Scene Timeline
 
-The quick navigation bar above the Shot strip on the Script Project Shots tab. It has one card per Shot, and pressing a card scrolls the strip to that Shot. It is always shown while the tab lists at least one Shot. The UI label is "Scene timeline"; the code keeps the older name (`SequenceTimeline`, `script_project.sequence_timeline`).
+The quick navigation bar above the Shot strip on the Script Project Shots tab. It has one card per Shot, and pressing a card scrolls the strip to that Shot. It is shown while the tab lists at least one Shot, unless the user turns it off with the "Scene timeline" switch on the General tab of Local settings (on by default, saved per install). The UI label is "Scene timeline"; the code keeps the older name (`SequenceTimeline`, `script_project.sequence_timeline`).
 
 ### Portal Session
 

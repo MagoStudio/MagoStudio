@@ -1,3 +1,5 @@
+<div align="center">
+
 <picture>
   <source media="(prefers-color-scheme: dark)" srcset="docs-public/readme/logo-dark.svg">
   <img src="docs-public/readme/logo-light.svg" width="240" alt="mago">
@@ -5,10 +7,16 @@
 
 # Mago Studio
 
+</div>
+
+[![English](https://img.shields.io/badge/README-English-1120F9)](README.md)
+[![中文](https://img.shields.io/badge/README-%E4%B8%AD%E6%96%87-1120F9)](README_zh-CN.md)
+
 [![CI](https://github.com/MagoStudio/MagoStudio/actions/workflows/ci.yml/badge.svg)](https://github.com/MagoStudio/MagoStudio/actions/workflows/ci.yml)
 [![Format](https://github.com/MagoStudio/MagoStudio/actions/workflows/format.yml/badge.svg)](https://github.com/MagoStudio/MagoStudio/actions/workflows/format.yml)
 
 [![Latest release](https://img.shields.io/github/v/release/MagoStudio/MagoStudio?sort=semver)](https://github.com/MagoStudio/MagoStudio/releases/latest)
+[![Downloads](https://img.shields.io/github/downloads/MagoStudio/MagoStudio/total)](https://github.com/MagoStudio/MagoStudio/releases)
 [![License: AGPL-3.0-only](https://img.shields.io/github/license/MagoStudio/MagoStudio)](LICENSE)
 [![Node](https://img.shields.io/badge/node-24.15-339933?logo=node.js&logoColor=white)](.nvmrc)
 [![Platforms](https://img.shields.io/badge/platforms-Windows%20%7C%20macOS%20%7C%20Linux-informational)](https://github.com/MagoStudio/MagoStudio/releases/latest)

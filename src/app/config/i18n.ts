@@ -230,6 +230,77 @@ void i18n.use(initReactI18next).init({
             comfyStopped: "ComfyUI is installed. Launch it to render locally."
           }
         },
+        localSettings: {
+          title: "Local settings",
+          openButtonAriaLabel: "Open local library settings",
+          saving: "Saving settings...",
+          signOutConfirm: "Sign out of Mago cloud?",
+          errors: {
+            checkComfy: "Unable to check ComfyUI",
+            openSettings: "Unable to open settings",
+            useFolder: "Unable to use folder",
+            saveComfyEndpoint: "Unable to save ComfyUI endpoint",
+            signIn: "Unable to sign in"
+          },
+          hints: {
+            endpointUnchecked: "Leave this field to check the endpoint.",
+            comfyNotResponding:
+              "ComfyUI is not responding. Start it or finish local setup.",
+            connectComfyFirst: "Connect ComfyUI above to check this model.",
+            textModelMissing:
+              "Missing or unavailable: {{missing}}. Install these through local setup, then restart ComfyUI.",
+            textModelUnverified:
+              "Unable to verify the selected text model. Select it again to retry.",
+            cloudTextNeedsSignIn:
+              "Sign in to Mago to use cloud text generation. Otherwise it falls back to the local text model."
+          },
+          tabs: {
+            account: "Account",
+            models: "Models",
+            general: "General",
+            needsAttention: "Needs attention"
+          },
+          statusMark: {
+            checking: "{{label}}: checking",
+            ready: "{{label}}: ready",
+            needsAttention: "{{label}}: needs attention",
+            checkingProgress: "Checking {{label}}"
+          },
+          account: {
+            heading: "Account",
+            signedInFallback: "Signed in",
+            signInPrompt:
+              "Sign in to use cloud rendering, credits and your subscription.",
+            signIn: "Sign in to Mago",
+            signOut: "Sign out"
+          },
+          models: {
+            heading: "ComfyUI",
+            description:
+              "Qwen Image Edit, local Wan video renders and Qwen3-VL captioning all run through this ComfyUI API. No API key is required.",
+            comfyNeeded:
+              "Set a responding ComfyUI endpoint before using local ComfyUI models.",
+            endpointLabel: "API endpoint",
+            endpointAriaLabel: "ComfyUI API endpoint",
+            textModelLabel: "Text model",
+            textModelCloud: "Gemini (Mago cloud)",
+            textModelQwenQ3: "Qwen3.8 27B Q3 (local, lower memory)",
+            textModelQwenQ5: "Qwen3.8 27B Q5 (local, higher quality)"
+          },
+          general: {
+            heading: "Project folder",
+            noLibrary: "No local library selected",
+            changeFolder: "Change folder",
+            chooseFolder: "Choose folder",
+            showInFolder: "Show in folder",
+            description:
+              "Mago stores its project database and generated thumbnails here. Source videos stay in their original locations.",
+            sceneTimelineLabel: "Scene timeline",
+            sceneTimelineDescription:
+              "Shows a card for each scene at the top of the Scenes tab, for jumping to it.",
+            advancedHeading: "Advanced"
+          }
+        },
         projectFolders: {
           sections: {
             thisWeek: "This week",

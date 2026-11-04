@@ -10,6 +10,7 @@ type Props = {
     name?: string;
     id: string;
     icon?: React.ReactNode;
+    badge?: React.ReactNode;
     isDisabled?: boolean;
   }[];
 };
@@ -54,6 +55,7 @@ export const TabMenuRegular: React.FC<Props> = ({
                 <div className="flex items-center justify-center">
                   {item.name}
                 </div>
+                {item.badge}
               </div>
             </Tooltip>
           </Tab>

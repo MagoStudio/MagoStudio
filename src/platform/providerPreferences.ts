@@ -66,28 +66,4 @@ export const readProviderPreferences = (): ProviderPreferences => {
   };
 };
 
-export const writeProviderPreferences = (
-  preferences: ProviderPreferences
-): void => {
-  if (typeof window === "undefined") return;
-  try {
-    window.localStorage.setItem(STORAGE_KEY, JSON.stringify(preferences));
-    // So other views update without a reload.
-    window.dispatchEvent(new CustomEvent(PROVIDER_PREFERENCES_EVENT));
-  } catch {
-    // Nothing useful to do if it cannot be persisted.
-  }
-};
-
 export const PROVIDER_PREFERENCES_EVENT = "mago:provider-preferences";
-
-/**
- * Turning every provider off would leave an empty model list, which is never
- * what the user meant, so the last one on cannot be switched off.
- */
-export const canDisableProvider = (
-  preferences: ProviderPreferences,
-  provider: RenderProvider
-): boolean =>
-  !preferences[provider] ||
-  Object.values(preferences).filter(Boolean).length > 1;

@@ -13,6 +13,11 @@ export interface LocalModelBundle {
   files: LocalModelFile[];
 }
 
+// Unsloth replaced this file on main on 2026-10-29. Keep the download tied
+// to the revision matching the trusted SHA-256 and byte count below.
+export const QWEN_IMAGE_2512_UNET_URL =
+  "https://huggingface.co/unsloth/Qwen-Image-2512-GGUF/resolve/1626d7531f84b4d2ea1cd6d2e69f41ec027dd354/qwen-image-2512-Q5_K_M.gguf";
+
 export const LOCAL_MODEL_BUNDLES: LocalModelBundle[] = [
   {
     id: "qwen-vl",
@@ -167,7 +172,7 @@ export const LOCAL_MODEL_BUNDLES: LocalModelBundle[] = [
     files: [
       {
         targetPath: "models/unet/qwen-image-2512-Q5_K_M.gguf",
-        url: "https://huggingface.co/unsloth/Qwen-Image-2512-GGUF/resolve/main/qwen-image-2512-Q5_K_M.gguf",
+        url: QWEN_IMAGE_2512_UNET_URL,
         bytes: 15000074784,
         sha256:
           "e9ea2c513cf25645829fcccbd0882e821b858f4fabfb48ae1b5f103da68ecd0f"
