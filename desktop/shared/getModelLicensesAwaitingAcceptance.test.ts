@@ -58,7 +58,7 @@ describe("getModelLicensesAwaitingAcceptance", () => {
       )
     ).toEqual([
       "Comfy-Org/MiniMax-H3",
-      "alibaba-pai/MiniMax-H3-Acc-LoRAs",
+      "Pika-Labs/Pika-H3-Flex-Turbo-LoRA",
       "Alissonerdx/Minimax-H3-ComfyUI",
       "akatz-ai/MiniMax-H3-Character-Swap-LoRA",
       "unsloth/FLUX.2-klein-9B-GGUF",

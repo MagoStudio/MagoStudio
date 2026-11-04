@@ -1,8 +1,13 @@
 import { describe, expect, it } from "vitest";
 
+import { MINIMAX_H3_STEP_LORAS } from "../../shared/minimaxH3StepLoras";
 import { LOCAL_SCRIPT_MODEL_FILES as files } from "../scriptProjects/comfyScriptProjectClient";
 
 import { evaluateScriptSetup } from "./probeScriptSetup";
+
+const hdStepLora = MINIMAX_H3_STEP_LORAS[8].loraFile;
+const turboStepLora = MINIMAX_H3_STEP_LORAS[4].loraFile;
+const draftStepLora = MINIMAX_H3_STEP_LORAS[2].loraFile;
 
 const installed = (): Record<string, unknown> => {
   const empty = evaluateScriptSetup({});
@@ -21,18 +26,19 @@ const installed = (): Record<string, unknown> => {
     input: { required: { vae_name: [[files.videoVae, files.audioVae]] } }
   };
   info.LoraLoaderModelOnly = {
-    input: { optional: { lora_name: [[`minimax\\${files.videoLora4}`]] } }
+    input: { optional: { lora_name: [[`minimax\\${hdStepLora}`]] } }
   };
   return info;
 };
 
 describe("ScriptShot minimum setup", () => {
-  it("accepts vanilla and the 4-step LoRA without captioning, image models, local LLM or PDD", () => {
+  it("accepts vanilla and the HD step LoRA without captioning, image models, local LLM or the optional step LoRAs", () => {
     const result = evaluateScriptSetup(installed());
     expect(result.ready).toBe(true);
-    expect(result.highQuality.some((item) => item.status !== "installed")).toBe(
-      true
-    );
+    expect(
+      result.optionalStepLoras.every((item) => item.status === "missing")
+    ).toBe(true);
+    expect(result.models.map((item) => item.name)).toContain(hdStepLora);
     expect(result.models.map((item) => item.name)).toContain(
       files.videoClipVanilla
     );
@@ -71,12 +77,53 @@ describe("ScriptShot minimum setup", () => {
     const result = evaluateScriptSetup(info);
     expect(result.ready).toBe(false);
     expect(
-      result.models.find((item) => item.name === files.videoLora4)
+      result.models.find((item) => item.name === hdStepLora)
     ).toMatchObject({
       status: "missing",
       folder: "models/loras/",
-      url: expect.stringContaining(files.videoLora4)
+      url: expect.stringContaining(hdStepLora)
     });
+  });
+  it("never asks for the retired PDD accelerator node", () => {
+    const result = evaluateScriptSetup(installed());
+    expect(result.nodes.map((item) => item.name)).not.toContain(
+      "MiniMaxH3PDDAccApply"
+    );
+    expect(result.nodes.map((item) => item.name)).toEqual(
+      expect.arrayContaining(["BasicScheduler", "LoraLoaderModelOnly"])
+    );
+  });
+});
+
+describe("MiniMax H3 optional step LoRAs", () => {
+  it("lists the draft and turbo LoRAs with pinned downloads, without blocking readiness", () => {
+    const result = evaluateScriptSetup(installed());
+    expect(result.ready).toBe(true);
+    expect(result.optionalStepLoras.map((item) => item.name)).toEqual([
+      draftStepLora,
+      turboStepLora
+    ]);
+    for (const stepLora of result.optionalStepLoras) {
+      expect(stepLora.folder).toBe("models/loras/");
+      expect(stepLora.url).toContain(
+        "Pika-Labs/Pika-H3-Flex-Turbo-LoRA/resolve/dcacd93a50f714ba1cd61c7ca2cc5f65e9a1ec60/"
+      );
+    }
+  });
+  it("marks a step LoRA installed once ComfyUI lists it", () => {
+    const info = installed();
+    info.LoraLoaderModelOnly = {
+      input: { required: { lora_name: [[hdStepLora, turboStepLora]] } }
+    };
+    const result = evaluateScriptSetup(info);
+    expect(
+      result.optionalStepLoras.find((item) => item.name === turboStepLora)
+        ?.status
+    ).toBe("installed");
+    expect(
+      result.optionalStepLoras.find((item) => item.name === draftStepLora)
+        ?.status
+    ).toBe("missing");
   });
 });
 
@@ -192,10 +239,7 @@ describe("MiniMax H3 VFX LoRAs", () => {
       input: {
         required: {
           lora_name: [
-            [
-              files.videoLora4,
-              "minimax/minimax_h3_head_swap_v1.0_r32.safetensors"
-            ]
+            [hdStepLora, "minimax/minimax_h3_head_swap_v1.0_r32.safetensors"]
           ]
         }
       }

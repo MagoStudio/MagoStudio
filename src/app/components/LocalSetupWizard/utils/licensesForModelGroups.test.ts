@@ -10,8 +10,11 @@ describe("licensesForModelGroups", () => {
     expect(reposOf(licensesForModelGroups(["minimal"]))).toEqual(
       expect.arrayContaining([
         "Comfy-Org/MiniMax-H3",
-        "alibaba-pai/MiniMax-H3-Acc-LoRAs"
+        "Pika-Labs/Pika-H3-Flex-Turbo-LoRA"
       ])
+    );
+    expect(reposOf(licensesForModelGroups(["minimal"]))).not.toContain(
+      "alibaba-pai/MiniMax-H3-Acc-LoRAs"
     );
   });
 

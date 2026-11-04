@@ -99,6 +99,8 @@ describe("inspectLocalModelGroups", () => {
       "not-installed",
       "not-installed",
       "not-installed",
+      "not-installed",
+      "not-installed",
       "not-installed"
     ]);
   });

@@ -1,5 +1,7 @@
 import { afterEach, describe, expect, it, vi } from "vitest";
 
+import { MINIMAX_H3_STEP_LORAS } from "../../shared/minimaxH3StepLoras";
+
 import {
   LTX_UPSCALE_MODEL_FILES,
   ltxUpscaleLoraFile
@@ -35,6 +37,7 @@ const installedFiles = [
   ...Object.values(MAGO_ANIMATE_MODEL_FILES),
   ...Object.values(LTX_UPSCALE_MODEL_FILES),
   ...Object.values(MINIMAX_H3_LOCAL_MODEL_FILES),
+  ...Object.values(MINIMAX_H3_STEP_LORAS).map((stepLora) => stepLora.loraFile),
   ...Object.values(resolveWanFunUnetFiles("fp8_scaled")).filter(
     (value): value is string => typeof value === "string"
   ),
@@ -52,8 +55,7 @@ const nodePayload = (nodeName: string, files = installedFiles) => ({
           "clip_name1",
           "clip_name2",
           "vae_name",
-          "lora_name",
-          "pdd_file"
+          "lora_name"
         ].map((input) => [input, [files]])
       )
     }
@@ -114,18 +116,52 @@ describe("probeComfyRenderModel", () => {
     });
   });
 
-  it("requires the PDD accelerator file for high-quality MiniMax H3", async () => {
-    const filesWithoutPddAccelerator = installedFiles.filter(
-      (file) => file !== MINIMAX_H3_LOCAL_MODEL_FILES.pddAccelerator
+  it.each([
+    ["hd", MINIMAX_H3_STEP_LORAS[8].loraFile],
+    ["turbo", MINIMAX_H3_STEP_LORAS[4].loraFile],
+    ["draft", MINIMAX_H3_STEP_LORAS[2].loraFile]
+  ])(
+    "requires the step LoRA for %s MiniMax H3",
+    async (h3Quality, stepLoraFile) => {
+      const filesWithoutStepLora = installedFiles.filter(
+        (file) => file !== stepLoraFile
+      );
+      const requestedNodeNames: string[] = [];
+      vi.stubGlobal(
+        "fetch",
+        vi.fn(async (url: string | URL | Request) => {
+          const nodeName = requestedNodeName(url);
+          requestedNodeNames.push(nodeName);
+          return Response.json(nodePayload(nodeName, filesWithoutStepLora));
+        })
+      );
+
+      await expect(
+        probeComfyRenderModel("http://127.0.0.1:8188", "minimax_h3_local", {
+          h3_quality: h3Quality
+        })
+      ).resolves.toMatchObject({
+        ready: false,
+        missingNodes: [],
+        missingModels: [stepLoraFile]
+      });
+      expect(requestedNodeNames).toContain("BasicScheduler");
+      expect(requestedNodeNames).toContain("LoraLoaderModelOnly");
+      expect(requestedNodeNames).not.toContain("MiniMaxH3PDDAccApply");
+    }
+  );
+
+  it("falls back to the HD step LoRA for a legacy high quality", async () => {
+    const filesWithoutHdStepLora = installedFiles.filter(
+      (file) => file !== MINIMAX_H3_STEP_LORAS[8].loraFile
     );
-    const requestedNodeNames: string[] = [];
     vi.stubGlobal(
       "fetch",
-      vi.fn(async (url: string | URL | Request) => {
-        const nodeName = requestedNodeName(url);
-        requestedNodeNames.push(nodeName);
-        return Response.json(nodePayload(nodeName, filesWithoutPddAccelerator));
-      })
+      vi.fn(async (url: string | URL | Request) =>
+        Response.json(
+          nodePayload(requestedNodeName(url), filesWithoutHdStepLora)
+        )
+      )
     );
 
     await expect(
@@ -134,37 +170,8 @@ describe("probeComfyRenderModel", () => {
       })
     ).resolves.toMatchObject({
       ready: false,
-      missingNodes: [],
-      missingModels: [MINIMAX_H3_LOCAL_MODEL_FILES.pddAccelerator]
+      missingModels: [MINIMAX_H3_STEP_LORAS[8].loraFile]
     });
-    expect(requestedNodeNames).toContain("MiniMaxH3PDDAccApply");
-    expect(requestedNodeNames).not.toContain("LoraLoaderModelOnly");
-  });
-
-  it("requires the four-step LoRA for medium-quality MiniMax H3", async () => {
-    const filesWithoutFourStepLora = installedFiles.filter(
-      (file) => file !== MINIMAX_H3_LOCAL_MODEL_FILES.fourStepLora
-    );
-    const requestedNodeNames: string[] = [];
-    vi.stubGlobal(
-      "fetch",
-      vi.fn(async (url: string | URL | Request) => {
-        const nodeName = requestedNodeName(url);
-        requestedNodeNames.push(nodeName);
-        return Response.json(nodePayload(nodeName, filesWithoutFourStepLora));
-      })
-    );
-
-    await expect(
-      probeComfyRenderModel("http://127.0.0.1:8188", "minimax_h3_local", {
-        h3_quality: "medium"
-      })
-    ).resolves.toMatchObject({
-      ready: false,
-      missingModels: [MINIMAX_H3_LOCAL_MODEL_FILES.fourStepLora]
-    });
-    expect(requestedNodeNames).toContain("BasicScheduler");
-    expect(requestedNodeNames).not.toContain("MiniMaxH3PDDAccApply");
   });
 
   it("requires the VFX LoRA and the guide node in a guided VFX mode", async () => {
@@ -180,7 +187,7 @@ describe("probeComfyRenderModel", () => {
 
     await expect(
       probeComfyRenderModel("http://127.0.0.1:8188", "minimax_h3_local", {
-        h3_quality: "high",
+        h3_quality: "hd",
         vfx_mode: "vfx_edit",
         vfx_edited_frame_id: "edited"
       })
@@ -205,7 +212,7 @@ describe("probeComfyRenderModel", () => {
 
     await expect(
       probeComfyRenderModel("http://127.0.0.1:8188", "minimax_h3_local", {
-        h3_quality: "high",
+        h3_quality: "hd",
         vfx_mode: "character_swap"
       })
     ).resolves.toMatchObject({

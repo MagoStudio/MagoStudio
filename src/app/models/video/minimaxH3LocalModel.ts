@@ -16,6 +16,7 @@ import {
 } from "@models/video/types";
 import { IMAGE_UPLOAD_LIMITS } from "@utils/image/imageUploadLimits";
 
+import type { MiniMaxH3Quality } from "../../../../desktop/shared/minimaxH3StepLoras";
 import {
   doesMiniMaxH3VfxModeKeepSourceShape,
   MINIMAX_H3_VFX_DEFAULT_LORA_STRENGTH,
@@ -338,13 +339,14 @@ export const minimaxH3LocalModel: VideoModelDefinition = {
               type: "enum",
               label: "Quality",
               tooltip:
-                "High uses the PDD 8-step accelerator. Medium uses the 4-step turbo LoRA and renders faster.",
+                "8 step HD gives the most detail. 4 step turbo and 2 step draft render faster; draft is for checking framing and motion. Turbo and draft are optional downloads.",
               ui: "SelectInput",
               options: [
-                { value: "high", label: "High — PDD 8 steps" },
-                { value: "medium", label: "Medium — 4-step LoRA" }
-              ],
-              defaultValue: "high",
+                { value: "hd", label: "8 step HD" },
+                { value: "turbo", label: "4 step turbo" },
+                { value: "draft", label: "2 step draft" }
+              ] satisfies { value: MiniMaxH3Quality; label: string }[],
+              defaultValue: "hd" satisfies MiniMaxH3Quality,
               nullable: false
             },
             {

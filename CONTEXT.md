@@ -50,6 +50,10 @@ a single render rather than an engine for every Shot in a Script project.
 
 A setting on MiniMax H3 (Local) that loads one community LoRA, turning the render into a specific edit of the source video: VFX edit, Head swap, Character swap or Style transfer. `none` renders a plain reference render. Each mode fixes its LoRA file, its prompt trigger, whether the source video is a **guide** (pinned frame for frame to the output through `MiniMaxH3AddGuide`) or a **reference** (`<Video 1>`), and whether a reference image is required. The mode table lives in `desktop/shared/minimaxH3VfxModes.ts`, shared by the settings panel and the ComfyUI graph builder. Sharpen is not a mode, and crossview is parked on its own branch.
 
+### Step LoRA
+
+The LoRA that sets how many sampling steps a local MiniMax H3 render takes: **2 step draft**, **4 step turbo** or **8 step HD**, all from Pika-Labs/Pika-H3-Flex-Turbo-LoRA at a pinned revision. Every local H3 render loads exactly one, through `LoraLoaderModelOnly`, and samples that many steps. 8 step HD ships in the Minimal Model group and is the default; draft and turbo are their own optional Model groups. The Scenes tab picks it per project (`local_h3_steps`), the timeline per render (`h3_quality`). The table lives in `desktop/shared/minimaxH3StepLoras.ts`. It replaced the PDD 8-step accelerator and the older 3/4/8-step LoRAs. A step LoRA is not a **VFX mode** LoRA; a VFX render loads both.
+
 ### Shot lock (locked scene)
 
 A Script project Shot's `locked` flag, saved on the backend and toggled from the lock button in

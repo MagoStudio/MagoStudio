@@ -1,14 +1,13 @@
 import { describe, expect, it } from "vitest";
 
+import { MINIMAX_H3_STEP_LORAS } from "../../shared/minimaxH3StepLoras";
 import { resolveMiniMaxH3VfxLora } from "../../shared/minimaxH3VfxModes";
 
 import {
   buildMiniMaxH3LocalGraph,
   clampMiniMaxH3Dimension,
   ComfyMiniMaxH3Client,
-  MINIMAX_H3_LOCAL_MODEL_FILES,
   type MiniMaxH3LocalGraphInput,
-  resolveMiniMaxH3Quality,
   snapMiniMaxH3LengthFrames
 } from "./comfyMiniMaxH3Client";
 
@@ -19,7 +18,7 @@ const graphInput = (
   width: 720,
   height: 1280,
   lengthFrames: 124,
-  quality: "high",
+  steps: 8,
   seed: 7,
   referenceImages: ["mago/reference.png"],
   referenceVideo: "mago/input.mp4",
@@ -28,40 +27,36 @@ const graphInput = (
 });
 
 describe("buildMiniMaxH3LocalGraph", () => {
-  it("uses the PDD accelerator and its sigma schedule at high quality", () => {
-    const graph = buildMiniMaxH3LocalGraph(graphInput({ quality: "high" }));
+  it.each([
+    [2, "pika_h3_flex_turbo_2step_draft_ref2va.safetensors"],
+    [4, "pika_h3_flex_turbo_4step_ref2va.safetensors"],
+    [8, "pika_h3_flex_turbo_8step_hd_ref2va.safetensors"]
+  ] as const)(
+    "uses the %i-step LoRA and a matching scheduler",
+    (steps, loraFile) => {
+      const graph = buildMiniMaxH3LocalGraph(graphInput({ steps }));
 
-    expect(graph["2"]).toMatchObject({
-      class_type: "MiniMaxH3PDDAccApply",
-      inputs: {
-        model: ["4", 0],
-        pdd_file: MINIMAX_H3_LOCAL_MODEL_FILES.pddAccelerator,
-        nfe: "8"
-      }
-    });
-    expect(graph["3"]?.inputs.model).toEqual(["1", 0]);
-    expect(graph["10"]?.inputs.model).toEqual(["2", 0]);
-    expect(graph["13"]?.inputs.sigmas).toEqual(["2", 1]);
-    expect(graph["12"]).toBeUndefined();
-  });
+      expect(MINIMAX_H3_STEP_LORAS[steps].loraFile).toBe(loraFile);
+      expect(graph["2"]).toMatchObject({
+        class_type: "LoraLoaderModelOnly",
+        inputs: { model: ["1", 0], lora_name: loraFile, strength_model: 1 }
+      });
+      expect(graph["3"]?.inputs.model).toEqual(["2", 0]);
+      expect(graph["12"]).toMatchObject({
+        class_type: "BasicScheduler",
+        inputs: { model: ["4", 0], steps }
+      });
+      expect(graph["10"]?.inputs.model).toEqual(["4", 0]);
+      expect(graph["13"]?.inputs.sigmas).toEqual(["12", 0]);
+    }
+  );
 
-  it("uses the four-step LoRA and a four-step scheduler at medium quality", () => {
-    const graph = buildMiniMaxH3LocalGraph(graphInput({ quality: "medium" }));
+  it("never adds the retired PDD accelerator", () => {
+    const graph = buildMiniMaxH3LocalGraph(graphInput({ steps: 8 }));
 
-    expect(graph["2"]).toMatchObject({
-      class_type: "LoraLoaderModelOnly",
-      inputs: {
-        model: ["1", 0],
-        lora_name: MINIMAX_H3_LOCAL_MODEL_FILES.fourStepLora
-      }
-    });
-    expect(graph["3"]?.inputs.model).toEqual(["2", 0]);
-    expect(graph["12"]).toMatchObject({
-      class_type: "BasicScheduler",
-      inputs: { steps: 4 }
-    });
-    expect(graph["10"]?.inputs.model).toEqual(["4", 0]);
-    expect(graph["13"]?.inputs.sigmas).toEqual(["12", 0]);
+    expect(Object.values(graph).map((node) => node.class_type)).not.toContain(
+      "MiniMaxH3PDDAccApply"
+    );
   });
 
   it("loads the vanilla model files", () => {
@@ -142,12 +137,6 @@ describe("MiniMax H3 sizing", () => {
     expect(snapMiniMaxH3LengthFrames(0.1)).toBe(5);
     expect(snapMiniMaxH3LengthFrames(30)).toBe(362);
   });
-
-  it("falls back to high quality for unknown values", () => {
-    expect(resolveMiniMaxH3Quality("medium")).toBe("medium");
-    expect(resolveMiniMaxH3Quality(undefined)).toBe("high");
-    expect(resolveMiniMaxH3Quality("ultra")).toBe("high");
-  });
 });
 
 describe("ComfyMiniMaxH3Client", () => {
@@ -158,7 +147,7 @@ describe("ComfyMiniMaxH3Client", () => {
         width: 720,
         height: 1280,
         durationSeconds: 5,
-        quality: "high",
+        steps: 8,
         referenceImagePaths: [],
         useReferenceVideoAudio: true,
         vfxMode: "none",
@@ -175,7 +164,7 @@ describe("ComfyMiniMaxH3Client", () => {
         width: 720,
         height: 1280,
         durationSeconds: 5,
-        quality: "high",
+        steps: 8,
         referenceImagePaths: [],
         referenceVideoPath: "/library/input.mp4",
         useReferenceVideoAudio: true,
@@ -197,7 +186,7 @@ describe("buildMiniMaxH3LocalGraph with a VFX LoRA", () => {
       ...overrides
     });
 
-  it("applies the VFX LoRA after the sigma shift, ahead of PDD", () => {
+  it("applies the VFX LoRA after the sigma shift, ahead of the scheduler", () => {
     const graph = buildMiniMaxH3LocalGraph(vfxGraphInput("vfx_edit"));
 
     expect(graph["17"]).toMatchObject({
@@ -208,13 +197,14 @@ describe("buildMiniMaxH3LocalGraph with a VFX LoRA", () => {
         strength_model: 0.7
       }
     });
-    expect(graph["2"]?.inputs.model).toEqual(["17", 0]);
-    expect(graph["10"]?.inputs.model).toEqual(["2", 0]);
+    expect(graph["2"]?.inputs.model).toEqual(["1", 0]);
+    expect(graph["12"]?.inputs.model).toEqual(["17", 0]);
+    expect(graph["10"]?.inputs.model).toEqual(["17", 0]);
   });
 
-  it("applies the VFX LoRA to the guider and scheduler at medium quality", () => {
+  it("applies the VFX LoRA to the guider and scheduler at turbo steps", () => {
     const graph = buildMiniMaxH3LocalGraph(
-      vfxGraphInput("vfx_edit", { quality: "medium" })
+      vfxGraphInput("vfx_edit", { steps: 4 })
     );
 
     expect(graph["12"]?.inputs.model).toEqual(["17", 0]);

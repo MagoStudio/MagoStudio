@@ -1,9 +1,17 @@
-/* oxlint-disable eslint/no-magic-numbers -- 4 and 8 are the supported MiniMax step presets; graph dimensions are probe placeholders */
+/* oxlint-disable eslint/no-magic-numbers -- graph dimensions are probe placeholders */
 import type {
   ComfySettings,
   ScriptSetupRequirement,
   ScriptSetupStatus
 } from "../../shared/contracts";
+import { pikaH3FlexTurboLoraUrl } from "../../shared/localModelManifest";
+import {
+  MINIMAX_H3_DRAFT_STEPS,
+  MINIMAX_H3_HD_STEPS,
+  MINIMAX_H3_STEP_LORAS,
+  MINIMAX_H3_TURBO_STEPS,
+  type MiniMaxH3StepLoraSteps
+} from "../../shared/minimaxH3StepLoras";
 import { REQUIRED_COMFYUI_VERSION } from "../../shared/requiredComfyVersion";
 import { asRecord } from "../comfy/asRecord";
 import { ComfyClient } from "../comfy/ComfyClient";
@@ -24,15 +32,13 @@ const defaultSettings = {
 type SetupSettings = Pick<ComfySettings, "vlmBackend" | "scriptTextModel">;
 
 const CORE_URL = "https://github.com/Comfy-Org/ComfyUI";
-const PDD_URL = "https://github.com/Jalen-Brunson/ComfyUI-MiniMax-H3-PDD-Acc";
 const NODE_URLS: Record<string, string> = {
   UnetLoaderGGUF: "https://github.com/city96/ComfyUI-GGUF",
   MagoQwen3VLLoader: "https://github.com/MagoStudio/ComfyUI-MagoNodes",
   MagoQwen3VLCaption: "https://github.com/MagoStudio/ComfyUI-MagoNodes",
   SimpleQwenVLggufV2: "https://github.com/KLL535/ComfyUI_Simple_Qwen3-VL-gguf",
   MiniMaxChunkFeedForward: "https://github.com/kijai/ComfyUI-KJNodes",
-  VHS_LoadVideo: "https://github.com/Kosinkadink/ComfyUI-VideoHelperSuite",
-  MiniMaxH3PDDAccApply: PDD_URL
+  VHS_LoadVideo: "https://github.com/Kosinkadink/ComfyUI-VideoHelperSuite"
 };
 const MODEL_ROOT = "https://huggingface.co/Comfy-Org/MiniMax-H3/resolve/main";
 export type ModelFile = {
@@ -44,6 +50,14 @@ export type ModelFile = {
   url?: string;
   sha256?: string;
 };
+const stepLoraFile = (steps: MiniMaxH3StepLoraSteps): ModelFile => ({
+  name: MINIMAX_H3_STEP_LORAS[steps].loraFile,
+  node: "LoraLoaderModelOnly",
+  input: "lora_name",
+  folder: "loras",
+  url: pikaH3FlexTurboLoraUrl(MINIMAX_H3_STEP_LORAS[steps].loraFile),
+  sha256: MINIMAX_H3_STEP_LORAS[steps].loraFileSha256
+});
 const modelFiles: ModelFile[] = [
   {
     name: files.videoUnet,
@@ -59,22 +73,14 @@ const modelFiles: ModelFile[] = [
   },
   { name: files.videoVae, node: "VAELoader", input: "vae_name", folder: "vae" },
   { name: files.audioVae, node: "VAELoader", input: "vae_name", folder: "vae" },
-  {
-    name: files.videoLora4,
-    node: "LoraLoaderModelOnly",
-    input: "lora_name",
-    folder: "loras"
-  }
+  stepLoraFile(MINIMAX_H3_HD_STEPS)
 ];
-const highQualityFile = {
-  name: files.videoPdd8,
-  node: "MiniMaxH3PDDAccApply",
-  input: "pdd_file",
-  folder: "pdd_acc",
-  url: `https://huggingface.co/alibaba-pai/MiniMax-H3-Acc-LoRAs/resolve/main/${files.videoPdd8}`
-};
+const optionalStepLoraFiles: ModelFile[] = [
+  stepLoraFile(MINIMAX_H3_DRAFT_STEPS),
+  stepLoraFile(MINIMAX_H3_TURBO_STEPS)
+];
 
-const nodeNames = (steps: 4 | 8) => [
+const nodeNames = () => [
   ...new Set([
     ...Object.values(
       buildMiniMaxH3Graph({
@@ -82,7 +88,7 @@ const nodeNames = (steps: 4 | 8) => [
         width: 512,
         height: 512,
         length: 124,
-        steps,
+        steps: MINIMAX_H3_HD_STEPS,
         noiseSeed: 0,
         referenceInputs: {}
       })
@@ -143,7 +149,7 @@ export const evaluateScriptSetup = (
             : "missing"
     };
   };
-  const nodes = nodeNames(4).map(nodeRequirement);
+  const nodes = nodeNames().map(nodeRequirement);
   const models = modelFiles.map(modelRequirement);
   return {
     ready: [...nodes, ...models].every((item) => item.status === "installed"),
@@ -157,12 +163,7 @@ export const evaluateScriptSetup = (
         ...group.files.map(modelRequirement)
       ]
     })),
-    highQuality: [
-      ...nodeNames(8)
-        .filter((name) => !nodeNames(4).includes(name))
-        .map(nodeRequirement),
-      modelRequirement(highQualityFile)
-    ],
+    optionalStepLoras: optionalStepLoraFiles.map(modelRequirement),
     vfxLoras: MINIMAX_H3_VFX_LORA_FILES.map(modelRequirement)
   };
 };
@@ -172,7 +173,7 @@ export const probeScriptSetup = async (
   settings: SetupSettings = defaultSettings
 ): Promise<ScriptSetupStatus> => {
   const client = new ComfyClient(endpoint);
-  const names = [...new Set([...nodeNames(4), ...nodeNames(8)])];
+  const names = nodeNames();
   const entries = await Promise.all(
     names.map(async (name) => {
       const info = await client.getJson(

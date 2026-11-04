@@ -101,16 +101,17 @@ Mago Studio 支持 Windows、macOS 和 Linux。使用应用或在 Mago Cloud 中
 
 它会安装 **Minimal**（最小）组，其中包含 Mago Studio 使用 MiniMax H3 渲染和为镜头生成描述所需的全部内容：
 
-- **MiniMax H3**，主视频模型，附带一个 4 步加速 LoRA，渲染更快。
-- **MiniMax H3 高质量版**，一个 8 步 LoRA，渲染质量更高。
+- **MiniMax H3**，主视频模型，附带 8 步 HD LoRA（8 step HD）。
 - **MiniMax H3 VFX LoRA**，用于特效编辑、换头、角色替换和风格迁移。
 - **Qwen3-VL 4B**，为你的图片和视频生成描述。
 
 MiniMax H3 相关文件遵循 [MiniMax H3 社区许可证](https://huggingface.co/MiniMaxAI/MiniMax-H3/blob/main/LICENSE)。
 
+两个更快的 MiniMax H3 LoRA，**2 步草稿**（2 step draft）和 **4 步加速**（4 step turbo），是可选组。Scenes（场景）标签页会标出你尚未安装的 LoRA。
+
 登录后，剧本写作和参考图会使用 Mago Cloud。如需离线使用，之后可以在 **Update installation**（更新安装）中添加可选的 **Local LLM**（本地大语言模型）组和图像模型组。
 
-**使用你自己的 ComfyUI？** 你需要 ComfyUI v0.34.0 或更高版本、三个自定义节点（KJNodes、VideoHelperSuite 和 MiniMax-H3-PDD-Acc），以及约 54 GB 的模型。选择 **I already have ComfyUI**（我已经安装了 ComfyUI）并输入它的地址（默认为 `http://127.0.0.1:8188`）。安装向导会列出所有缺失的节点和模型。
+**使用你自己的 ComfyUI？** 你需要 ComfyUI v0.34.0 或更高版本、两个自定义节点（KJNodes 和 VideoHelperSuite），以及约 55 GB 的模型。选择 **I already have ComfyUI**（我已经安装了 ComfyUI）并输入它的地址（默认为 `http://127.0.0.1:8188`）。安装向导会列出所有缺失的节点和模型。
 
 ## 从源码运行
 

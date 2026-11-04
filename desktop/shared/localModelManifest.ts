@@ -1,4 +1,11 @@
 /* oxlint-disable eslint/no-magic-numbers -- pinned release sizes in bytes */
+import {
+  MINIMAX_H3_DRAFT_STEPS,
+  MINIMAX_H3_HD_STEPS,
+  MINIMAX_H3_STEP_LORAS,
+  MINIMAX_H3_TURBO_STEPS
+} from "./minimaxH3StepLoras";
+
 export interface LocalModelFile {
   targetPath: string;
   url: string;
@@ -17,6 +24,14 @@ export interface LocalModelBundle {
 // to the revision matching the trusted SHA-256 and byte count below.
 export const QWEN_IMAGE_2512_UNET_URL =
   "https://huggingface.co/unsloth/Qwen-Image-2512-GGUF/resolve/1626d7531f84b4d2ea1cd6d2e69f41ec027dd354/qwen-image-2512-Q5_K_M.gguf";
+
+export const PIKA_H3_FLEX_TURBO_LORA_PINNED_REVISION =
+  "dcacd93a50f714ba1cd61c7ca2cc5f65e9a1ec60";
+
+export const pikaH3FlexTurboLoraUrl = (loraFile: string): string =>
+  `https://huggingface.co/Pika-Labs/Pika-H3-Flex-Turbo-LoRA/resolve/${PIKA_H3_FLEX_TURBO_LORA_PINNED_REVISION}/${loraFile}`;
+
+const PIKA_H3_FLEX_TURBO_LORA_BYTES = 3912311400;
 
 export const LOCAL_MODEL_BUNDLES: LocalModelBundle[] = [
   {
@@ -70,26 +85,42 @@ export const LOCAL_MODEL_BUNDLES: LocalModelBundle[] = [
           "8e505d95dd1561d47abd43d4238fd40d9bb1ae9e147ed0a4cba778d76ae4db48"
       },
       {
-        targetPath:
-          "models/loras/minimax_h3_ref2v_turbo_4step_v0.1_comfyui_bf16.safetensors",
-        url: "https://huggingface.co/Comfy-Org/MiniMax-H3/resolve/main/loras/minimax_h3_ref2v_turbo_4step_v0.1_comfyui_bf16.safetensors",
-        bytes: 1956193000,
-        sha256:
-          "5b9ab5ade15d0775676d01a907268a69a1468dc6033b3b0d3ded5502f3ebb84c"
+        targetPath: `models/loras/${MINIMAX_H3_STEP_LORAS[MINIMAX_H3_HD_STEPS].loraFile}`,
+        url: pikaH3FlexTurboLoraUrl(
+          MINIMAX_H3_STEP_LORAS[MINIMAX_H3_HD_STEPS].loraFile
+        ),
+        bytes: PIKA_H3_FLEX_TURBO_LORA_BYTES,
+        sha256: MINIMAX_H3_STEP_LORAS[MINIMAX_H3_HD_STEPS].loraFileSha256
       }
     ]
   },
   {
-    id: "minimax-h3-high-quality",
-    name: "MiniMax H3 — high quality timeline",
-    isOptional: false,
+    id: "minimax-h3-draft-lora",
+    name: "MiniMax H3 — 2 step draft LoRA",
+    isOptional: true,
     files: [
       {
-        targetPath: "models/pdd_acc/MiniMax-H3-Ref2VA-Acc-8Step.safetensors",
-        url: "https://huggingface.co/alibaba-pai/MiniMax-H3-Acc-LoRAs/resolve/main/MiniMax-H3-Ref2VA-Acc-8Step.safetensors",
-        bytes: 1372450680,
-        sha256:
-          "111c82e669f6e20e628228172edf39395f1a9fc3ad049793895e542c0f55b18c"
+        targetPath: `models/loras/${MINIMAX_H3_STEP_LORAS[MINIMAX_H3_DRAFT_STEPS].loraFile}`,
+        url: pikaH3FlexTurboLoraUrl(
+          MINIMAX_H3_STEP_LORAS[MINIMAX_H3_DRAFT_STEPS].loraFile
+        ),
+        bytes: PIKA_H3_FLEX_TURBO_LORA_BYTES,
+        sha256: MINIMAX_H3_STEP_LORAS[MINIMAX_H3_DRAFT_STEPS].loraFileSha256
+      }
+    ]
+  },
+  {
+    id: "minimax-h3-turbo-lora",
+    name: "MiniMax H3 — 4 step turbo LoRA",
+    isOptional: true,
+    files: [
+      {
+        targetPath: `models/loras/${MINIMAX_H3_STEP_LORAS[MINIMAX_H3_TURBO_STEPS].loraFile}`,
+        url: pikaH3FlexTurboLoraUrl(
+          MINIMAX_H3_STEP_LORAS[MINIMAX_H3_TURBO_STEPS].loraFile
+        ),
+        bytes: PIKA_H3_FLEX_TURBO_LORA_BYTES,
+        sha256: MINIMAX_H3_STEP_LORAS[MINIMAX_H3_TURBO_STEPS].loraFileSha256
       }
     ]
   },

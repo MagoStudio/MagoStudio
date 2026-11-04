@@ -39,13 +39,6 @@ export const LOCAL_NODE_PACK_PINS: Readonly<Record<string, LocalNodePackPin>> =
         "370ce11404bc28f439d940db93728819394157f6a96bc58c1fd30c1f9f64d9ac",
       stripRoot: true
     },
-    "https://github.com/Jalen-Brunson/ComfyUI-MiniMax-H3-PDD-Acc": {
-      revision: "311a65dd53832d8a5f8177a9d5fb923c09e35a90",
-      url: "https://github.com/Jalen-Brunson/ComfyUI-MiniMax-H3-PDD-Acc/archive/311a65dd53832d8a5f8177a9d5fb923c09e35a90.zip",
-      sha256:
-        "b106b37d7e7e9b8ee1773a7387b623065e7e5dd0747de75610ce820004893dab",
-      stripRoot: true
-    },
     "https://github.com/KLL535/ComfyUI_Simple_Qwen3-VL-gguf": {
       revision: "85b92359595a450d6c37f0eccf210a8a1069f72e",
       url: "https://github.com/KLL535/ComfyUI_Simple_Qwen3-VL-gguf/archive/85b92359595a450d6c37f0eccf210a8a1069f72e.zip",

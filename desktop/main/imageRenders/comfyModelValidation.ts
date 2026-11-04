@@ -3,6 +3,10 @@ import type {
   LocalVideoModelName
 } from "../../shared/contracts";
 import {
+  MINIMAX_H3_STEP_LORAS,
+  resolveMiniMaxH3QualitySteps
+} from "../../shared/minimaxH3StepLoras";
+import {
   isMiniMaxH3VfxEditedFrameProvided,
   resolveMiniMaxH3VfxLora,
   resolveMiniMaxH3VfxMode
@@ -15,11 +19,7 @@ import {
   ltxUpscaleLoraFile,
   type LtxUpscaleFactor
 } from "./comfyLtxUpscaleClient";
-import {
-  isMiniMaxH3PddAcceleratorQuality,
-  MINIMAX_H3_LOCAL_MODEL_FILES,
-  resolveMiniMaxH3Quality
-} from "./comfyMiniMaxH3Client";
+import { MINIMAX_H3_LOCAL_MODEL_FILES } from "./comfyMiniMaxH3Client";
 import { qwenImageEditSetupConfig } from "./comfyQwenClient";
 import {
   MAGO_ANIMATE_MODEL_FILES,
@@ -239,9 +239,8 @@ const requirementsFor = (
   }
 
   if (model === "minimax_h3_local") {
-    const usesPddAccelerator = isMiniMaxH3PddAcceleratorQuality(
-      resolveMiniMaxH3Quality(settings.h3_quality)
-    );
+    const stepLora =
+      MINIMAX_H3_STEP_LORAS[resolveMiniMaxH3QualitySteps(settings.h3_quality)];
     const vfxLora = resolveMiniMaxH3VfxLora(
       resolveMiniMaxH3VfxMode(settings.vfx_mode),
       isMiniMaxH3VfxEditedFrameProvided(settings)
@@ -262,8 +261,8 @@ const requirementsFor = (
         "SaveVideo",
         "LoadImage",
         "VHS_LoadVideo",
-        ...(usesPddAccelerator ? [] : ["BasicScheduler"]),
-        ...(vfxLora ? ["LoraLoaderModelOnly"] : []),
+        "BasicScheduler",
+        "LoraLoaderModelOnly",
         ...(isSourceClipGuided ? ["MiniMaxH3AddGuide"] : [])
       ],
       files: [
@@ -287,17 +286,7 @@ const requirementsFor = (
           "vae_name",
           MINIMAX_H3_LOCAL_MODEL_FILES.audioVae
         ),
-        usesPddAccelerator
-          ? loaderFile(
-              "MiniMaxH3PDDAccApply",
-              "pdd_file",
-              MINIMAX_H3_LOCAL_MODEL_FILES.pddAccelerator
-            )
-          : loaderFile(
-              "LoraLoaderModelOnly",
-              "lora_name",
-              MINIMAX_H3_LOCAL_MODEL_FILES.fourStepLora
-            ),
+        loaderFile("LoraLoaderModelOnly", "lora_name", stepLora.loraFile),
         ...(vfxLora
           ? [loaderFile("LoraLoaderModelOnly", "lora_name", vfxLora.loraFile)]
           : [])

@@ -121,20 +121,22 @@ On Windows, choose **I don't have ComfyUI installed** and the wizard:
 It installs the **Minimal** group, which is everything Mago Studio needs to render with
 MiniMax H3 and caption your Shots:
 
-- **MiniMax H3**, the main video model, with a 4-step turbo LoRA for faster renders.
-- **MiniMax H3 high quality**, an 8-step LoRA for higher-quality renders.
+- **MiniMax H3**, the main video model, with the 8 step HD LoRA.
 - **MiniMax H3 VFX LoRAs** for VFX edit, head swap, character swap and style transfer.
 - **Qwen3-VL 4B**, which writes captions for your images and video.
 
 The MiniMax H3 files fall under the
 [MiniMax H3 Community License](https://huggingface.co/MiniMaxAI/MiniMax-H3/blob/main/LICENSE).
 
+Two faster MiniMax H3 LoRAs, **2 step draft** and **4 step turbo**, are optional groups.
+The Scenes tab marks the ones you have not installed.
+
 Script writing and reference images use Mago Cloud when you're signed in. To use them
 offline, add the optional **Local LLM** and image model groups later from
 **Update installation**.
 
 **Using your own ComfyUI?** You'll need ComfyUI v0.34.0 or later, three node packs
-(KJNodes, VideoHelperSuite and MiniMax-H3-PDD-Acc) and about 54 GB of models. Choose
+(KJNodes and VideoHelperSuite) and about 55 GB of models. Choose
 **I already have ComfyUI** and enter its address (default `http://127.0.0.1:8188`).
 The wizard lists any missing nodes and models.
 

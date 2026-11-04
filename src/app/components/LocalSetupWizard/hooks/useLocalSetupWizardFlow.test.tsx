@@ -42,7 +42,7 @@ beforeEach(() => {
   startInstaller.mockResolvedValue({ phase });
   acceptedModelLicenseRepos.mockResolvedValue([
     "Comfy-Org/MiniMax-H3",
-    "alibaba-pai/MiniMax-H3-Acc-LoRAs",
+    "Pika-Labs/Pika-H3-Flex-Turbo-LoRA",
     "Alissonerdx/Minimax-H3-ComfyUI",
     "akatz-ai/MiniMax-H3-Character-Swap-LoRA"
   ]);
@@ -268,7 +268,7 @@ describe("model licenses step", () => {
       step: "licenses",
       licensesAwaitingAcceptance: [
         { huggingFaceRepo: "Comfy-Org/MiniMax-H3" },
-        { huggingFaceRepo: "alibaba-pai/MiniMax-H3-Acc-LoRAs" },
+        { huggingFaceRepo: "Pika-Labs/Pika-H3-Flex-Turbo-LoRA" },
         { huggingFaceRepo: "Alissonerdx/Minimax-H3-ComfyUI" },
         { huggingFaceRepo: "akatz-ai/MiniMax-H3-Character-Swap-LoRA" }
       ]
@@ -281,7 +281,7 @@ describe("model licenses step", () => {
 
     expect(acceptModelLicenses).toHaveBeenCalledWith([
       "Comfy-Org/MiniMax-H3",
-      "alibaba-pai/MiniMax-H3-Acc-LoRAs",
+      "Pika-Labs/Pika-H3-Flex-Turbo-LoRA",
       "Alissonerdx/Minimax-H3-ComfyUI",
       "akatz-ai/MiniMax-H3-Character-Swap-LoRA"
     ]);
@@ -305,7 +305,7 @@ describe("model licenses step", () => {
     expect(hook.result.current.state).toMatchObject({
       step: "licenses",
       licensesAwaitingAcceptance: [
-        { huggingFaceRepo: "alibaba-pai/MiniMax-H3-Acc-LoRAs" },
+        { huggingFaceRepo: "Pika-Labs/Pika-H3-Flex-Turbo-LoRA" },
         { huggingFaceRepo: "Alissonerdx/Minimax-H3-ComfyUI" },
         { huggingFaceRepo: "akatz-ai/MiniMax-H3-Character-Swap-LoRA" }
       ]

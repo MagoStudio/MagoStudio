@@ -1,4 +1,8 @@
 import {
+  MINIMAX_H3_STEP_LORAS,
+  type MiniMaxH3StepLoraSteps
+} from "../../shared/minimaxH3StepLoras";
+import {
   type MiniMaxH3VfxLora,
   type MiniMaxH3VfxMode,
   resolveMiniMaxH3VfxLora
@@ -25,8 +29,6 @@ const REFERENCE_VIDEO_AUDIO_OUTPUT_INDEX = 2;
 const VFX_LORA_NODE_ID = "17";
 type ComfyNodeOutputLink = [nodeId: string, outputIndex: number];
 const SOURCE_CLIP_GUIDE_NODE_ID = "18";
-const MEDIUM_QUALITY_STEPS = 4;
-const HIGH_QUALITY_PDD_STEPS = 8;
 
 export const MINIMAX_H3_FPS = 24;
 export const MINIMAX_H3_MAX_REFERENCE_IMAGES = 9;
@@ -35,21 +37,8 @@ export const MINIMAX_H3_LOCAL_MODEL_FILES = {
   unet: MINIMAX_H3_SHARED_MODEL_FILES.unet,
   textEncoder: MINIMAX_H3_SHARED_MODEL_FILES.textEncoderVanilla,
   videoVae: MINIMAX_H3_SHARED_MODEL_FILES.videoVae,
-  audioVae: MINIMAX_H3_SHARED_MODEL_FILES.audioVae,
-  pddAccelerator: "MiniMax-H3-Ref2VA-Acc-8Step.safetensors",
-  fourStepLora: MINIMAX_H3_SHARED_MODEL_FILES.fourStepLora
+  audioVae: MINIMAX_H3_SHARED_MODEL_FILES.audioVae
 } as const;
-
-export const MINIMAX_H3_QUALITIES = ["high", "medium"] as const;
-
-export type MiniMaxH3Quality = (typeof MINIMAX_H3_QUALITIES)[number];
-
-export const resolveMiniMaxH3Quality = (value: unknown): MiniMaxH3Quality =>
-  value === "medium" ? "medium" : "high";
-
-export const isMiniMaxH3PddAcceleratorQuality = (
-  quality: MiniMaxH3Quality
-): boolean => quality === "high";
 
 export type MiniMaxH3VfxLoraApplication = {
   lora: MiniMaxH3VfxLora;
@@ -61,7 +50,7 @@ export type MiniMaxH3LocalGraphInput = {
   width: number;
   height: number;
   lengthFrames: number;
-  quality: MiniMaxH3Quality;
+  steps: MiniMaxH3StepLoraSteps;
   seed: number;
   referenceImages: string[];
   referenceVideo?: string;
@@ -106,45 +95,28 @@ const buildReferenceNodes = (
   return { nodes, referenceInputs };
 };
 
-const buildAcceleratorNodes = (
-  quality: MiniMaxH3Quality,
+const buildStepLoraNodes = (
+  steps: MiniMaxH3StepLoraSteps,
   shiftedModel: ComfyNodeOutputLink
-): ComfyGraph => {
-  if (isMiniMaxH3PddAcceleratorQuality(quality))
-    return {
-      "2": {
-        class_type: "MiniMaxH3PDDAccApply",
-        inputs: {
-          model: shiftedModel,
-          pdd_file: MINIMAX_H3_LOCAL_MODEL_FILES.pddAccelerator,
-          nfe: String(HIGH_QUALITY_PDD_STEPS),
-          lora_strength: 1,
-          head_strength: 1,
-          on_off_grid: "error",
-          partition_check: "warn"
-        }
-      }
-    };
-  return {
-    "2": {
-      class_type: "LoraLoaderModelOnly",
-      inputs: {
-        model: ["1", 0],
-        lora_name: MINIMAX_H3_LOCAL_MODEL_FILES.fourStepLora,
-        strength_model: 1
-      }
-    },
-    "12": {
-      class_type: "BasicScheduler",
-      inputs: {
-        model: shiftedModel,
-        scheduler: "simple",
-        steps: MEDIUM_QUALITY_STEPS,
-        denoise: 1
-      }
+): ComfyGraph => ({
+  "2": {
+    class_type: "LoraLoaderModelOnly",
+    inputs: {
+      model: ["1", 0],
+      lora_name: MINIMAX_H3_STEP_LORAS[steps].loraFile,
+      strength_model: 1
     }
-  };
-};
+  },
+  "12": {
+    class_type: "BasicScheduler",
+    inputs: {
+      model: shiftedModel,
+      scheduler: "simple",
+      steps,
+      denoise: 1
+    }
+  }
+});
 
 const buildVfxLoraNodes = (
   vfxLora: MiniMaxH3VfxLoraApplication | undefined
@@ -190,7 +162,6 @@ const buildSourceClipGuideNodes = (
 export const buildMiniMaxH3LocalGraph = (
   input: MiniMaxH3LocalGraphInput
 ): ComfyGraph => {
-  const usesPddAccelerator = isMiniMaxH3PddAcceleratorQuality(input.quality);
   const { nodes: referenceNodes, referenceInputs } = buildReferenceNodes(input);
   const shiftedModel: ComfyNodeOutputLink = input.vfxLora
     ? [VFX_LORA_NODE_ID, 0]
@@ -202,7 +173,7 @@ export const buildMiniMaxH3LocalGraph = (
     referenceNodes,
     buildVfxLoraNodes(input.vfxLora),
     buildSourceClipGuideNodes(input),
-    buildAcceleratorNodes(input.quality, shiftedModel),
+    buildStepLoraNodes(input.steps, shiftedModel),
     {
       "1": {
         class_type: "UNETLoader",
@@ -214,7 +185,7 @@ export const buildMiniMaxH3LocalGraph = (
       "3": {
         class_type: "MiniMaxChunkFeedForward",
         inputs: {
-          model: usesPddAccelerator ? ["1", 0] : ["2", 0],
+          model: ["2", 0],
           chunks: 4,
           seq_threshold: 4096
         }
@@ -260,7 +231,7 @@ export const buildMiniMaxH3LocalGraph = (
       "10": {
         class_type: "BasicGuider",
         inputs: {
-          model: usesPddAccelerator ? ["2", 0] : shiftedModel,
+          model: shiftedModel,
           conditioning
         }
       },
@@ -274,7 +245,7 @@ export const buildMiniMaxH3LocalGraph = (
           noise: ["9", 0],
           guider: ["10", 0],
           sampler: ["11", 0],
-          sigmas: usesPddAccelerator ? ["2", 1] : ["12", 0],
+          sigmas: ["12", 0],
           latent_image: ["8", 1]
         }
       },
@@ -312,7 +283,7 @@ export type MiniMaxH3RenderRequest = {
   width: number;
   height: number;
   durationSeconds: number;
-  quality: MiniMaxH3Quality;
+  steps: MiniMaxH3StepLoraSteps;
   referenceImagePaths: string[];
   referenceVideoPath?: string;
   useReferenceVideoAudio: boolean;
@@ -402,7 +373,7 @@ export const buildMiniMaxH3GraphFromPlan = ({
     width: request.width,
     height: request.height,
     lengthFrames: plan.lengthFrames,
-    quality: request.quality,
+    steps: request.steps,
     seed: plan.seed,
     referenceImages,
     referenceVideo,

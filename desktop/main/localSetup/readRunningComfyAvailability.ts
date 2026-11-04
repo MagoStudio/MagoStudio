@@ -10,7 +10,6 @@ const REQUEST_TIMEOUT_MS = 5_000;
 const NODE_PACK_NODES: Record<string, string[]> = {
   "comfyui-kjnodes": ["MiniMaxChunkFeedForward"],
   "comfyui-videohelpersuite": ["VHS_LoadVideo"],
-  "comfyui-minimax-h3-pdd-acc": ["MiniMaxH3PDDAccApply"],
   "comfyui-gguf": ["UnetLoaderGGUF"],
   "comfyui_simple_qwen3-vl-gguf": ["SimpleQwenVLggufV2"]
 };
@@ -21,8 +20,7 @@ const MODEL_LOADERS: Record<string, [string, string]> = {
   text_encoders: ["CLIPLoader", "clip_name"],
   vae: ["VAELoader", "vae_name"],
   latent_upscale_models: ["LatentUpscaleModelLoader", "model_name"],
-  loras: ["LoraLoaderModelOnly", "lora_name"],
-  pdd_acc: ["MiniMaxH3PDDAccApply", "pdd_file"]
+  loras: ["LoraLoaderModelOnly", "lora_name"]
 };
 
 const basename = (name: string): string =>

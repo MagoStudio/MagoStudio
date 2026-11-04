@@ -35,8 +35,9 @@ export const LOCAL_MODEL_LICENSES: LocalModelLicense[] = [
     isPermissiveLicense: false
   },
   {
-    modelName: "MiniMax H3 8-step LoRA",
-    huggingFaceRepo: "alibaba-pai/MiniMax-H3-Acc-LoRAs",
+    modelName:
+      "Pika H3 Flex Turbo LoRAs (2 step draft, 4 step turbo, 8 step HD)",
+    huggingFaceRepo: "Pika-Labs/Pika-H3-Flex-Turbo-LoRA",
     licenseName: "MiniMax H3 Community License",
     licenseUrl: MINIMAX_H3_LICENSE_URL,
     isPermissiveLicense: false

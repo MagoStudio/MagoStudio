@@ -7,12 +7,11 @@ import {
 import { backendApiClient } from "@/lib/backend-api-client";
 import { getLocalDesktopApi } from "@/platform/localDesktop";
 
+import { resolveMiniMaxH3StepLoraSteps } from "../../../../desktop/shared/minimaxH3StepLoras";
 import {
   DEFAULT_LOCAL_H3_MODEL,
   DEFAULT_LOCAL_H3_TEXT_ENCODER,
-  DEFAULT_LOCAL_H3_STEPS,
   LOCAL_H3_MODEL_OPTIONS,
-  LOCAL_H3_STEP_OPTIONS,
   LOCAL_H3_TEXT_ENCODER_OPTIONS,
   LocalH3Model,
   LocalH3Steps,
@@ -38,12 +37,9 @@ export const postGenerateProjectShots = async (
   request: GenerateProjectShotsRequest
 ): Promise<ShotGenerateResult> => {
   if (await isLocalScriptProject(request.projectId)) {
-    const requestedSteps = request.videoSettings?.local_h3_steps;
-    const localH3Steps: LocalH3Steps = LOCAL_H3_STEP_OPTIONS.includes(
-      requestedSteps as LocalH3Steps
-    )
-      ? (requestedSteps as LocalH3Steps)
-      : DEFAULT_LOCAL_H3_STEPS;
+    const localH3Steps: LocalH3Steps = resolveMiniMaxH3StepLoraSteps(
+      request.videoSettings?.local_h3_steps
+    );
     const useLegacyH3Workflow =
       request.videoSettings?.local_h3_legacy_workflow === true;
     const requestedTextEncoder = request.videoSettings?.local_h3_text_encoder;

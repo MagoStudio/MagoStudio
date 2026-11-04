@@ -10,9 +10,7 @@ export const MINIMAX_H3_SHARED_MODEL_FILES = {
   unet: "minimax_h3_ref2va_pruned_int8_convrot.safetensors",
   textEncoderVanilla: "qwen3vl_32b_minimax_h3_nvfp4_awq.safetensors",
   videoVae: "minimax_h3_video_vae_fp16.safetensors",
-  audioVae: "minimax_h3_audio_vae_fp32.safetensors",
-  pddAccelerator: "MiniMax-H3-Ref2VA-Acc-8Step.safetensors",
-  fourStepLora: "minimax_h3_ref2v_turbo_4step_v0.1_comfyui_bf16.safetensors"
+  audioVae: "minimax_h3_audio_vae_fp32.safetensors"
 } as const;
 
 export const clampMiniMaxH3Dimension = (value: number): number =>

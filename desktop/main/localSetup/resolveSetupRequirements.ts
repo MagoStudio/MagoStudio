@@ -40,7 +40,7 @@ export const resolveSetupRequirements = async (
   const knownRequirements = [
     ...setup.nodes,
     ...setup.models,
-    ...setup.highQuality,
+    ...setup.optionalStepLoras,
     ...setup.vfxLoras,
     ...setup.optional.flatMap((group) => group.requirements)
   ];

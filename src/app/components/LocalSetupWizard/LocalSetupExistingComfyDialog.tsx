@@ -466,9 +466,6 @@ const ConnectionForm = ({ onComplete }: { onComplete: () => void }) => {
                 title="ComfyUI and node packs (including optional features)"
                 items={[
                   ...result.nodes,
-                  ...result.highQuality.filter(
-                    (item) => item.installKind !== "model"
-                  ),
                   ...result.optional.flatMap((group) =>
                     group.requirements.filter(
                       (item) => item.installKind !== "model"
@@ -491,14 +488,12 @@ const ConnectionForm = ({ onComplete }: { onComplete: () => void }) => {
                   startDownloadOnceLicensesAccepted
                 }
                 debugMissing={debugMissing}
-                title="Optional: 8-step slow rendering"
-                items={result.highQuality.filter(
-                  (item) => item.installKind === "model"
-                )}
+                title="Optional: 2 step draft and 4 step turbo LoRAs"
+                items={result.optionalStepLoras}
               />
               <Text variant="xs" color="glyph-secondary">
-                Use Fast rendering with the minimum setup. Slow rendering also
-                needs the 8-step accelerator above.
+                The minimum setup renders with the 8 step HD LoRA. Add the draft
+                or turbo LoRA above to render faster.
               </Text>
               <details
                 key={`vfx-loras-${String(debugMissing)}`}
