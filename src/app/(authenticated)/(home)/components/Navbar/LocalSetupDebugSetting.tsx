@@ -11,21 +11,16 @@ export const LocalSetupDebugSetting = () => {
     useLocalSetupDebugSetting();
 
   return (
-    <>
-      <div className="h-px bg-glyph-stroke" aria-hidden="true" />
-      <div className="flex flex-col gap-1">
-        <Checkbox
-          inputId={checkboxId}
-          isChecked={isLocalSetupDebugEnabled}
-          onChange={(event) =>
-            setIsLocalSetupDebugEnabled(event.target.checked)
-          }
-          label={t("localSetup.debugSetting.label")}
-        />
-        <Text variant="2xs" color="glyph-tertiary">
-          {t("localSetup.debugSetting.description")}
-        </Text>
-      </div>
-    </>
+    <div className="flex flex-col gap-1">
+      <Checkbox
+        inputId={checkboxId}
+        isChecked={isLocalSetupDebugEnabled}
+        onChange={(event) => setIsLocalSetupDebugEnabled(event.target.checked)}
+        label={t("localSetup.debugSetting.label")}
+      />
+      <Text variant="2xs" color="glyph-tertiary">
+        {t("localSetup.debugSetting.description")}
+      </Text>
+    </div>
   );
 };

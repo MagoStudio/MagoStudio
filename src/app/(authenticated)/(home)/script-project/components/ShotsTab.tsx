@@ -70,6 +70,7 @@ import { suggestShotHeading } from "@domains/scriptProject/utils/suggestShotHead
 import { withPendingShotHiddenEdits } from "@domains/scriptProject/utils/withPendingShotHiddenEdits";
 import { GPT_IMAGE_2_QUALITY_COST } from "@home/components/Navbar/Img2ImgModalV2/schemas/gptImage2.schema";
 import { useLatestRef } from "@hooks/useLatestRef";
+import { useSceneTimelineVisibilitySetting } from "@hooks/userLocalStorage/useSceneTimelineVisibilitySetting";
 import {
   ProjectState,
   SheetGroup,
@@ -137,6 +138,7 @@ export const ShotsTab: React.FC<Props> = ({
 }) => {
   const { t } = useTranslation();
   const { showToast, showErrorToast } = useToast();
+  const [isSceneTimelineShown] = useSceneTimelineVisibilitySetting();
   const { data: project } = useProject(projectId);
   const isLocalProject = project?.origin === "local";
   const {
@@ -818,15 +820,17 @@ export const ShotsTab: React.FC<Props> = ({
           </Text>
         ) : (
           <>
-            <SequenceTimeline
-              projectId={projectId}
-              shots={matchingShots}
-              cutShots={cut?.shots ?? []}
-              isLocalProject={isLocalProject}
-              renderingShotTimelineIds={renderingShotTimelineIds}
-              changedShotTimelineIds={staleShotTimelineIds}
-              onSelect={scrollToShot}
-            />
+            {isSceneTimelineShown && (
+              <SequenceTimeline
+                projectId={projectId}
+                shots={matchingShots}
+                cutShots={cut?.shots ?? []}
+                isLocalProject={isLocalProject}
+                renderingShotTimelineIds={renderingShotTimelineIds}
+                changedShotTimelineIds={staleShotTimelineIds}
+                onSelect={scrollToShot}
+              />
+            )}
             <div
               ref={shotsContentRef}
               className={cn(

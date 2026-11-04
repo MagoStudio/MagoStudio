@@ -8,6 +8,25 @@ import {
 } from "./graphicsCards";
 import { BYTES_PER_GIGABYTE as GB } from "./resolveHardwareVerdict";
 describe("multiple GPU detection", () => {
+  it("allows an 8 GB NVIDIA card reporting slightly less memory", () => {
+    const report = buildMultiGpuReport(
+      parseNvidiaCards("NVIDIA GeForce RTX 4060 Ti, 8188"),
+      32 * GB
+    );
+
+    expect(report.graphicsCardName).toBe("NVIDIA GeForce RTX 4060 Ti");
+    expect(report.videoMemoryBytes).toBe(8188 * 1024 ** 2);
+    expect(report.videoMemoryLabel).toBe("8 GB");
+    expect(report.verdict).toBe("limited");
+    expect(report.graphicsCards).toEqual([
+      {
+        name: "NVIDIA GeForce RTX 4060 Ti",
+        videoMemoryLabel: "8 GB",
+        selected: true
+      }
+    ]);
+  });
+
   it("reads every NVIDIA device including MiB values above 4 GB", () => {
     const cards = parseNvidiaCards(
       "NVIDIA RTX 3080, 10240\nNVIDIA GeForce RTX 5090, 32607\n"

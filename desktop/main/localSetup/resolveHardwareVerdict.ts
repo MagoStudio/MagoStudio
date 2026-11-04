@@ -3,8 +3,8 @@ import type {
   LocalSetupHardwareVerdict
 } from "../../shared/contracts";
 
-export const MINIMUM_VIDEO_MEMORY_GIGABYTES = 8;
-export const COMFORTABLE_VIDEO_MEMORY_GIGABYTES = 16;
+export const MINIMUM_VIDEO_MEMORY_MEBIBYTES = 8000;
+export const COMFORTABLE_VIDEO_MEMORY_MEBIBYTES = 16000;
 
 const BYTES_PER_KILOBYTE = 1024;
 const BYTES_PER_MEGABYTE = BYTES_PER_KILOBYTE * BYTES_PER_KILOBYTE;
@@ -25,9 +25,9 @@ export const resolveHardwareVerdict = ({
   );
   if (!isNvidiaGraphicsCard || videoMemoryBytes === null) return "blocked";
 
-  const videoMemoryGigabytes = videoMemoryBytes / BYTES_PER_GIGABYTE;
-  if (videoMemoryGigabytes < MINIMUM_VIDEO_MEMORY_GIGABYTES) return "blocked";
-  if (videoMemoryGigabytes < COMFORTABLE_VIDEO_MEMORY_GIGABYTES) {
+  const videoMemoryMebibytes = videoMemoryBytes / BYTES_PER_MEGABYTE;
+  if (videoMemoryMebibytes < MINIMUM_VIDEO_MEMORY_MEBIBYTES) return "blocked";
+  if (videoMemoryMebibytes < COMFORTABLE_VIDEO_MEMORY_MEBIBYTES) {
     return "limited";
   }
   return "ready";

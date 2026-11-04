@@ -38,6 +38,29 @@ describe("resolveHardwareVerdict", () => {
     ).toBe("blocked");
   });
 
+  it.each([
+    [7999, "blocked"],
+    [8000, "limited"],
+    [8188, "limited"],
+    [8192, "limited"],
+    [15999, "limited"],
+    [16000, "ready"],
+    [16380, "ready"],
+    [16384, "ready"],
+    [6144, "blocked"],
+    [7680, "blocked"]
+  ] as const)(
+    "applies the explicit memory thresholds for %i MiB (%s)",
+    (mebibytes, verdict) => {
+      expect(
+        resolveHardwareVerdict({
+          graphicsCardName: "NVIDIA GeForce RTX",
+          videoMemoryBytes: mebibytes * 1024 ** 2
+        })
+      ).toBe(verdict);
+    }
+  );
+
   it("blocks a card that is not NVIDIA however much memory it reports", () => {
     expect(
       resolveHardwareVerdict({

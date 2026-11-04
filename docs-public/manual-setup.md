@@ -85,7 +85,7 @@ Pick one. The wizard picks Q5 with 24 GB VRAM or more, otherwise Q3.
 
 | Folder                 | File                                                                                                                                                                                    | Size  |
 | ---------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ----- |
-| `models/unet`          | [qwen-image-2512-Q5_K_M.gguf](https://huggingface.co/unsloth/Qwen-Image-2512-GGUF/resolve/main/qwen-image-2512-Q5_K_M.gguf)                                                             | 15.00 |
+| `models/unet`          | [qwen-image-2512-Q5_K_M.gguf](https://huggingface.co/unsloth/Qwen-Image-2512-GGUF/resolve/1626d7531f84b4d2ea1cd6d2e69f41ec027dd354/qwen-image-2512-Q5_K_M.gguf)                         | 15.00 |
 | `models/text_encoders` | [qwen_2.5_vl_7b_fp8_scaled.safetensors](https://huggingface.co/Comfy-Org/Qwen-Image_ComfyUI/resolve/main/split_files/text_encoders/qwen_2.5_vl_7b_fp8_scaled.safetensors)               | 9.38  |
 | `models/vae`           | [qwen_image_vae.safetensors](https://huggingface.co/Comfy-Org/Qwen-Image_ComfyUI/resolve/main/split_files/vae/qwen_image_vae.safetensors)                                               | 0.25  |
 | `models/loras`         | [Qwen-Image-2512-Lightning-4steps-V1.0-fp32.safetensors](https://huggingface.co/lightx2v/Qwen-Image-2512-Lightning/resolve/main/Qwen-Image-2512-Lightning-4steps-V1.0-fp32.safetensors) | 1.70  |

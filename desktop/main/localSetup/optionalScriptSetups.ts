@@ -6,6 +6,7 @@ import {
   hardwareVariantLabel,
   SCRIPT_TEXT_MODEL_GROUP_ID
 } from "../../shared/localModelGroups";
+import { QWEN_IMAGE_2512_UNET_URL } from "../../shared/localModelManifest";
 import { FLUX2_KLEIN_MODEL_FILES } from "../imageRenders/comfyQwenClient";
 import {
   LOCAL_SCRIPT_MODEL_FILES as files,
@@ -107,7 +108,7 @@ export const optionalScriptSetups = (
         node: "UnetLoaderGGUF",
         input: "unet_name",
         folder: "unet",
-        url: hf("unsloth/Qwen-Image-2512-GGUF", files.imageUnet)
+        url: QWEN_IMAGE_2512_UNET_URL
       },
       {
         name: files.imageClip,

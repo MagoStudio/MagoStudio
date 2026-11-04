@@ -68,7 +68,7 @@ const SequenceTimelineItem: React.FC<ItemProps> = ({
     <button
       type="button"
       onClick={onSelect}
-      className="group relative flex h-20 w-48 shrink-0 flex-col gap-1.5 rounded-lg border border-element-primary bg-surface-secondary px-2.5 py-2 text-left outline-hidden transition-[width,border-color] duration-100 hover:w-80 hover:border-glyph-action-main focus-visible:w-80 focus-visible:ring-1 focus-visible:ring-glyph-action-main"
+      className="group relative flex h-20 w-max min-w-48 shrink-0 flex-col gap-1.5 rounded-lg border border-element-primary bg-surface-secondary px-2.5 py-2 text-left outline-hidden transition-[min-width,border-color] duration-100 hover:min-w-80 hover:border-glyph-action-main focus-visible:min-w-80 focus-visible:ring-1 focus-visible:ring-glyph-action-main"
       data-testid={`sequence-timeline-item-${shot.timeline_id}`}
     >
       {isSequential && (
@@ -81,7 +81,7 @@ const SequenceTimelineItem: React.FC<ItemProps> = ({
         </span>
       )}
       <span className="absolute -right-3 top-1/2 h-px w-3 bg-element-primary group-last:hidden" />
-      <span className="flex h-8 min-w-0 items-start gap-1.5 overflow-hidden">
+      <span className="flex h-8 min-w-0 items-start gap-1.5 overflow-hidden [contain:inline-size]">
         <Text variant="2xs" color="glyph-tertiary" className="shrink-0">
           {String(shot.shot_index + 1).padStart(SHOT_INDEX_PAD_LENGTH, "0")}
         </Text>
@@ -93,7 +93,7 @@ const SequenceTimelineItem: React.FC<ItemProps> = ({
           {shot.heading}
         </Text>
       </span>
-      <span className="flex h-5 items-center gap-1 overflow-hidden whitespace-nowrap">
+      <span className="flex h-5 items-center gap-1 whitespace-nowrap">
         <span
           className={cn(
             "inline-flex h-5 items-center gap-1 rounded px-1.5 font-lato text-2xs",

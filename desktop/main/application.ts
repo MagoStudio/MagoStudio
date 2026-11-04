@@ -1,6 +1,6 @@
 import path from "node:path";
 
-import { app, BrowserWindow, shell } from "electron";
+import { app, BrowserWindow, dialog, session, shell } from "electron";
 
 import {
   inWindowNavigationHosts,
@@ -40,6 +40,7 @@ import { runBackgroundTask } from "./libraryHealth";
 import { LibrarySettings } from "./librarySettings";
 import { VideoFrameService } from "./media/videoFrameService";
 import { openStartupLibrary } from "./openStartupLibrary";
+import { installOfflineRenderer } from "./renderer/offlineRenderer";
 import {
   ensureRendererCertificate,
   installHostResolverRule,
@@ -52,7 +53,13 @@ import { registerMediaProtocol } from "./rendererProtocol";
 import { ComfyScriptProjectClient } from "./scriptProjects/comfyScriptProjectClient";
 import { LocalScriptChatService } from "./scriptProjects/localScriptChatService";
 import { LocalScriptProjectService } from "./scriptProjects/localScriptProjectService";
-import { failStartup, logStartup, startupComplete } from "./startupDiagnostics";
+import {
+  failStartup,
+  logStartup,
+  pauseStartupTimeout,
+  resumeStartupTimeout,
+  startupComplete
+} from "./startupDiagnostics";
 import { LocalI2vPromptAdapter } from "./vlm/localI2vPromptAdapter";
 import { VlmService } from "./vlm/vlmService";
 
@@ -126,6 +133,8 @@ const usesPackagedRenderer =
   app.isPackaged || process.env.MAGO_PACKAGED_SMOKE === "1";
 const developmentRendererUrl = process.env.MAGO_RENDERER_URL;
 const cloudConfig = resolveCloudConfig();
+const RENDERER_LOAD_TIMEOUT_MS = 15_000;
+let windowsBeingCreated = 0;
 
 /**
  * Bring up the https origin the renderer is served from, and point its hostname
@@ -136,13 +145,16 @@ const cloudConfig = resolveCloudConfig();
  * `await` is too late and the hostname fails to resolve. That is why the port is
  * fixed rather than ephemeral — it has to be known before the listener binds.
  */
-const rendererOriginPromise: Promise<RendererOrigin> | null = (() => {
-  if (!usesPackagedRenderer && !developmentRendererUrl) return null;
-
-  const port = rendererPort();
+const port = rendererPort();
+if (usesPackagedRenderer || developmentRendererUrl) {
   installHostResolverRule({ host: cloudConfig.rendererHost, port });
-
-  return (async () => {
+}
+let rendererOriginPromise: Promise<RendererOrigin> | null = null;
+let offlineRendererInstalled = false;
+const getRendererOrigin = (): Promise<RendererOrigin> | null => {
+  if (!usesPackagedRenderer && !developmentRendererUrl) return null;
+  // Offline startup must never wait for a certificate or a listening socket.
+  rendererOriginPromise ??= (async () => {
     const certificate = await ensureRendererCertificate(
       cloudConfig.rendererHost
     );
@@ -154,8 +166,12 @@ const rendererOriginPromise: Promise<RendererOrigin> | null = (() => {
       port,
       config: cloudConfig
     });
-  })();
-})();
+  })().catch((error: unknown) => {
+    rendererOriginPromise = null;
+    throw error;
+  });
+  return rendererOriginPromise;
+};
 
 registerDeepLinkScheme();
 
@@ -181,10 +197,25 @@ app.on("second-instance", () => {
   deepLinkTarget.focus();
 });
 
-const createWindow = async (): Promise<BrowserWindow> => {
+const createWindowOnce = async (): Promise<BrowserWindow> => {
   logStartup("Waiting for renderer origin and settings");
-  const origin = await rendererOriginPromise;
   const appMode = (await librarySettings.getAppMode()) ?? "unchosen";
+  const useOfflineRenderer = usesPackagedRenderer && appMode === "offline";
+  if (useOfflineRenderer && !offlineRendererInstalled) {
+    installOfflineRenderer(
+      session.defaultSession,
+      path.join(app.getAppPath(), "out"),
+      cloudConfig
+    );
+    offlineRendererInstalled = true;
+    logStartup(
+      "Offline renderer: serving bundled files directly (no TLS listener)"
+    );
+  } else if (!useOfflineRenderer && offlineRendererInstalled) {
+    session.defaultSession.protocol.unhandle("https");
+    offlineRendererInstalled = false;
+  }
+  const origin = useOfflineRenderer ? null : await getRendererOrigin();
   const window = new BrowserWindow({
     width: 1440,
     height: 900,
@@ -259,7 +290,30 @@ const createWindow = async (): Promise<BrowserWindow> => {
     startupComplete();
   });
   logStartup("Loading application window");
-  await window.loadURL(origin?.url || "about:blank");
+  let loadTimer: ReturnType<typeof setTimeout> | undefined;
+  try {
+    await Promise.race([
+      window.loadURL(
+        useOfflineRenderer
+          ? `https://${cloudConfig.rendererHost}/`
+          : origin?.url || "about:blank"
+      ),
+      new Promise<never>((_resolve, reject) => {
+        // Next's development server can need longer for its first compilation.
+        if (!usesPackagedRenderer) return;
+        loadTimer = setTimeout(() => {
+          reject(
+            new Error("The application window did not load within 15 seconds.")
+          );
+        }, RENDERER_LOAD_TIMEOUT_MS);
+      })
+    ]);
+  } catch (error) {
+    window.destroy();
+    throw error;
+  } finally {
+    clearTimeout(loadTimer);
+  }
 
   deepLinkTarget = window;
   while (pendingDeepLinks.length > 0) {
@@ -267,6 +321,38 @@ const createWindow = async (): Promise<BrowserWindow> => {
     if (link) deliverDeepLink(link);
   }
   return window;
+};
+
+const createWindow = async (): Promise<BrowserWindow> => {
+  windowsBeingCreated += 1;
+  try {
+    return await createWindowOnce();
+  } catch (error) {
+    if (
+      !usesPackagedRenderer ||
+      (await librarySettings.getAppMode()) === "offline"
+    ) {
+      throw error;
+    }
+    logStartup(`Cloud renderer startup failed: ${String(error)}`);
+    pauseStartupTimeout();
+    const { response } = await dialog.showMessageBox({
+      type: "warning",
+      title: "Mago Studio could not open cloud sign-in",
+      message: "You can continue working offline.",
+      detail:
+        "Cloud sign-in could not start. Your local library is available in offline mode. You can try signing in again later.",
+      buttons: ["Work offline", "Show error"],
+      defaultId: 0,
+      cancelId: 1
+    });
+    if (response !== 0) throw error;
+    await librarySettings.setAppMode("offline");
+    resumeStartupTimeout();
+    return await createWindowOnce();
+  } finally {
+    windowsBeingCreated -= 1;
+  }
 };
 
 void app
@@ -340,6 +426,8 @@ void app
   .catch(failStartup);
 
 app.on("window-all-closed", () => {
+  // A failed cloud window is destroyed before its offline replacement opens.
+  if (windowsBeingCreated > 0) return;
   if (process.platform !== "darwin") app.quit();
 });
 

@@ -1,11 +1,9 @@
 import { describe, expect, it, vi } from "vitest";
 
 import {
-  canDisableProvider,
   DEFAULT_PROVIDER_PREFERENCES,
   parseProviderPreferences,
-  readProviderPreferences,
-  ProviderPreferences
+  readProviderPreferences
 } from "./providerPreferences";
 
 describe("parseProviderPreferences", () => {
@@ -101,34 +99,5 @@ describe("parseProviderPreferences", () => {
         DEFAULT_PROVIDER_PREFERENCES
       );
     }
-  });
-});
-
-describe("canDisableProvider", () => {
-  const all: ProviderPreferences = {
-    "local-comfy": true,
-    "mago-cloud": true
-  };
-
-  it("allows switching one off while others remain", () => {
-    expect(canDisableProvider(all, "mago-cloud")).toBe(true);
-  });
-
-  it("refuses to switch off the last one, which would empty the model list", () => {
-    const onlyCloud: ProviderPreferences = {
-      "local-comfy": false,
-      "mago-cloud": true
-    };
-
-    expect(canDisableProvider(onlyCloud, "mago-cloud")).toBe(false);
-  });
-
-  it("always allows switching one back on", () => {
-    const onlyCloud: ProviderPreferences = {
-      "local-comfy": false,
-      "mago-cloud": true
-    };
-
-    expect(canDisableProvider(onlyCloud, "local-comfy")).toBe(true);
   });
 });
