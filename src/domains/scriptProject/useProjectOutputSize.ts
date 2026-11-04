@@ -1,11 +1,11 @@
+import { resolveMiniMaxH3StepLoraSteps } from "../../../desktop/shared/minimaxH3StepLoras";
+
 import {
   DEFAULT_LOCAL_H3_LEGACY_WORKFLOW,
   DEFAULT_LOCAL_H3_MODEL,
-  DEFAULT_LOCAL_H3_STEPS,
   DEFAULT_LOCAL_H3_TEXT_ENCODER,
   DEFAULT_SHOT_DURATION_SECONDS,
   DEFAULT_SHOT_RETRIES,
-  LOCAL_H3_STEP_OPTIONS,
   LOCAL_H3_MODEL_OPTIONS,
   LOCAL_H3_TEXT_ENCODER_OPTIONS,
   LocalH3Steps,
@@ -37,12 +37,9 @@ export const useProjectOutputSize = (projectId: string | undefined) => {
   const shotQualityRetries =
     project?.settings?.shot_quality_retries ?? DEFAULT_SHOT_RETRIES;
 
-  const storedLocalH3Steps = project?.settings?.local_h3_steps;
-  const localH3Steps: LocalH3Steps = LOCAL_H3_STEP_OPTIONS.includes(
-    storedLocalH3Steps as LocalH3Steps
-  )
-    ? (storedLocalH3Steps as LocalH3Steps)
-    : DEFAULT_LOCAL_H3_STEPS;
+  const localH3Steps: LocalH3Steps = resolveMiniMaxH3StepLoraSteps(
+    project?.settings?.local_h3_steps
+  );
   const localH3LegacyWorkflow =
     project?.settings?.local_h3_legacy_workflow ??
     DEFAULT_LOCAL_H3_LEGACY_WORKFLOW;

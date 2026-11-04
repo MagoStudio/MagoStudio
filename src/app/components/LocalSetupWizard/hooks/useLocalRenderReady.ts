@@ -2,7 +2,11 @@ import { VideoEngine } from "@models/video/types";
 import { useQuery } from "@tanstack/react-query";
 
 import { isComfyLocalVideoModel } from "@/platform/localVideoModels";
-const SLOW_RENDER_STEPS = 8;
+
+import {
+  MINIMAX_H3_STEP_LORAS,
+  type MiniMaxH3StepLoraSteps
+} from "../../../../../desktop/shared/minimaxH3StepLoras";
 
 export const useLocalVideoReady = (
   model: VideoEngine,
@@ -25,7 +29,10 @@ export const useLocalVideoReady = (
   return !enabled || (!result.isError && result.data?.ready === true);
 };
 
-export const useLocalShotsReady = (enabled: boolean, steps: number) => {
+export const useLocalShotsReady = (
+  enabled: boolean,
+  steps: MiniMaxH3StepLoraSteps
+) => {
   const result = useQuery({
     queryKey: ["local-script-setup"],
     queryFn: () => window.mago.comfy.scriptSetupStatus(),
@@ -33,11 +40,14 @@ export const useLocalShotsReady = (enabled: boolean, steps: number) => {
     retry: false,
     refetchInterval: 5000
   });
+  const selectedStepLoraRequirement = [
+    ...(result.data?.models ?? []),
+    ...(result.data?.optionalStepLoras ?? [])
+  ].find((item) => item.name === MINIMAX_H3_STEP_LORAS[steps].loraFile);
   return (
     !enabled ||
     (!result.isError &&
       result.data?.ready === true &&
-      (steps !== SLOW_RENDER_STEPS ||
-        result.data.highQuality.every((item) => item.status === "installed")))
+      selectedStepLoraRequirement?.status === "installed")
   );
 };

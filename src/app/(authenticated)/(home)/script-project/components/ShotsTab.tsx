@@ -1,5 +1,6 @@
 import { LaunchComfyOrSetupMagoStudioButton } from "@app/components/ComfyLaunchDialog/LaunchComfyOrSetupMagoStudioButton";
 import { useIsModelGroupInstalled } from "@app/components/LocalSetupWizard/hooks/useIsModelGroupInstalled";
+import { useLocalH3StepLoraInstallState } from "@app/components/LocalSetupWizard/hooks/useLocalH3StepLoraInstallState";
 import { useLocalShotsReady } from "@app/components/LocalSetupWizard/hooks/useLocalRenderReady";
 import { useLocalSheetModelInstallGate } from "@app/components/LocalSetupWizard/hooks/useLocalSheetModelInstallGate";
 import type { RequiredLocalInstall } from "@app/components/LocalSetupWizard/requiredLocalInstall";
@@ -83,14 +84,13 @@ import { cn } from "@utils";
 import { Fragment, useRef, useState } from "react";
 import { useTranslation } from "react-i18next";
 
+import { MINIMAX_H3_STEP_LORAS } from "../../../../../../desktop/shared/minimaxH3StepLoras";
+
 import { AddShotDialog } from "./AddShotDialog";
 import { EarlierScriptVersionToggle } from "./EarlierScriptVersionToggle";
 import { GenerateRunButton } from "./GenerateRunButton";
 import { useScenesLayout } from "./hooks/useScenesLayout";
-import {
-  LocalH3QualitySwitch,
-  resolveLocalH3QualitySteps
-} from "./LocalH3QualitySwitch";
+import { LocalH3StepsDropdown } from "./LocalH3StepsDropdown";
 import { ProjectOutputSizeControls } from "./ProjectOutputSizeControls";
 import { ScenesLayoutSwitcher } from "./ScenesLayoutSwitcher";
 import { SceneStoryboardRenderPoller } from "./SceneStoryboardRenderPoller";
@@ -154,15 +154,18 @@ export const ShotsTab: React.FC<Props> = ({
     modelGroupId: "minimal",
     isModelGroupCheckNeeded: isLocalProject
   });
-  const localReady = useLocalShotsReady(
-    isLocalProject,
-    resolveLocalH3QualitySteps(localH3Steps)
-  );
-  // Quality (Slow 8 / Fast 4 steps) is the only H3 choice a local project
-  // shows; the rest render at their defaults, whatever an older build stored.
+  const localH3StepLoraInstallState =
+    useLocalH3StepLoraInstallState(isLocalProject);
+  const selectedStepLoraInstall: RequiredLocalInstall = {
+    kind: "model-group",
+    modelGroupId: MINIMAX_H3_STEP_LORAS[localH3Steps].modelGroupId
+  };
+  const isSelectedStepLoraModelGroupInstalled =
+    localH3StepLoraInstallState.isStepLoraModelGroupInstalled(localH3Steps);
+  const localReady = useLocalShotsReady(isLocalProject, localH3Steps);
   const localH3VideoSettings = isLocalProject
     ? {
-        local_h3_steps: resolveLocalH3QualitySteps(localH3Steps),
+        local_h3_steps: localH3Steps,
         local_h3_legacy_workflow: DEFAULT_LOCAL_H3_LEGACY_WORKFLOW,
         local_h3_text_encoder: DEFAULT_LOCAL_H3_TEXT_ENCODER,
         local_h3_model: DEFAULT_LOCAL_H3_MODEL
@@ -760,10 +763,13 @@ export const ShotsTab: React.FC<Props> = ({
               />
             )}
             {isLocalProject && (
-              <LocalH3QualitySwitch
+              <LocalH3StepsDropdown
                 steps={localH3Steps}
                 isDisabled={
                   isGeneratingShots || isRunActive || isSavingOutputSize
+                }
+                isStepLoraInstalled={
+                  localH3StepLoraInstallState.isStepLoraInstalled
                 }
                 onChange={setLocalH3Steps}
               />
@@ -790,9 +796,14 @@ export const ShotsTab: React.FC<Props> = ({
                 requiredLocalInstall={MINIMAL_MODEL_GROUP_INSTALL}
                 lockedRenderButton={generateShotsButton}
               />
+            ) : !isSelectedStepLoraModelGroupInstalled ? (
+              <SetupMagoStudioButton
+                requiredLocalInstall={selectedStepLoraInstall}
+                lockedRenderButton={generateShotsButton}
+              />
             ) : !localReady ? (
               <LaunchComfyOrSetupMagoStudioButton
-                requiredLocalInstall={MINIMAL_MODEL_GROUP_INSTALL}
+                requiredLocalInstall={selectedStepLoraInstall}
                 lockedRenderButton={generateShotsButton}
               />
             ) : (

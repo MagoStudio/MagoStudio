@@ -18,11 +18,11 @@ describe("buildComfyModelStatusSettings", () => {
     expect(
       buildComfyModelStatusSettings({
         modelName: VideoEngine.minimax_h3_local,
-        renderSettingsValues: { h3_quality: "high", vfx_mode: "vfx_edit" },
+        renderSettingsValues: { h3_quality: "hd", vfx_mode: "vfx_edit" },
         sources: [{ asset_id: "edited", type: "key_frame" }]
       })
     ).toEqual({
-      h3_quality: "high",
+      h3_quality: "hd",
       vfx_mode: "vfx_edit",
       vfx_edited_frame_id: "edited"
     });

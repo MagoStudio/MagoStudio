@@ -96,7 +96,7 @@ export const addSetupDestinations = (
     comfyRoot: root,
     nodes: status.nodes.map(map),
     models: status.models.map(map),
-    highQuality: status.highQuality.map(map),
+    optionalStepLoras: status.optionalStepLoras.map(map),
     vfxLoras: status.vfxLoras.map(map),
     optional: status.optional.map((group) => ({
       ...group,

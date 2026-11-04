@@ -203,7 +203,9 @@ flowchart TD
 flowchart LR
     ENGINE["ComfyUI engine<br/>Windows portable ZIP<br/>3.39 GB"] --> MIN
 
-    MIN["Minimal · always<br/>KJNodes · VideoHelperSuite · H3 PDD-Acc"] --> MINF["MiniMax H3 model + encoder + VAEs + 4-step LoRA<br/>H3 8-step Acc LoRA<br/>H3 VFX LoRAs<br/>Qwen3-VL 4B captioning"]
+    MIN["Minimal · always<br/>KJNodes · VideoHelperSuite"] --> MINF["MiniMax H3 model + encoder + VAEs + 8 step HD LoRA<br/>H3 VFX LoRAs<br/>Qwen3-VL 4B captioning"]
+    H3D["MiniMax H3 2 step draft"] --> H3DF["Pika H3 Flex 2 step draft LoRA"]
+    H3T["MiniMax H3 4 step turbo"] --> H3TF["Pika H3 Flex 4 step turbo LoRA"]
     LLM["Local LLM<br/>Simple_Qwen3-VL-gguf"] --> LLMF["Qwen3.8 27B<br/>Q5 if 24 GB+ VRAM, else Q3"]
     QI["Qwen Image<br/>ComfyUI-GGUF"] --> QIF["Qwen Image 2512 Q5 + encoder + VAE + Lightning LoRA"]
     FI["Flux Image<br/>ComfyUI-GGUF"] --> FIF["Flux 2 Klein 4B Q8 + Qwen3 4B encoder + VAE"]

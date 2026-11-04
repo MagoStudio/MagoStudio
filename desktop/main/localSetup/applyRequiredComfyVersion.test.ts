@@ -8,7 +8,7 @@ const readyStatus: ScriptSetupStatus = {
   ready: true,
   nodes: [],
   models: [],
-  highQuality: [],
+  optionalStepLoras: [],
   vfxLoras: [],
   optional: []
 };

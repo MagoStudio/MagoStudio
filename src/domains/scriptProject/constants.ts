@@ -10,6 +10,11 @@ import {
   SequentialShotMode
 } from "@schemas/scriptProject";
 
+import {
+  MINIMAX_H3_STEP_LORA_STEPS,
+  type MiniMaxH3StepLoraSteps
+} from "../../../desktop/shared/minimaxH3StepLoras";
+
 export const SHEET_RENDER_MODELS = [
   "seedream_5_pro_t2i",
   "gpt_image_2_t2i",
@@ -182,20 +187,9 @@ const SHOT_RETRY_OPTIONS = [
 
 export const DEFAULT_SHOT_RETRIES = SHOT_RETRY_OPTIONS[0].retries;
 
-export const LOCAL_H3_FAST_STEPS = 3;
-export const LOCAL_H3_BASELINE_STEPS = 4;
-export const LOCAL_H3_QUALITY_STEPS = 8;
+export const LOCAL_H3_STEP_OPTIONS = MINIMAX_H3_STEP_LORA_STEPS;
 
-export const LOCAL_H3_STEP_OPTIONS = [
-  LOCAL_H3_FAST_STEPS,
-  LOCAL_H3_BASELINE_STEPS,
-  LOCAL_H3_QUALITY_STEPS
-] as const;
-
-export type LocalH3Steps = (typeof LOCAL_H3_STEP_OPTIONS)[number];
-
-/** The supplied FastH3 workflow is the four-step reference baseline. */
-export const DEFAULT_LOCAL_H3_STEPS: LocalH3Steps = LOCAL_H3_BASELINE_STEPS;
+export type LocalH3Steps = MiniMaxH3StepLoraSteps;
 
 export const DEFAULT_LOCAL_H3_LEGACY_WORKFLOW = false;
 

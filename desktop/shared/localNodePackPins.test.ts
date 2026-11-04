@@ -2,8 +2,8 @@
 
 import { LOCAL_NODE_PACK_PINS } from "./localNodePackPins";
 describe("bundled node pack pins", () => {
-  it("pins all six packs to immutable commits or registry versions and SHA-256", () => {
-    expect(Object.values(LOCAL_NODE_PACK_PINS)).toHaveLength(6);
+  it("pins all five packs to immutable commits or registry versions and SHA-256", () => {
+    expect(Object.values(LOCAL_NODE_PACK_PINS)).toHaveLength(5);
     for (const pin of Object.values(LOCAL_NODE_PACK_PINS)) {
       expect(pin.sha256).toMatch(/^[a-f0-9]{64}$/);
       expect(pin.url).not.toMatch(/HEAD|latest|\/main\.|\/master\./);

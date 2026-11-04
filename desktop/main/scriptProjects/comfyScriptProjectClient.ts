@@ -2,6 +2,11 @@
 import path from "node:path";
 
 import type { LocalScriptTextModel } from "../../shared/contracts";
+import {
+  MINIMAX_H3_HD_STEPS,
+  MINIMAX_H3_STEP_LORAS,
+  type MiniMaxH3StepLoraSteps
+} from "../../shared/minimaxH3StepLoras";
 import { asRecord as record } from "../comfy/asRecord";
 import { ComfyClient } from "../comfy/ComfyClient";
 import type { ComfyGraph } from "../comfy/comfyGraph";
@@ -37,11 +42,7 @@ export const LOCAL_SCRIPT_MODEL_FILES = {
   videoClip: "qwen3vl_32b_h3_ultra_uncensored_heretic_int8_convrot.safetensors",
   videoClipVanilla: MINIMAX_H3_SHARED_MODEL_FILES.textEncoderVanilla,
   videoVae: MINIMAX_H3_SHARED_MODEL_FILES.videoVae,
-  audioVae: MINIMAX_H3_SHARED_MODEL_FILES.audioVae,
-  videoPdd8: MINIMAX_H3_SHARED_MODEL_FILES.pddAccelerator,
-  videoLora3: "robert-taomate_h3_3step_comfy.safetensors",
-  videoLora4: MINIMAX_H3_SHARED_MODEL_FILES.fourStepLora,
-  videoLora8: "minimax_h3_ref2v_turbo_8step_v1.0_768p_comfyui_bf16.safetensors"
+  audioVae: MINIMAX_H3_SHARED_MODEL_FILES.audioVae
 } as const;
 
 export const LOCAL_SCRIPT_TEXT_MODEL_FILES: Record<
@@ -52,7 +53,7 @@ export const LOCAL_SCRIPT_TEXT_MODEL_FILES: Record<
   "qwen38-27b-q3": LOCAL_SCRIPT_MODEL_FILES.llmQ3
 };
 
-export type LocalH3Steps = 3 | 4 | 8;
+export type LocalH3Steps = MiniMaxH3StepLoraSteps;
 export type LocalH3TextEncoder = "heretic" | "vanilla";
 export type LocalH3Model = "base" | "singularity";
 
@@ -76,15 +77,6 @@ export const resolveLocalScriptImageModel = (
 export const LOCAL_H3_TEXT_ENCODERS: Record<LocalH3TextEncoder, string> = {
   heretic: LOCAL_SCRIPT_MODEL_FILES.videoClip,
   vanilla: LOCAL_SCRIPT_MODEL_FILES.videoClipVanilla
-};
-
-export const LOCAL_H3_PRESETS: Record<
-  LocalH3Steps,
-  { steps: LocalH3Steps; lora: string }
-> = {
-  3: { steps: 3, lora: LOCAL_SCRIPT_MODEL_FILES.videoLora3 },
-  4: { steps: 4, lora: LOCAL_SCRIPT_MODEL_FILES.videoLora4 },
-  8: { steps: 8, lora: LOCAL_SCRIPT_MODEL_FILES.videoLora8 }
 };
 
 export const LOCAL_SCRIPT_VIDEO_CRF = LOCAL_VIDEO_RENDER_CRF;
@@ -151,8 +143,6 @@ type MiniMaxH3GraphInput = {
 const buildMiniMaxH3FastGraph = (
   input: MiniMaxH3GraphInput
 ): Record<string, ComfyGraphNode> => {
-  const preset = LOCAL_H3_PRESETS[input.steps];
-  const usesPddAccelerator = input.steps === 8;
   return {
     "1": {
       class_type: "UNETLoader",
@@ -162,29 +152,17 @@ const buildMiniMaxH3FastGraph = (
       }
     },
     "2": {
-      class_type: usesPddAccelerator
-        ? "MiniMaxH3PDDAccApply"
-        : "LoraLoaderModelOnly",
-      inputs: usesPddAccelerator
-        ? {
-            model: ["4", 0],
-            pdd_file: LOCAL_SCRIPT_MODEL_FILES.videoPdd8,
-            nfe: String(LOCAL_H3_PRESETS[8].steps),
-            lora_strength: 1,
-            head_strength: 1,
-            on_off_grid: "error",
-            partition_check: "warn"
-          }
-        : {
-            model: ["1", 0],
-            lora_name: preset.lora,
-            strength_model: 1
-          }
+      class_type: "LoraLoaderModelOnly",
+      inputs: {
+        model: ["1", 0],
+        lora_name: MINIMAX_H3_STEP_LORAS[input.steps].loraFile,
+        strength_model: 1
+      }
     },
     "3": {
       class_type: "MiniMaxChunkFeedForward",
       inputs: {
-        model: [usesPddAccelerator ? "1" : "2", 0],
+        model: ["2", 0],
         chunks: 4,
         seq_threshold: 4096
       }
@@ -230,7 +208,7 @@ const buildMiniMaxH3FastGraph = (
     "10": {
       class_type: "BasicGuider",
       inputs: {
-        model: [usesPddAccelerator ? "2" : "4", 0],
+        model: ["4", 0],
         conditioning: ["8", 0]
       }
     },
@@ -238,26 +216,22 @@ const buildMiniMaxH3FastGraph = (
       class_type: "KSamplerSelect",
       inputs: { sampler_name: "euler" }
     },
-    ...(usesPddAccelerator
-      ? {}
-      : {
-          "12": {
-            class_type: "BasicScheduler",
-            inputs: {
-              model: ["4", 0],
-              scheduler: "simple",
-              steps: preset.steps,
-              denoise: 1
-            }
-          }
-        }),
+    "12": {
+      class_type: "BasicScheduler",
+      inputs: {
+        model: ["4", 0],
+        scheduler: "simple",
+        steps: input.steps,
+        denoise: 1
+      }
+    },
     "13": {
       class_type: "SamplerCustomAdvanced",
       inputs: {
         noise: ["9", 0],
         guider: ["10", 0],
         sampler: ["11", 0],
-        sigmas: usesPddAccelerator ? ["2", 1] : ["12", 0],
+        sigmas: ["12", 0],
         latent_image: ["8", 1]
       }
     },
@@ -292,7 +266,6 @@ const buildMiniMaxH3FastGraph = (
 const buildMiniMaxH3LegacyGraph = (
   input: MiniMaxH3GraphInput
 ): Record<string, ComfyGraphNode> => {
-  const preset = LOCAL_H3_PRESETS[input.steps];
   return {
     "1": {
       class_type: "UNETLoader",
@@ -305,7 +278,7 @@ const buildMiniMaxH3LegacyGraph = (
       class_type: "LoraLoaderModelOnly",
       inputs: {
         model: ["1", 0],
-        lora_name: preset.lora,
+        lora_name: MINIMAX_H3_STEP_LORAS[input.steps].loraFile,
         strength_model: 1
       }
     },
@@ -351,7 +324,7 @@ const buildMiniMaxH3LegacyGraph = (
         negative: ["8", 0],
         latent_image: ["8", 1],
         seed: input.noiseSeed,
-        steps: preset.steps,
+        steps: input.steps,
         cfg: 1,
         sampler_name: "euler",
         scheduler: "simple",
@@ -792,7 +765,7 @@ export class ComfyScriptProjectClient {
         width: clampMiniMaxH3Dimension(input.width ?? 768),
         height: clampMiniMaxH3Dimension(input.height ?? 432),
         length,
-        steps: input.steps ?? 4,
+        steps: input.steps ?? MINIMAX_H3_HD_STEPS,
         noiseSeed: Math.floor(Math.random() * 2 ** 32),
         workflow: input.useLegacyWorkflow ? "legacy_ksampler" : "fast_h3",
         textEncoder: input.textEncoder ?? "vanilla",

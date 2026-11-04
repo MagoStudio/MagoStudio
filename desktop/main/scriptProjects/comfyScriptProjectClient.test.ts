@@ -1,5 +1,6 @@
 import { afterEach, describe, expect, it, vi } from "vitest";
 
+import { MINIMAX_H3_STEP_LORAS } from "../../shared/minimaxH3StepLoras";
 import { ComfyClient } from "../comfy/ComfyClient";
 import { ComfyQwenClient } from "../imageRenders/comfyQwenClient";
 
@@ -7,7 +8,6 @@ import {
   buildMiniMaxH3Graph,
   buildMiniMaxH3ReferenceInputs,
   ComfyScriptProjectClient,
-  LOCAL_H3_PRESETS,
   LOCAL_H3_MODELS,
   LOCAL_SCRIPT_VIDEO_CRF,
   LOCAL_SCRIPT_MODEL_FILES,
@@ -140,7 +140,7 @@ describe("ComfyScriptProjectClient", () => {
     expect(Object.keys(inputs)).not.toContain("ref_image_1");
   });
 
-  it.each([3, 4] as const)(
+  it.each([2, 4, 8] as const)(
     "builds the supplied FastH3 baseline for the %i-step preset",
     (steps) => {
       const graph = buildMiniMaxH3Graph({
@@ -157,7 +157,7 @@ describe("ComfyScriptProjectClient", () => {
         class_type: "LoraLoaderModelOnly",
         inputs: {
           model: ["1", 0],
-          lora_name: LOCAL_H3_PRESETS[steps].lora,
+          lora_name: MINIMAX_H3_STEP_LORAS[steps].loraFile,
           strength_model: 1
         }
       });
@@ -187,6 +187,7 @@ describe("ComfyScriptProjectClient", () => {
         denoise: 1
       });
       expect(graph["13"].class_type).toBe("SamplerCustomAdvanced");
+      expect(graph["13"].inputs.sigmas).toEqual(["12", 0]);
       expect(graph["14"].inputs.samples).toEqual(["13", 0]);
       expect(graph["15"].inputs.samples).toEqual(["13", 0]);
       expect(graph["17"].inputs).toMatchObject({
@@ -201,7 +202,7 @@ describe("ComfyScriptProjectClient", () => {
     }
   );
 
-  it("uses the PDD accelerator for the slow eight-step preset", () => {
+  it("uses the HD step LoRA instead of the retired PDD accelerator at eight steps", () => {
     const graph = buildMiniMaxH3Graph({
       prompt: "move naturally",
       width: 1280,
@@ -212,25 +213,16 @@ describe("ComfyScriptProjectClient", () => {
       referenceInputs: { "ref_images.ref_image_0": ["20", 0] }
     });
 
-    expect(graph["2"]).toEqual({
-      class_type: "MiniMaxH3PDDAccApply",
-      inputs: {
-        model: ["4", 0],
-        pdd_file: LOCAL_SCRIPT_MODEL_FILES.videoPdd8,
-        nfe: "8",
-        lora_strength: 1,
-        head_strength: 1,
-        on_off_grid: "error",
-        partition_check: "warn"
-      }
-    });
-    expect(graph["3"].inputs.model).toEqual(["1", 0]);
-    expect(graph["10"].inputs.model).toEqual(["2", 0]);
-    expect(graph["12"]).toBeUndefined();
-    expect(graph["13"].inputs.sigmas).toEqual(["2", 1]);
+    expect(graph["2"].inputs.lora_name).toBe(
+      "pika_h3_flex_turbo_8step_hd_ref2va.safetensors"
+    );
+    expect(graph["12"].inputs.steps).toBe(8);
+    expect(Object.values(graph).map((node) => node.class_type)).not.toContain(
+      "MiniMaxH3PDDAccApply"
+    );
   });
 
-  it.each([3, 4, 8] as const)(
+  it.each([2, 4, 8] as const)(
     "builds the legacy KSampler workflow with the %i-step preset",
     (steps) => {
       const graph = buildMiniMaxH3Graph({
@@ -246,7 +238,7 @@ describe("ComfyScriptProjectClient", () => {
 
       expect(graph["2"].inputs).toMatchObject({
         model: ["1", 0],
-        lora_name: LOCAL_H3_PRESETS[steps].lora
+        lora_name: MINIMAX_H3_STEP_LORAS[steps].loraFile
       });
       expect(graph["5"].inputs.clip_name).toBe(
         LOCAL_SCRIPT_MODEL_FILES.videoClipVanilla
@@ -319,7 +311,7 @@ describe("ComfyScriptProjectClient", () => {
     });
 
     expect(graph["1"].inputs.unet_name).toBe(LOCAL_H3_MODELS.singularity);
-    expect(graph["2"].inputs.lora_name).toBe(LOCAL_H3_PRESETS[4].lora);
+    expect(graph["2"].inputs.lora_name).toBe(MINIMAX_H3_STEP_LORAS[4].loraFile);
     expect(graph["8"].class_type).toBe("MiniMaxH3ReferenceToVideo");
   });
 });

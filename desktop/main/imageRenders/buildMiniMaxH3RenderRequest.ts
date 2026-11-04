@@ -1,13 +1,11 @@
+import { resolveMiniMaxH3QualitySteps } from "../../shared/minimaxH3StepLoras";
 import {
   isMiniMaxH3VfxEditedFrameProvided,
   resolveMiniMaxH3VfxLoraStrength,
   resolveMiniMaxH3VfxMode
 } from "../../shared/minimaxH3VfxModes";
 
-import {
-  type MiniMaxH3RenderRequest,
-  resolveMiniMaxH3Quality
-} from "./comfyMiniMaxH3Client";
+import type { MiniMaxH3RenderRequest } from "./comfyMiniMaxH3Client";
 
 export const buildMiniMaxH3RenderRequest = ({
   settings,
@@ -26,7 +24,7 @@ export const buildMiniMaxH3RenderRequest = ({
   width: Number(settings.width),
   height: Number(settings.height),
   durationSeconds,
-  quality: resolveMiniMaxH3Quality(settings.h3_quality),
+  steps: resolveMiniMaxH3QualitySteps(settings.h3_quality),
   referenceImagePaths,
   referenceVideoPath: sourceVideoPath,
   useReferenceVideoAudio:

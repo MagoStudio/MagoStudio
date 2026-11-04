@@ -11,11 +11,12 @@ describe("postGenerateProjectShots (local project)", () => {
   });
 
   it.each([
-    [undefined, 4],
-    [3, 3],
+    [undefined, 8],
+    [2, 2],
+    [3, 2],
     [4, 4],
     [8, 8],
-    [12, 4]
+    [12, 8]
   ])(
     "normalizes the requested H3 preset %s to %i steps",
     async (value, expected) => {

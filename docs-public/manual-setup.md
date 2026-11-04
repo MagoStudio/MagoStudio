@@ -28,14 +28,13 @@ If this page and the code disagree, the code wins. Please open an issue.
 
 ### Pinned (installed by the wizard)
 
-| Pack                                                                                      | Pinned revision                            | Archive                                                                                                                 | Model group                                     |
-| ----------------------------------------------------------------------------------------- | ------------------------------------------ | ----------------------------------------------------------------------------------------------------------------------- | ----------------------------------------------- |
-| [ComfyUI-KJNodes](https://github.com/kijai/ComfyUI-KJNodes)                               | 1.5.0                                      | <https://cdn.comfy.org/kijai/comfyui-kjnodes/1.5.0/node.zip>                                                            | Minimal                                         |
-| [ComfyUI-VideoHelperSuite](https://github.com/Kosinkadink/ComfyUI-VideoHelperSuite)       | 1.7.9                                      | <https://cdn.comfy.org/kosinkadink/comfyui-videohelpersuite/1.7.9/node.zip>                                             | Minimal                                         |
-| [ComfyUI-MiniMax-H3-PDD-Acc](https://github.com/Jalen-Brunson/ComfyUI-MiniMax-H3-PDD-Acc) | `311a65dd53832d8a5f8177a9d5fb923c09e35a90` | [zip](https://github.com/Jalen-Brunson/ComfyUI-MiniMax-H3-PDD-Acc/archive/311a65dd53832d8a5f8177a9d5fb923c09e35a90.zip) | Minimal                                         |
-| [ComfyUI_Simple_Qwen3-VL-gguf](https://github.com/KLL535/ComfyUI_Simple_Qwen3-VL-gguf)    | `85b92359595a450d6c37f0eccf210a8a1069f72e` | [zip](https://github.com/KLL535/ComfyUI_Simple_Qwen3-VL-gguf/archive/85b92359595a450d6c37f0eccf210a8a1069f72e.zip)      | Local LLM                                       |
-| [ComfyUI-GGUF](https://github.com/city96/ComfyUI-GGUF)                                    | 1.1.10                                     | <https://cdn.comfy.org/city96/ComfyUI-GGUF/1.1.10/node.zip>                                                             | Qwen Image, Flux Image                          |
-| [ComfyUI-MagoNodes](https://github.com/MagoStudio/ComfyUI-MagoNodes)                      | `63e0307d59ce15341f38f9928f66e0f3e91a4709` | [zip](https://github.com/MagoStudio/ComfyUI-MagoNodes/archive/63e0307d59ce15341f38f9928f66e0f3e91a4709.zip)             | none (in the Windows bundle; LTX tiled sampler) |
+| Pack                                                                                   | Pinned revision                            | Archive                                                                                                            | Model group                                     |
+| -------------------------------------------------------------------------------------- | ------------------------------------------ | ------------------------------------------------------------------------------------------------------------------ | ----------------------------------------------- |
+| [ComfyUI-KJNodes](https://github.com/kijai/ComfyUI-KJNodes)                            | 1.5.0                                      | <https://cdn.comfy.org/kijai/comfyui-kjnodes/1.5.0/node.zip>                                                       | Minimal                                         |
+| [ComfyUI-VideoHelperSuite](https://github.com/Kosinkadink/ComfyUI-VideoHelperSuite)    | 1.7.9                                      | <https://cdn.comfy.org/kosinkadink/comfyui-videohelpersuite/1.7.9/node.zip>                                        | Minimal                                         |
+| [ComfyUI_Simple_Qwen3-VL-gguf](https://github.com/KLL535/ComfyUI_Simple_Qwen3-VL-gguf) | `85b92359595a450d6c37f0eccf210a8a1069f72e` | [zip](https://github.com/KLL535/ComfyUI_Simple_Qwen3-VL-gguf/archive/85b92359595a450d6c37f0eccf210a8a1069f72e.zip) | Local LLM                                       |
+| [ComfyUI-GGUF](https://github.com/city96/ComfyUI-GGUF)                                 | 1.1.10                                     | <https://cdn.comfy.org/city96/ComfyUI-GGUF/1.1.10/node.zip>                                                        | Qwen Image, Flux Image                          |
+| [ComfyUI-MagoNodes](https://github.com/MagoStudio/ComfyUI-MagoNodes)                   | `63e0307d59ce15341f38f9928f66e0f3e91a4709` | [zip](https://github.com/MagoStudio/ComfyUI-MagoNodes/archive/63e0307d59ce15341f38f9928f66e0f3e91a4709.zip)        | none (in the Windows bundle; LTX tiled sampler) |
 
 Install each into `custom_nodes/`, then run `pip install -r requirements.txt` with
 ComfyUI's own Python, and restart ComfyUI.
@@ -55,22 +54,21 @@ Sizes are decimal GB.
 
 ### Minimal (always installed) — MiniMax H3 and captioning
 
-| Folder                    | File                                                                                                                                                                                               | Size  |
-| ------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ----- |
-| `models/diffusion_models` | [minimax_h3_ref2va_pruned_int8_convrot.safetensors](https://huggingface.co/Comfy-Org/MiniMax-H3/resolve/main/diffusion_models/minimax_h3_ref2va_pruned_int8_convrot.safetensors)                   | 20.97 |
-| `models/text_encoders`    | [qwen3vl_32b_minimax_h3_nvfp4_awq.safetensors](https://huggingface.co/Comfy-Org/MiniMax-H3/resolve/main/text_encoders/qwen3vl_32b_minimax_h3_nvfp4_awq.safetensors)                                | 15.69 |
-| `models/vae`              | [minimax_h3_video_vae_fp16.safetensors](https://huggingface.co/Comfy-Org/MiniMax-H3/resolve/main/vae/minimax_h3_video_vae_fp16.safetensors)                                                        | 5.21  |
-| `models/vae`              | [minimax_h3_audio_vae_fp32.safetensors](https://huggingface.co/Comfy-Org/MiniMax-H3/resolve/main/vae/minimax_h3_audio_vae_fp32.safetensors)                                                        | 0.61  |
-| `models/loras`            | [minimax_h3_ref2v_turbo_4step_v0.1_comfyui_bf16.safetensors](https://huggingface.co/Comfy-Org/MiniMax-H3/resolve/main/loras/minimax_h3_ref2v_turbo_4step_v0.1_comfyui_bf16.safetensors)            | 1.96  |
-| `models/pdd_acc`          | [MiniMax-H3-Ref2VA-Acc-8Step.safetensors](https://huggingface.co/alibaba-pai/MiniMax-H3-Acc-LoRAs/resolve/main/MiniMax-H3-Ref2VA-Acc-8Step.safetensors)                                            | 1.37  |
-| `models/loras`            | [minimax_h3_vfx_edit_v1.0_r128.safetensors](https://huggingface.co/Alissonerdx/Minimax-H3-ComfyUI/resolve/main/loras/minimax_h3_vfx_edit_v1.0_r128.safetensors)                                    | 1.24  |
-| `models/loras`            | [minimax_h3_vfx_edit_v1.0_r128_ffp.safetensors](https://huggingface.co/Alissonerdx/Minimax-H3-ComfyUI/resolve/main/loras/minimax_h3_vfx_edit_v1.0_r128_ffp.safetensors)                            | 1.24  |
-| `models/loras`            | [minimax_h3_head_swap_v1.0_r32.safetensors](https://huggingface.co/Alissonerdx/Minimax-H3-ComfyUI/resolve/main/loras/minimax_h3_head_swap_v1.0_r32.safetensors)                                    | 0.31  |
-| `models/loras`            | [h3_character_swap_pro4500_1000.safetensors](https://huggingface.co/akatz-ai/MiniMax-H3-Character-Swap-LoRA/resolve/main/h3_character_swap_pro4500_1000.safetensors)                               | 0.16  |
-| `models/loras`            | [minimax_h3_style_transfer_v1.0_r64.safetensors](https://huggingface.co/Alissonerdx/Minimax-H3-ComfyUI/resolve/main/loras/minimax_h3_style_transfer_v1.0_r64.safetensors)                          | 0.62  |
-| `models/text_encoders`    | [qwen3-vl-4b-heretic_int8_dynamic_convrot.safetensors](https://huggingface.co/ethanfel/Qwen3-VL-4B-Heretic-ComfyUI-ConvRot-INT8/resolve/main/qwen3-vl-4b-heretic_int8_dynamic_convrot.safetensors) | 4.84  |
+| Folder                    | File                                                                                                                                                                                                       | Size  |
+| ------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ----- |
+| `models/diffusion_models` | [minimax_h3_ref2va_pruned_int8_convrot.safetensors](https://huggingface.co/Comfy-Org/MiniMax-H3/resolve/main/diffusion_models/minimax_h3_ref2va_pruned_int8_convrot.safetensors)                           | 20.97 |
+| `models/text_encoders`    | [qwen3vl_32b_minimax_h3_nvfp4_awq.safetensors](https://huggingface.co/Comfy-Org/MiniMax-H3/resolve/main/text_encoders/qwen3vl_32b_minimax_h3_nvfp4_awq.safetensors)                                        | 15.69 |
+| `models/vae`              | [minimax_h3_video_vae_fp16.safetensors](https://huggingface.co/Comfy-Org/MiniMax-H3/resolve/main/vae/minimax_h3_video_vae_fp16.safetensors)                                                                | 5.21  |
+| `models/vae`              | [minimax_h3_audio_vae_fp32.safetensors](https://huggingface.co/Comfy-Org/MiniMax-H3/resolve/main/vae/minimax_h3_audio_vae_fp32.safetensors)                                                                | 0.61  |
+| `models/loras`            | [pika_h3_flex_turbo_8step_hd_ref2va.safetensors](https://huggingface.co/Pika-Labs/Pika-H3-Flex-Turbo-LoRA/resolve/dcacd93a50f714ba1cd61c7ca2cc5f65e9a1ec60/pika_h3_flex_turbo_8step_hd_ref2va.safetensors) | 3.91  |
+| `models/loras`            | [minimax_h3_vfx_edit_v1.0_r128.safetensors](https://huggingface.co/Alissonerdx/Minimax-H3-ComfyUI/resolve/main/loras/minimax_h3_vfx_edit_v1.0_r128.safetensors)                                            | 1.24  |
+| `models/loras`            | [minimax_h3_vfx_edit_v1.0_r128_ffp.safetensors](https://huggingface.co/Alissonerdx/Minimax-H3-ComfyUI/resolve/main/loras/minimax_h3_vfx_edit_v1.0_r128_ffp.safetensors)                                    | 1.24  |
+| `models/loras`            | [minimax_h3_head_swap_v1.0_r32.safetensors](https://huggingface.co/Alissonerdx/Minimax-H3-ComfyUI/resolve/main/loras/minimax_h3_head_swap_v1.0_r32.safetensors)                                            | 0.31  |
+| `models/loras`            | [h3_character_swap_pro4500_1000.safetensors](https://huggingface.co/akatz-ai/MiniMax-H3-Character-Swap-LoRA/resolve/main/h3_character_swap_pro4500_1000.safetensors)                                       | 0.16  |
+| `models/loras`            | [minimax_h3_style_transfer_v1.0_r64.safetensors](https://huggingface.co/Alissonerdx/Minimax-H3-ComfyUI/resolve/main/loras/minimax_h3_style_transfer_v1.0_r64.safetensors)                                  | 0.62  |
+| `models/text_encoders`    | [qwen3-vl-4b-heretic_int8_dynamic_convrot.safetensors](https://huggingface.co/ethanfel/Qwen3-VL-4B-Heretic-ComfyUI-ConvRot-INT8/resolve/main/qwen3-vl-4b-heretic_int8_dynamic_convrot.safetensors)         | 4.84  |
 
-About 54 GB. With the engine ZIP and its extraction, plan for about 63 GB free.
+About 55 GB. With the engine ZIP and its extraction, plan for about 64 GB free.
 
 ### Local LLM — Script Project text model
 
@@ -181,14 +179,22 @@ Both setups also use the Qwen Image text encoder and VAE listed above.
 | `models/text_encoders` | [qwen_3_8b_fp8mixed.safetensors](https://huggingface.co/Comfy-Org/vae-text-encorder-for-flux-klein-9b/resolve/main/split_files/text_encoders/qwen_3_8b_fp8mixed.safetensors) |
 | `models/vae`           | flux2-vae.safetensors (same as Flux 2 Klein 4B)                                                                                                                              |
 
+### MiniMax H3 2 step draft and 4 step turbo (optional)
+
+Each is its own Model group. The Scenes tab and the timeline Quality setting offer them; the
+8 step HD LoRA in Minimal is the default. Files are pinned to revision `dcacd93a50f714ba1cd61c7ca2cc5f65e9a1ec60`.
+
+| Folder         | File                                                                                                                                                                                                             | Size | Model group             |
+| -------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ---- | ----------------------- |
+| `models/loras` | [pika_h3_flex_turbo_2step_draft_ref2va.safetensors](https://huggingface.co/Pika-Labs/Pika-H3-Flex-Turbo-LoRA/resolve/dcacd93a50f714ba1cd61c7ca2cc5f65e9a1ec60/pika_h3_flex_turbo_2step_draft_ref2va.safetensors) | 3.91 | MiniMax H3 2 step draft |
+| `models/loras` | [pika_h3_flex_turbo_4step_ref2va.safetensors](https://huggingface.co/Pika-Labs/Pika-H3-Flex-Turbo-LoRA/resolve/dcacd93a50f714ba1cd61c7ca2cc5f65e9a1ec60/pika_h3_flex_turbo_4step_ref2va.safetensors)             | 3.91 | MiniMax H3 4 step turbo |
+
 ### Script Project MiniMax H3 alternatives
 
-| Folder                    | File                                                                                                                                                                                                                                                                                 |
-| ------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
-| `models/diffusion_models` | [Minimax-h3_Singularity_ref2va_Pruned_v1.3_int8.safetensors](https://huggingface.co/WarmBloodAban/Minimax-h3_Singularity/resolve/main/Minimax-h3_Singularity_ref2va_Pruned_v1.3_int8.safetensors)                                                                                    |
-| `models/text_encoders`    | [qwen3vl_32b_h3_ultra_uncensored_heretic_int8_convrot.safetensors](https://huggingface.co/ethanfel/Qwen3-VL-32B-Ultra-Heretic-H3-ComfyUI-INT8-ConvRot/resolve/main/qwen3vl_32b_h3_ultra_uncensored_heretic_int8_convrot.safetensors)                                                 |
-| `models/loras`            | [minimax_h3_ref2v_turbo_8step_v1.0_768p_comfyui_bf16.safetensors](https://huggingface.co/lightx2v/Minimax-h3-Turbo/resolve/main/minimax_h3_ref2v_turbo_8step_v1.0_768p_comfyui_bf16.safetensors)                                                                                     |
-| `models/loras`            | [taomate_h3_3step_comfy.safetensors](https://huggingface.co/Robert1212star/TaoMate-H3-3Step-ComfyUI/resolve/main/taomate_h3_3step_comfy.safetensors) — save as `robert-taomate_h3_3step_comfy.safetensors`, about 2.48 GB. Source matched by name only; the app pins no hash for it. |
+| Folder                    | File                                                                                                                                                                                                                                 |
+| ------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| `models/diffusion_models` | [Minimax-h3_Singularity_ref2va_Pruned_v1.3_int8.safetensors](https://huggingface.co/WarmBloodAban/Minimax-h3_Singularity/resolve/main/Minimax-h3_Singularity_ref2va_Pruned_v1.3_int8.safetensors)                                    |
+| `models/text_encoders`    | [qwen3vl_32b_h3_ultra_uncensored_heretic_int8_convrot.safetensors](https://huggingface.co/ethanfel/Qwen3-VL-32B-Ultra-Heretic-H3-ComfyUI-INT8-ConvRot/resolve/main/qwen3vl_32b_h3_ultra_uncensored_heretic_int8_convrot.safetensors) |
 
 ### Qwen3-VL 2B GGUF captioning (alternative backend)
 

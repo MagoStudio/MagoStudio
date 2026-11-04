@@ -49,19 +49,21 @@ const LOCAL_MODEL_GROUP_DEFINITIONS = [
         repositoryUrl:
           "https://github.com/Kosinkadink/ComfyUI-VideoHelperSuite",
         customNodesFolderName: "comfyui-videohelpersuite"
-      },
-      {
-        repositoryUrl:
-          "https://github.com/Jalen-Brunson/ComfyUI-MiniMax-H3-PDD-Acc",
-        customNodesFolderName: "ComfyUI-MiniMax-H3-PDD-Acc"
       }
     ],
-    bundleIds: [
-      "qwen-vl",
-      "minimax-h3",
-      "minimax-h3-high-quality",
-      "minimax-h3-vfx-loras"
-    ]
+    bundleIds: ["qwen-vl", "minimax-h3", "minimax-h3-vfx-loras"]
+  },
+  {
+    id: "minimax-h3-draft-lora",
+    isAlwaysInstalled: false,
+    nodePacks: [],
+    bundleIds: ["minimax-h3-draft-lora"]
+  },
+  {
+    id: "minimax-h3-turbo-lora",
+    isAlwaysInstalled: false,
+    nodePacks: [],
+    bundleIds: ["minimax-h3-turbo-lora"]
   },
   {
     id: "local-llm",

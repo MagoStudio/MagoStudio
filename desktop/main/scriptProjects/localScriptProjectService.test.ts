@@ -304,10 +304,12 @@ describe("local cut export planning", () => {
 });
 
 describe("local MiniMax H3 prompt composition", () => {
-  it("defaults invalid or missing local H3 presets to the four-step baseline", () => {
-    expect(resolveLocalH3Steps(undefined)).toBe(4);
-    expect(resolveLocalH3Steps(5)).toBe(4);
-    expect(resolveLocalH3Steps(3)).toBe(3);
+  it("defaults invalid or missing local H3 presets to the HD eight-step LoRA", () => {
+    expect(resolveLocalH3Steps(undefined)).toBe(8);
+    expect(resolveLocalH3Steps(5)).toBe(8);
+    expect(resolveLocalH3Steps(2)).toBe(2);
+    expect(resolveLocalH3Steps(3)).toBe(2);
+    expect(resolveLocalH3Steps(4)).toBe(4);
     expect(resolveLocalH3Steps(8)).toBe(8);
   });
 

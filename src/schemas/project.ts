@@ -7,9 +7,10 @@ import {
 } from "@/schemas/scriptProject";
 import { ShotSchema } from "@/schemas/shot";
 
-const LOCAL_H3_FAST_STEPS = 3;
-const LOCAL_H3_BASELINE_STEPS = 4;
-const LOCAL_H3_QUALITY_STEPS = 8;
+const LOCAL_H3_DRAFT_STEPS = 2;
+const LOCAL_H3_LEGACY_THREE_STEPS = 3;
+const LOCAL_H3_TURBO_STEPS = 4;
+const LOCAL_H3_HD_STEPS = 8;
 
 const FolderItemSchema = z.object({
   id: z.string(),
@@ -73,9 +74,10 @@ export const ProjectSchema = z.object({
     shot_quality_retries: z.number().optional(),
     local_h3_steps: z
       .union([
-        z.literal(LOCAL_H3_FAST_STEPS),
-        z.literal(LOCAL_H3_BASELINE_STEPS),
-        z.literal(LOCAL_H3_QUALITY_STEPS)
+        z.literal(LOCAL_H3_DRAFT_STEPS),
+        z.literal(LOCAL_H3_LEGACY_THREE_STEPS),
+        z.literal(LOCAL_H3_TURBO_STEPS),
+        z.literal(LOCAL_H3_HD_STEPS)
       ])
       .optional(),
     local_h3_legacy_workflow: z.boolean().optional(),

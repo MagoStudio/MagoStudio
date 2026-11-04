@@ -94,7 +94,17 @@ void i18n.use(initReactI18next).init({
               minimal: {
                 name: "Minimal",
                 description:
-                  "ComfyUI, MiniMax H3 video, its high-quality and VFX LoRAs, and Qwen3-VL captioning."
+                  "ComfyUI, MiniMax H3 video with its 8 step HD and VFX LoRAs, and Qwen3-VL captioning."
+              },
+              "minimax-h3-draft-lora": {
+                name: "MiniMax H3 2 step draft",
+                description:
+                  "The fastest MiniMax H3 LoRA, for checking framing and motion. Audio is weaker."
+              },
+              "minimax-h3-turbo-lora": {
+                name: "MiniMax H3 4 step turbo",
+                description:
+                  "A faster MiniMax H3 LoRA, with less detail than 8 step HD."
               },
               "local-llm": {
                 name: "Local LLM",
@@ -2567,11 +2577,12 @@ void i18n.use(initReactI18next).init({
             label: "Flux 2 Klein 9B Q8 (Local)"
           },
           local_h3_steps_input: {
-            label: "Local H3 render preset"
+            label: "MiniMax H3 speed"
           },
-          local_h3_steps_3: { label: "H3 · 3 steps" },
-          local_h3_steps_4: { label: "H3 · 4 steps" },
-          local_h3_steps_8: { label: "H3 · 8 steps" },
+          local_h3_steps_2: { label: "2 step draft" },
+          local_h3_steps_4: { label: "4 step turbo" },
+          local_h3_steps_8: { label: "8 step HD" },
+          local_h3_steps_not_installed: { label: "Not installed" },
           local_h3_legacy_workflow_toggle: {
             label: "Legacy KSampler"
           },

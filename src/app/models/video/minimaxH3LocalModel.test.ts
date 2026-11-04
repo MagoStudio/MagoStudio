@@ -35,10 +35,10 @@ describe("minimaxH3LocalModel", () => {
     expect(minimaxH3LocalModel.displayName).toBe("MiniMax H3 (Local)");
   });
 
-  it("defaults Quality to high and offers high and medium", () => {
+  it("defaults Quality to 8 step HD and offers HD, turbo and draft", () => {
     const quality = settingByKey("h3_quality");
-    expect(quality?.defaultValue).toBe("high");
-    expect(enumOptionValues("h3_quality")).toEqual(["high", "medium"]);
+    expect(quality?.defaultValue).toBe("hd");
+    expect(enumOptionValues("h3_quality")).toEqual(["hd", "turbo", "draft"]);
   });
 
   it("replaces the output size with aspect ratio and 480p, 720p or 1080p resolution", () => {

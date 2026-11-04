@@ -10,6 +10,7 @@ import type {
   LocalScriptSheetsInput,
   LocalScriptShotsInput
 } from "../../shared/contracts";
+import { resolveMiniMaxH3StepLoraSteps } from "../../shared/minimaxH3StepLoras";
 import type { RunCloudTextModel } from "../../shared/textModelRequest";
 import { ProjectRepository } from "../database/projectRepository";
 import { ScriptProjectSnapshotRepository } from "../database/scriptProjectSnapshotRepository";
@@ -199,7 +200,7 @@ const hasOwnSheetDescription = (key: JsonRecord, image: JsonRecord): boolean =>
     image.description !== key.seed_description);
 
 export const resolveLocalH3Steps = (value: unknown): LocalH3Steps =>
-  value === 3 || value === 4 || value === 8 ? value : 4;
+  resolveMiniMaxH3StepLoraSteps(value);
 
 export const resolveLocalH3TextEncoder = (
   value: unknown

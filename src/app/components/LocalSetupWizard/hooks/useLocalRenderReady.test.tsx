@@ -5,6 +5,11 @@ import { beforeEach, describe, expect, it, vi } from "vitest";
 
 import { renderWithProviders } from "@/test-utils/renderWithProviders";
 
+import {
+  MINIMAX_H3_STEP_LORAS,
+  type MiniMaxH3StepLoraSteps
+} from "../../../../../desktop/shared/minimaxH3StepLoras";
+
 import { useLocalShotsReady, useLocalVideoReady } from "./useLocalRenderReady";
 
 const modelStatus = vi.fn();
@@ -20,9 +25,13 @@ const Video = () => (
     {useLocalVideoReady(VideoEngine.minimax_h3_local, {}) ? "ready" : "setup"}
   </div>
 );
-const Shots = ({ steps, local = true }: { steps: number; local?: boolean }) => (
-  <div>{useLocalShotsReady(local, steps) ? "ready" : "setup"}</div>
-);
+const Shots = ({
+  steps,
+  local = true
+}: {
+  steps: MiniMaxH3StepLoraSteps;
+  local?: boolean;
+}) => <div>{useLocalShotsReady(local, steps) ? "ready" : "setup"}</div>;
 const render = (element: React.ReactElement) =>
   renderWithProviders(element, {
     queryClient: new QueryClient({
@@ -52,15 +61,51 @@ describe("local render readiness", () => {
     await waitFor(() => expect(modelStatus).toHaveBeenCalled());
     expect(screen.getByText("setup")).toBeInTheDocument();
   });
-  it("allows Fast rendering without the optional Slow files", async () => {
+  it("allows HD rendering once the required HD step LoRA is installed", async () => {
     scriptSetupStatus.mockResolvedValue({
       ready: true,
-      highQuality: [{ status: "missing" }]
+      models: [
+        { name: MINIMAX_H3_STEP_LORAS[8].loraFile, status: "installed" }
+      ],
+      optionalStepLoras: []
+    });
+    const screen = render(<Shots steps={8} />);
+    expect(await screen.findByText("ready")).toBeInTheDocument();
+  });
+  it.each([
+    ["not listed", []],
+    [
+      "listed as missing",
+      [{ name: MINIMAX_H3_STEP_LORAS[4].loraFile, status: "missing" }]
+    ]
+  ])(
+    "blocks turbo rendering while its optional step LoRA is %s",
+    async (_description, optionalStepLoras) => {
+      scriptSetupStatus.mockResolvedValue({
+        ready: true,
+        models: [
+          { name: MINIMAX_H3_STEP_LORAS[8].loraFile, status: "installed" }
+        ],
+        optionalStepLoras
+      });
+      const screen = render(<Shots steps={8} />);
+      expect(await screen.findByText("ready")).toBeInTheDocument();
+      screen.rerender(<Shots steps={4} />);
+      expect(screen.getByText("setup")).toBeInTheDocument();
+    }
+  );
+  it("allows turbo rendering once its optional step LoRA is installed", async () => {
+    scriptSetupStatus.mockResolvedValue({
+      ready: true,
+      models: [
+        { name: MINIMAX_H3_STEP_LORAS[8].loraFile, status: "installed" }
+      ],
+      optionalStepLoras: [
+        { name: MINIMAX_H3_STEP_LORAS[4].loraFile, status: "installed" }
+      ]
     });
     const screen = render(<Shots steps={4} />);
     expect(await screen.findByText("ready")).toBeInTheDocument();
-    screen.rerender(<Shots steps={8} />);
-    expect(screen.getByText("setup")).toBeInTheDocument();
   });
   it("does not probe ComfyUI for cloud ScriptShot projects", () => {
     const screen = render(<Shots steps={8} local={false} />);

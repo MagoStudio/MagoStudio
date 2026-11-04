@@ -19,7 +19,7 @@ const videoVae = missingModel("minimax_h3_video_vae_fp16.safetensors");
 const audioVae = missingModel("minimax_h3_audio_vae_fp32.safetensors");
 const everyRestrictiveRepo = [
   "Comfy-Org/MiniMax-H3",
-  "alibaba-pai/MiniMax-H3-Acc-LoRAs",
+  "Pika-Labs/Pika-H3-Flex-Turbo-LoRA",
   "Alissonerdx/Minimax-H3-ComfyUI",
   "akatz-ai/MiniMax-H3-Character-Swap-LoRA",
   "unsloth/FLUX.2-klein-9B-GGUF",
@@ -44,7 +44,7 @@ const installBridge = (models: (typeof videoVae)[]) =>
           ready: false,
           nodes: [],
           models,
-          highQuality: [],
+          optionalStepLoras: [],
           optional: [],
           vfxLoras: []
         })
@@ -150,7 +150,7 @@ describe("ComfyUI connection check", () => {
         ready: true,
         nodes: [],
         models: [],
-        highQuality: [],
+        optionalStepLoras: [],
         optional: [],
         vfxLoras: []
       })
@@ -311,7 +311,11 @@ describe("model license notice on a ComfyUI model download", () => {
     fireEvent.click(screen.getByRole("button", { name: /Download\.\.\./ }));
 
     await screen.findByText("Model licenses");
-    expect(screen.getByText("MiniMax H3 8-step LoRA")).toBeInTheDocument();
+    expect(
+      screen.getByText(
+        "Pika H3 Flex Turbo LoRAs (2 step draft, 4 step turbo, 8 step HD)"
+      )
+    ).toBeInTheDocument();
     expect(screen.queryByText("MiniMax H3")).not.toBeInTheDocument();
     expect(downloadRequirement).not.toHaveBeenCalled();
   });
@@ -367,7 +371,7 @@ describe("updating an installed node pack from the ComfyUI dialog", () => {
         ready: false,
         nodes: [outdatedNodePack],
         models: [],
-        highQuality: [],
+        optionalStepLoras: [],
         optional: [],
         vfxLoras: []
       })

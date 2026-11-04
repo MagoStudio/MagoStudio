@@ -176,12 +176,7 @@ describe("LibrarySettings", () => {
   it("selects only the required bundles until the user says otherwise", async () => {
     await expect(
       new LibrarySettings().getSelectedModelBundleIds()
-    ).resolves.toEqual([
-      "qwen-vl",
-      "minimax-h3",
-      "minimax-h3-high-quality",
-      "minimax-h3-vfx-loras"
-    ]);
+    ).resolves.toEqual(["qwen-vl", "minimax-h3", "minimax-h3-vfx-loras"]);
   });
 
   it("uses 4B captioning for new settings and legacy 2B selections", async () => {
@@ -200,13 +195,14 @@ describe("LibrarySettings", () => {
 
     await settings.setSelectedModelBundleIds([
       "minimax-h3",
+      "minimax-h3-turbo-lora",
       "minimax-h3-high-quality",
       "invented-bundle"
     ]);
 
     await expect(settings.getSelectedModelBundleIds()).resolves.toEqual([
       "minimax-h3",
-      "minimax-h3-high-quality"
+      "minimax-h3-turbo-lora"
     ]);
   });
 
@@ -230,13 +226,13 @@ describe("LibrarySettings", () => {
 
     await settings.acceptModelLicenses([
       "Comfy-Org/MiniMax-H3",
-      "alibaba-pai/MiniMax-H3-Acc-LoRAs",
+      "Pika-Labs/Pika-H3-Flex-Turbo-LoRA",
       "invented/repo"
     ]);
 
     await expect(settings.getAcceptedModelLicenseRepos()).resolves.toEqual([
       "Comfy-Org/MiniMax-H3",
-      "alibaba-pai/MiniMax-H3-Acc-LoRAs"
+      "Pika-Labs/Pika-H3-Flex-Turbo-LoRA"
     ]);
   });
 

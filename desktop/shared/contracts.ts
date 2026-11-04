@@ -214,7 +214,7 @@ export interface ScriptSetupStatus {
   ready: boolean;
   nodes: ScriptSetupRequirement[];
   models: ScriptSetupRequirement[];
-  highQuality: ScriptSetupRequirement[];
+  optionalStepLoras: ScriptSetupRequirement[];
   vfxLoras: ScriptSetupRequirement[];
   optional: {
     id: OptionalScriptSetupId;
