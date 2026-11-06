@@ -1,3 +1,4 @@
+import { Divider } from "@components/Divider";
 import { GhostButton } from "@components/GhostButton";
 import { Text } from "@components/Text";
 import { useTranslation } from "react-i18next";
@@ -5,6 +6,7 @@ import { useTranslation } from "react-i18next";
 import type { LibraryInfo } from "../../../../../../../desktop/shared/contracts";
 import { LocalSetupDebugSetting } from "../LocalSetupDebugSetting";
 
+import { LanguageSetting } from "./LanguageSetting";
 import { SceneTimelineVisibilitySetting } from "./SceneTimelineVisibilitySetting";
 
 type Props = {
@@ -24,6 +26,8 @@ export const LocalSettingsGeneralTab = ({
 
   return (
     <>
+      <LanguageSetting />
+      <Divider className="bg-glyph-stroke" aria-hidden="true" />
       <div className="flex flex-col gap-2">
         <Text variant="sm" weight="bold">
           {t("localSettings.general.heading")}
@@ -52,9 +56,9 @@ export const LocalSettingsGeneralTab = ({
           {t("localSettings.general.description")}
         </Text>
       </div>
-      <div className="h-px bg-glyph-stroke" aria-hidden="true" />
+      <Divider className="bg-glyph-stroke" aria-hidden="true" />
       <SceneTimelineVisibilitySetting />
-      <div className="h-px bg-glyph-stroke" aria-hidden="true" />
+      <Divider className="bg-glyph-stroke" aria-hidden="true" />
       <div className="flex flex-col gap-2">
         <Text variant="sm" weight="bold">
           {t("localSettings.general.advancedHeading")}

@@ -113,7 +113,7 @@ export const QueueStatusTabButton: React.FC<Props> = ({
       selected={isSelected}
     >
       <div className="flex items-center gap-2">
-        Queue
+        {t("titles.queue.label")}
         <div className="flex items-center gap-1">
           {queueStatusCounts.done && queueStatusCounts.done > 0 && (
             <span className="flex items-center text-glyph-success">
