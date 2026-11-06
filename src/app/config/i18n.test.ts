@@ -4,6 +4,62 @@ import path from "node:path";
 import { describe, expect, it } from "vitest";
 
 import { i18n } from "./i18n";
+import { SUPPORTED_LANGUAGE_CODES } from "./supportedLanguages";
+
+type Catalog = { [key: string]: string | Catalog };
+
+const flattenCatalog = (
+  catalog: Catalog,
+  prefix = ""
+): Record<string, string> =>
+  Object.fromEntries(
+    Object.entries(catalog).flatMap(([key, value]) => {
+      const fullKey = prefix ? `${prefix}.${key}` : key;
+      return typeof value === "string"
+        ? [[fullKey, value]]
+        : Object.entries(flattenCatalog(value, fullKey));
+    })
+  );
+
+const interpolationPlaceholder = /{{[^}]+}}/g;
+const nestedTranslation = /\$t\([^)]*\)/g;
+const markupTag = /<\/?[A-Za-z0-9]+\s*\/?>/g;
+
+const placeholdersIn = (text: string) =>
+  [
+    ...(text.match(interpolationPlaceholder) ?? []),
+    ...(text.match(nestedTranslation) ?? []),
+    ...(text.match(markupTag) ?? [])
+  ]
+    .map((placeholder) => placeholder.replace(/\s/g, ""))
+    .sort();
+
+const pluralSuffix = /_(?:zero|one|two|few|many|other)$/;
+
+const expectedTranslationKeys = (
+  englishKeys: string[],
+  language: string
+): Map<string, string> => {
+  const pluralCategories = new Intl.PluralRules(language).resolvedOptions()
+    .pluralCategories;
+  const englishKeyByTranslationKey = new Map<string, string>();
+  for (const englishKey of englishKeys) {
+    if (!pluralSuffix.test(englishKey)) {
+      englishKeyByTranslationKey.set(englishKey, englishKey);
+      continue;
+    }
+    const pluralBaseKey = englishKey.replace(pluralSuffix, "");
+    const englishOtherKey = englishKeys.includes(`${pluralBaseKey}_other`)
+      ? `${pluralBaseKey}_other`
+      : englishKey;
+    for (const category of pluralCategories)
+      englishKeyByTranslationKey.set(
+        `${pluralBaseKey}_${category}`,
+        englishOtherKey
+      );
+  }
+  return englishKeyByTranslationKey;
+};
 
 const sourceRoot = path.resolve(process.cwd(), "src");
 const sourceExtension = /\.(?:ts|tsx)$/;
@@ -50,6 +106,32 @@ describe("i18n resources", () => {
       .map(([key, files]) => `${key} (${[...new Set(files)].join(", ")})`);
     expect(report, `Missing i18n keys:\n${report.join("\n")}`).toEqual([]);
   });
+
+  it.each(SUPPORTED_LANGUAGE_CODES.filter((code) => code !== "en"))(
+    "%s has the keys its plural rules need, with the placeholders of English",
+    (language) => {
+      const englishStrings = flattenCatalog(
+        i18n.getResourceBundle("en", "translation") as Catalog
+      );
+      const translatedStrings = flattenCatalog(
+        i18n.getResourceBundle(language, "translation") as Catalog
+      );
+      const englishKeyByTranslationKey = expectedTranslationKeys(
+        Object.keys(englishStrings),
+        language
+      );
+
+      expect(Object.keys(translatedStrings).sort()).toEqual(
+        [...englishKeyByTranslationKey.keys()].sort()
+      );
+      for (const [translationKey, englishKey] of englishKeyByTranslationKey) {
+        expect(
+          placeholdersIn(translatedStrings[translationKey] ?? ""),
+          `placeholders of ${translationKey}`
+        ).toEqual(placeholdersIn(englishStrings[englishKey] ?? ""));
+      }
+    }
+  );
 
   it("defines the dynamically selected Script Project version-review labels", () => {
     for (const field of ["good", "bad", "todo"]) {

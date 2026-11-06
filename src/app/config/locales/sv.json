@@ -1,0 +1,5603 @@
+{
+  "localSetup": {
+    "pill": {
+      "label": "Lokal installation",
+      "labelWithProgress": "Lokal installation {{percentage}} %"
+    },
+    "existingComfy": {
+      "title": "Använder din egen ComfyUI",
+      "checking": "Kontrollerar ComfyUI och installationen…",
+      "vfxLoras": {
+        "title": "Valfritt: MiniMax H3 VFX-LoRA",
+        "description": "VFX-redigering, Huvudbyte, Karaktärsbyte och Stilöverföring laddar var sin LoRA. Ladda ned alla som saknas till en mapp i ett enda steg.",
+        "downloadAllMissing": "Ladda ned alla som saknas ({{count}})",
+        "downloadingAll": "Laddar ned {{count}} LoRA…",
+        "pause": "Pausa",
+        "retry": "Återuppta/försök igen",
+        "savedTo": "Sparat i {{folder}}. Kontrollera installationen igen när ComfyUI har uppdaterat sin modellista."
+      }
+    },
+    "hardware": {
+      "graphicsCard": "Grafikkort",
+      "videoMemory": "Videominne",
+      "systemMemory": "Minne",
+      "checkingValue": "Kontrollerar…",
+      "checkingTitle": "Kontrollerar din hårdvara…",
+      "readyTitle": "Din dator kan köra Mago lokalt",
+      "continue": "Fortsätt",
+      "limitedTitle": "Mago fungerar, med begränsningar",
+      "limitedDescription": "Ditt grafikkort har {{videoMemory}} videominne. Mindre modeller körs här. Större modeller körs i Mago Cloud.",
+      "continueAnyway": "Fortsätt ändå",
+      "useCloud": "Använd Mago Cloud",
+      "blockedTitle": "Den här datorn kan inte köra Mago lokalt",
+      "blockedDescription": "Lokal rendering kräver ett NVIDIA-grafikkort med minst 8 GB videominne. Du kan fortfarande rendera allt i Mago Cloud."
+    },
+    "storage": {
+      "insufficientTitle": "Inte tillräckligt med utrymme på {{drive}}",
+      "insufficientDescription": "Du behöver {{required}} GB. Den här enheten har {{free}} GB ledigt.",
+      "insufficientHint": "Frigör {{missing}} GB eller välj en enhet med mer utrymme.",
+      "chooseAnotherDrive": "Välj en annan enhet",
+      "checkAgain": "Kontrollera igen",
+      "title": "Var ska Mago lagra motorn?",
+      "description": "ComfyUI, startmodeller och tillfälliga uppackningsfiler kräver {{required}} GB.",
+      "driveGroupLabel": "Målenhet",
+      "freeSpace": "{{free}} GB ledigt",
+      "chooseFolder": "Använd en annan mapp",
+      "continue": "Fortsätt"
+    },
+    "licenses": {
+      "title": "Modellicenser",
+      "description": "Mago Studio kör modeller med öppna vikter på din dator. Varje modell omfattas av upphovspersonens licens. Genom att godkänna använder du modellerna efter eget omdöme. Mago Cloud-modellerna är fortfarande tillgängliga för kommersiell användning.",
+      "listLabel": "Modellicenser",
+      "accept": "Godkänn"
+    },
+    "welcome": {
+      "title": "Rendera på den här datorn",
+      "description": "Mago laddar ned ComfyUI, MiniMax-videomodeller och Qwen-VL för bildtexter. Du kan lägga till lokala text- och bildmodeller i nästa steg eller fortsätta använda Mago Cloud för dem.",
+      "hardwareLabel": "1  Hårdvarukontroll",
+      "hardwareEstimate": "Cirka 10 sekunder",
+      "modelsLabel": "2  Modeller",
+      "modelsEstimate": "Välj vad som ska installeras",
+      "storageLabel": "3  Lagring",
+      "storageEstimate": "Från {{gigabytes}} GB",
+      "downloadLabel": "4  Nedladdning",
+      "downloadEstimate": "Från {{count}} filer",
+      "useExistingComfy": "Jag har redan ComfyUI",
+      "installComfy": "Jag har inte ComfyUI installerat"
+    },
+    "models": {
+      "title": "Välj vad som ska installeras",
+      "description": "Minimal installation renderar video. Lägg till de andra grupperna nu eller senare via Uppdatera installation.",
+      "listLabel": "Modellgrupper",
+      "groups": {
+        "minimal": {
+          "name": "Minimal",
+          "description": "ComfyUI, MiniMax H3-video med tillhörande högkvalitets- och VFX-LoRA samt Qwen3-VL för bildtexter."
+        },
+        "local-llm": {
+          "name": "Lokal LLM",
+          "description": "Qwen3.8 27B för att skriva manus och prompter. Q5 eller Q3, väljs utifrån ditt videominne."
+        },
+        "qwen-image": {
+          "name": "Qwen Image",
+          "description": "Qwen Image 2512 för ark och stillbilder."
+        },
+        "flux-image": {
+          "name": "Flux Image",
+          "description": "Flux 2 Klein 4B för ark och stillbilder."
+        }
+      },
+      "size": "{{gigabytes}} GB",
+      "alwaysInstalled": "Installeras alltid",
+      "installed": "Installerad",
+      "updateAvailable": "Uppdatering tillgänglig",
+      "continue": "Fortsätt",
+      "loadError": "Det gick inte att läsa vilka modeller som är installerade.",
+      "startFailed": "Det gick inte att starta nedladdningen.",
+      "insufficientSpace": "Du behöver {{required}} GB i Magos installationsmapp. Den har {{free}} GB ledigt."
+    },
+    "updateInstallation": {
+      "label": "Uppdatera installation",
+      "tooltip": "Den här modellen är inte installerad än. Lägg till den i din installation."
+    },
+    "download": {
+      "installingDependencies": "Installerar beroenden för nodpaket..."
+    },
+    "comfyRestart": {
+      "description": "Nya nodpaket laddas när ComfyUI startas om. Starta om när ingen rendering behöver ComfyUI.",
+      "busyWarning_one": "ComfyUI har {{count}} rendering som körs eller står i kö. Om du startar om stoppas den.",
+      "busyWarning_other": "ComfyUI har {{count}} renderingar som körs eller står i kö. Om du startar om stoppas de.",
+      "restart": "Starta om ComfyUI",
+      "restarting": "Startar om ComfyUI...",
+      "waitingForRestart": "Installerat. Starta om ComfyUI nedan för att ladda det.",
+      "restartAnyway": "Starta om ComfyUI ändå",
+      "restarted": "ComfyUI har startats om med de nya nodpaketen. Installationen har kontrollerats igen.",
+      "restartYourself": "Starta om ComfyUI för att ladda de nya nodpaketen. Mago kan inte starta om den här ComfyUI: den saknar ComfyUI-Manager och Mago känner inte till dess installationsmapp.",
+      "restartStatusUnknown": "Starta om ComfyUI för att ladda de nya nodpaketen. Mago kunde inte kontrollera om det går att starta om den åt dig."
+    },
+    "requirementDownload": {
+      "savedNodePack": "Sparat i {{savedTo}}. Det fästa nodpaketets SHA-256 har verifierats och paketet har packats upp med CRC-kontroller.",
+      "savedModel": "Sparat i {{savedTo}}. Kontrollera installationen igen när ComfyUI har uppdaterat sin modellista."
+    },
+    "nodePackUpdate": {
+      "title": "Uppdatera det här nodpaketet?",
+      "outdated": "{{nodePackName}} är installerat, men det är inte den version som Mago behöver.",
+      "steps": "Mago laddar först ned den fästa versionen till en tillfällig mapp. När det har lyckats flyttas den nuvarande mappen till säkerhetskopieringsmappen och den nya installeras.",
+      "installedFolder": "Installationsmapp",
+      "backupFolder": "Säkerhetskopieringsmapp",
+      "cancel": "Avbryt",
+      "confirm": "Uppdatera nodpaket"
+    },
+    "nodePackDependencies": {
+      "installed": "Dess Python-beroenden har installerats.",
+      "noRequirements": "Det har inga Python-beroenden.",
+      "manual": "Mago hittade inte den Python som kör din ComfyUI. Kör det här kommandot med den Python-installationen och starta sedan om ComfyUI:",
+      "copyCommand": "Kopiera kommando",
+      "failed": "Nodpaketet är på plats, men det gick inte att installera dess Python-beroenden. Åtgärda felet, kör det här kommandot och starta sedan om ComfyUI:",
+      "rowHint": "Ladda ned och packa upp i {{folder}}. Mago packar upp paketet och installerar dess Python-beroenden om den hittar den Python som kör ComfyUI. Starta sedan om ComfyUI."
+    },
+    "steps": {
+      "welcome": "Välkommen",
+      "hardware": "Hårdvarukontroll",
+      "models": "Modeller",
+      "storage": "Lagring",
+      "licenses": "Licenser",
+      "download": "Nedladdning"
+    },
+    "stepCounter": "Steg {{current}} av {{total}} · {{name}}",
+    "skipStep": "Nästa (för teamtest)",
+    "skipToFakeDownload": "Nästa (fejkad nedladdning)",
+    "collapse": "Fäll ihop installationen",
+    "back": "Tillbaka",
+    "comfyLaunch": {
+      "label": "Starta ComfyUI",
+      "launching": "Startar ComfyUI...",
+      "timeout": "ComfyUI har startats men har inte svarat än. Kontrollera installationen och försök igen.",
+      "tooltip": "ComfyUI körs inte. Starta det för att rendera lokalt.",
+      "launchedProcessExited": "ComfyUI stängdes under uppstarten (slutkod {{exitCode}}). Ditt grafikkort eller dina drivrutiner kanske inte stöds, eller så kan installationen vara skadad. Kör installationen igen för att kontrollera.",
+      "reportedFailureReason": "ComfyUI rapporterade: {{reason}}",
+      "unknownExitCode": "—",
+      "dialog": {
+        "launchingTitle": "Startar ComfyUI",
+        "launchingDescription": "Mago startar ComfyUI från din lokala installation. Det tar oftast mindre än en minut.",
+        "startingProcess": "Startar ComfyUI-processen…",
+        "checkProgress_one": "Kontrollerat {{count}} gång · nästa kontroll om {{seconds}} s",
+        "checkProgress_other": "Kontrollerat {{count}} gånger · nästa kontroll om {{seconds}} s",
+        "elapsed": "{{elapsed}} / {{limit}}",
+        "failedTitle": "ComfyUI startade inte",
+        "timedOutDescription": "ComfyUI svarade inte inom {{minutes}} minuter. Försök igen startar om det. Om det fortsätter att misslyckas kör du installationen igen för att reparera den.",
+        "launchErrorDescription": "Mago kunde inte starta ComfyUI. Kör installationen igen för att reparera den.",
+        "launchErrorFallback": "Det gick inte att starta ComfyUI-startprogrammet.",
+        "cancel": "Avbryt",
+        "retry": "Försök igen"
+      }
+    },
+    "setupMagoStudio": {
+      "label": "Installera Mago Studio",
+      "tooltip": "Du måste slutföra installationen för att kunna rendera lokalt."
+    },
+    "debugSetting": {
+      "label": "Felsökningsverktyg för installationsguiden",
+      "description": "Visar Tillbaka, Nästa (fejkad nedladdning) och förhandsvisningen som visar allt som saknas i installationsguiden."
+    },
+    "localRenderBlocked": {
+      "setupUnfinished": "Du måste slutföra installationen för att kunna rendera lokalt.",
+      "comfyStopped": "ComfyUI är installerat. Starta det för att rendera lokalt."
+    }
+  },
+  "localSettings": {
+    "title": "Lokala inställningar",
+    "openButtonAriaLabel": "Öppna inställningar för lokalt bibliotek",
+    "saving": "Sparar inställningar...",
+    "signOutConfirm": "Logga ut från Mago Cloud?",
+    "errors": {
+      "checkComfy": "Det gick inte att kontrollera ComfyUI",
+      "openSettings": "Det gick inte att öppna inställningarna",
+      "useFolder": "Det gick inte att använda mappen",
+      "saveComfyEndpoint": "Det gick inte att spara ComfyUI-slutpunkten",
+      "signIn": "Det gick inte att logga in"
+    },
+    "hints": {
+      "endpointUnchecked": "Lämna fältet för att kontrollera slutpunkten.",
+      "comfyNotResponding": "ComfyUI svarar inte. Starta det eller slutför den lokala installationen.",
+      "connectComfyFirst": "Anslut ComfyUI ovan för att kontrollera den här modellen.",
+      "textModelMissing": "Saknas eller är inte tillgängligt: {{missing}}. Installera dem via den lokala installationen och starta sedan om ComfyUI.",
+      "textModelUnverified": "Det gick inte att verifiera den valda textmodellen. Välj den igen för att försöka på nytt.",
+      "cloudTextNeedsSignIn": "Logga in på Mago för att använda textgenerering i molnet. Annars används den lokala textmodellen."
+    },
+    "tabs": {
+      "account": "Konto",
+      "models": "Modeller",
+      "general": "Allmänt",
+      "needsAttention": "Behöver åtgärdas"
+    },
+    "statusMark": {
+      "checking": "{{label}}: kontrollerar",
+      "ready": "{{label}}: klar",
+      "needsAttention": "{{label}}: behöver åtgärdas",
+      "checkingProgress": "Kontrollerar {{label}}"
+    },
+    "account": {
+      "heading": "Konto",
+      "signedInFallback": "Inloggad",
+      "signInPrompt": "Logga in för att använda rendering i molnet, krediter och din prenumeration.",
+      "signIn": "Logga in på Mago",
+      "signOut": "Logga ut"
+    },
+    "models": {
+      "heading": "ComfyUI",
+      "description": "Qwen Image Edit, lokala Wan-videorenderingar och Qwen3-VL-bildtexter körs alla via detta ComfyUI-API. Ingen API-nyckel krävs.",
+      "comfyNeeded": "Ange en ComfyUI-slutpunkt som svarar innan du använder lokala ComfyUI-modeller.",
+      "endpointLabel": "API-slutpunkt",
+      "endpointAriaLabel": "ComfyUI API-slutpunkt",
+      "textModelLabel": "Textmodell",
+      "textModelCloud": "Gemini (Mago Cloud)",
+      "textModelQwenQ3": "Qwen3.8 27B Q3 (lokal, mindre minne)",
+      "textModelQwenQ5": "Qwen3.8 27B Q5 (lokal, högre kvalitet)"
+    },
+    "general": {
+      "heading": "Projektmapp",
+      "noLibrary": "Inget lokalt bibliotek valt",
+      "changeFolder": "Byt mapp",
+      "chooseFolder": "Välj mapp",
+      "showInFolder": "Visa i mapp",
+      "description": "Mago sparar sin projektdatabas och genererade miniatyrer här. Källvideor ligger kvar på sina ursprungliga platser.",
+      "languageLabel": "Språk",
+      "sceneTimelineLabel": "Scentidslinje",
+      "sceneTimelineDescription": "Visar ett kort för varje scen högst upp på fliken Scener, så att du kan hoppa dit.",
+      "advancedHeading": "Avancerat"
+    }
+  },
+  "projectFolders": {
+    "sections": {
+      "thisWeek": "Den här veckan",
+      "previous30Days": "Senaste 30 dagarna",
+      "january": "Januari",
+      "february": "Februari",
+      "march": "Mars",
+      "april": "April",
+      "may": "Maj",
+      "june": "Juni",
+      "july": "Juli",
+      "august": "Augusti",
+      "september": "September",
+      "october": "Oktober",
+      "november": "November",
+      "december": "December"
+    }
+  },
+  "documentation": {
+    "path": "https://www.notion.so/magostudio/User-onboarding-Welcome-to-Mago-Alpha-version-6fcbcef6bf1b4d65abffe07aa8154680"
+  },
+  "status": {
+    "still_in_progress": {
+      "label": "Pågår fortfarande"
+    },
+    "clip_is_rendering": {
+      "label": "Klippet renderas"
+    },
+    "clip_is_rendering_left": {
+      "label": "kvar"
+    },
+    "next": {
+      "label": "Nästa"
+    },
+    "in_queue": {
+      "label": "I kö"
+    },
+    "in_queue_next": {
+      "label": "I kö: nästa"
+    },
+    "not_available": {
+      "label": "Inte tillgänglig"
+    },
+    "error": {
+      "label": "Fel"
+    },
+    "failed": {
+      "label": "Misslyckades"
+    },
+    "paused": {
+      "label": "Pausad"
+    },
+    "starting": {
+      "label": "Startar"
+    },
+    "done": {
+      "label": "Klar"
+    },
+    "cancelled": {
+      "label": "Avbruten"
+    },
+    "processing_video": {
+      "label": "Bearbetar video"
+    },
+    "processing_failed": {
+      "label": "Bearbetningen misslyckades"
+    },
+    "loading": {
+      "label": "Läser in"
+    },
+    "in_progress": {
+      "label": "Pågår"
+    },
+    "unknown_error": {
+      "label": "Okänt fel"
+    },
+    "timeout": {
+      "label": "Tidsgränsen överskreds"
+    },
+    "processing": {
+      "label": "Bearbetar"
+    },
+    "encoding": {
+      "label": "Kodar"
+    },
+    "finalizing": {
+      "label": "Slutför"
+    },
+    "uploading": {
+      "label": "Laddar upp"
+    },
+    "syncing": {
+      "label": "Synkar…"
+    },
+    "syncing_projects": {
+      "label": "Synkar projekt · {{completed}}/{{total}}"
+    },
+    "downloading_offline": {
+      "label": "Laddar ned för offlineanvändning · {{ready}}/{{total}}"
+    },
+    "waiting_download": {
+      "label": "Väntar på nedladdning"
+    },
+    "downloading_asset": {
+      "label": "Laddar ned"
+    },
+    "retry_download": {
+      "label": "Försök ladda ned igen"
+    },
+    "loading_image": {
+      "label": "Läser in bild"
+    },
+    "loading_video": {
+      "label": "Läser in video"
+    },
+    "loading_credits": {
+      "label": "Läser in krediter och prenumeration"
+    },
+    "loading_project_preview": {
+      "label": "Läser in förhandsvisning av projekt"
+    },
+    "shared": {
+      "label": "(delat)"
+    },
+    "pinned_track_empty": {
+      "label": "Fäst ett spår i ditt projekt för att se det här"
+    }
+  },
+  "plans_panel": {
+    "title": {
+      "label": "Planer"
+    },
+    "section_in_progress": {
+      "label": "Pågår"
+    },
+    "section_ended": {
+      "label": "Avslutade"
+    }
+  },
+  "app_sidebar": {
+    "home": {
+      "label": "Hem"
+    },
+    "navigation": {
+      "label": "Huvudnavigering"
+    },
+    "collapse": {
+      "label": "Fäll ihop sidofältet"
+    },
+    "expand": {
+      "label": "Fäll ut sidofältet"
+    }
+  },
+  "project_types": {
+    "timeline": {
+      "label": "Video till video",
+      "description": "Ge ditt eget material en ny stil och lägg till VFX, shot för shot eller i bulk."
+    },
+    "script_to_shots": {
+      "label": "Mago Director",
+      "description": "Gör en idé till ett manus, besätt rollerna och rendera varje scen."
+    }
+  },
+  "credits_menu": {
+    "open": {
+      "label": "Öppna kreditmenyn"
+    },
+    "credits_mode": {
+      "label": "Kreditläge"
+    },
+    "relaxed_mode": {
+      "label": "Relaxed mode"
+    },
+    "unlimited_mode": {
+      "label": "Unlimited mode"
+    },
+    "upgrade": {
+      "label": "Uppgradera"
+    }
+  },
+  "home_tools": {
+    "title": {
+      "label": "Verktyg"
+    }
+  },
+  "upcoming_tools": {
+    "coming_soon": {
+      "label": "Kommer snart"
+    },
+    "generate_image": {
+      "label": "Generera bild",
+      "description": "Ladda upp en bild och ge den en ny stil med valfri bildmodell."
+    },
+    "generate_video": {
+      "label": "Generera video",
+      "description": "Animera en stillbild till ett videoklipp."
+    }
+  },
+  "projects_by_type": {
+    "empty_state": {
+      "description": "Inga projekt av den här typen än."
+    }
+  },
+  "new_users_paywall": {
+    "title": {
+      "label": "Dina gratiskrediter är slut. Välj en plan för att fortsätta rendera"
+    },
+    "best_offer": {
+      "label": "Bästa erbjudandet"
+    },
+    "per_month": {
+      "label": "per månad"
+    },
+    "learn_more": {
+      "label": "Läs mer"
+    },
+    "buy_credits": {
+      "label": "Köp krediter"
+    },
+    "subscribe": {
+      "label": "Prenumerera"
+    },
+    "navbar_subscribe": {
+      "label": "Prenumerera nu"
+    },
+    "discount_note": {
+      "label": "betala bara {{price}} din första månad som ny användare"
+    },
+    "free": {
+      "name": {
+        "label": "Betala per användning"
+      },
+      "subtitle": {
+        "label": "Din nuvarande plan"
+      },
+      "price": {
+        "label": "€0"
+      },
+      "line_1": {
+        "label": "Köp krediter efter behov"
+      }
+    },
+    "pro": {
+      "name": {
+        "label": "PRO"
+      },
+      "subtitle": {
+        "label": "Bäst för att upptäcka appen"
+      },
+      "free_renders_bold": {
+        "label": "Gratis renderingar"
+      },
+      "free_renders_rest": {
+        "label": " med Mago-modeller"
+      },
+      "simultaneous_note": {
+        "label": "– max. 2 samtidigt"
+      }
+    },
+    "studio": {
+      "name": {
+        "label": "Studio"
+      },
+      "subtitle": {
+        "label": "Släpp loss Magos fulla kraft"
+      },
+      "free_renders_bold": {
+        "label": "Gratis renderingar"
+      },
+      "free_renders_rest": {
+        "label": " med alla modeller inkl. Kling, Seedance m.fl."
+      },
+      "simultaneous_note": {
+        "label": "– max. 3 samtidigt"
+      }
+    }
+  },
+  "queue_panel": {
+    "title": {
+      "label": "Kö"
+    },
+    "section_in_progress_plans": {
+      "label": "Pågående planer"
+    },
+    "section_in_progress": {
+      "label": "Pågår"
+    },
+    "section_waiting": {
+      "label": "Väntar"
+    },
+    "section_completed": {
+      "label": "Klara"
+    },
+    "empty_in_progress": {
+      "label": "Inga jobb"
+    },
+    "empty_waiting": {
+      "label": "Inga jobb väntar"
+    },
+    "history_notice": {
+      "label": "Vi sparar historiken i 3 dagar"
+    },
+    "duration": {
+      "label": "Längd: {{value}}"
+    },
+    "frame_range": {
+      "label": "Bildrutor: {{start}}—{{end}}"
+    },
+    "cost": {
+      "label": "Kostnad: {{value}}"
+    },
+    "stop_render_confirmation": {
+      "description": "Renderingen {{name}} stoppas och tas bort från renderingskön."
+    },
+    "stop_render": {
+      "label": "Stoppa nu"
+    },
+    "open_project": {
+      "label": "Öppna projekt"
+    },
+    "delete_render": {
+      "label": "Ta bort"
+    }
+  },
+  "hints": {
+    "privacy_notice": "Mago använder inte ditt innehåll för att träna sina modeller. Dina videor är privata och delas inte utanför dina projekt."
+  },
+  "actions": {
+    "open_mago": {
+      "label": "Öppna Mago nu"
+    },
+    "use_template_video": {
+      "label": "Använd mallvideo {{number}}"
+    },
+    "use_this_prompt": {
+      "label": "Använd den här prompten"
+    },
+    "go_back_to_source_video": {
+      "label": "Tillbaka till originalvideon"
+    },
+    "video_preupload_modal_confirm": {
+      "label": "Beskär och ladda upp"
+    },
+    "open_stylizer": {
+      "label": "Öppna stilverktyget"
+    },
+    "upload_my_frame": {
+      "label": "Ladda upp min bildruta"
+    },
+    "frame_range_preset_full": {
+      "label": "Hela"
+    },
+    "frame_range_preset_one_second": {
+      "label": "1 sek."
+    },
+    "frame_range_preset_group": {
+      "ariaLabel": "Förinställt bildruteintervall"
+    },
+    "run_stylization": {
+      "label": "Generera {{ startFrameNumber }}–{{ endFrameNumber }}"
+    },
+    "run_stylization_area": {
+      "label": "Generera område {{ startFrameNumber }}–{{ endFrameNumber }}"
+    },
+    "run_test": {
+      "label": "Testa"
+    },
+    "play_video": {
+      "label": "Spela upp video"
+    },
+    "pause_video": {
+      "label": "Pausa video"
+    },
+    "toggle_crop": {
+      "label": "Växla beskärningsmarkering"
+    },
+    "reset_zoom": {
+      "label": "Återställ zoom"
+    },
+    "toggle_fullscreen": {
+      "label": "Växla helskärm"
+    },
+    "mute_sound": {
+      "label": "Stäng av ljudet"
+    },
+    "unmute_sound": {
+      "label": "Slå på ljudet"
+    },
+    "no_sound_on_track": {
+      "label": "Det här spåret har inget ljud"
+    },
+    "close_fullscreen": {
+      "label": "Stäng helskärm"
+    },
+    "resize_crop_top_left": {
+      "label": "Ändra beskärning från övre vänstra hörnet"
+    },
+    "resize_crop_top_right": {
+      "label": "Ändra beskärning från övre högra hörnet"
+    },
+    "resize_crop_bottom_left": {
+      "label": "Ändra beskärning från nedre vänstra hörnet"
+    },
+    "resize_crop_bottom_right": {
+      "label": "Ändra beskärning från nedre högra hörnet"
+    },
+    "upload_stylized_frame": {
+      "label": "Ladda upp stiliserad bildruta"
+    },
+    "stylize_frame": {
+      "label": "Ändra bildruta"
+    },
+    "confirm": "Bekräfta",
+    "switch_to_free": {
+      "label": "Byt till gratisplanen"
+    },
+    "switch_to_beginner": {
+      "label": "Byt till Beginner-planen"
+    },
+    "upgrade": {
+      "label": "Uppgradera"
+    },
+    "top_up_credits": {
+      "label": "Fyll på krediter"
+    },
+    "downgrade": {
+      "label": "Nedgradera"
+    },
+    "contact_us": {
+      "label": "Kontakta oss"
+    },
+    "subscribe_again": {
+      "label": "Prenumerera igen"
+    },
+    "addStyleReferenceImage": {
+      "label": "Lägg till stilreferensbild"
+    },
+    "optimize_prompt": {
+      "label": "Optimera prompt"
+    },
+    "undo": {
+      "label": "Ångra"
+    },
+    "back_to_project": {
+      "label": "Tillbaka till projektet"
+    },
+    "back_to_project_escape": {
+      "label": "Tillbaka till projektet (Escape)"
+    },
+    "try_another_video": {
+      "label": "Prova en annan video"
+    },
+    "modify_frames": {
+      "label": "Ändra bildrutor"
+    },
+    "download_sbs_video": {
+      "label": "Ladda ned video sida vid sida"
+    },
+    "download_with_info": {
+      "label": "Ladda ned med info"
+    },
+    "download_pinned": {
+      "label": "Ladda ned fästa"
+    },
+    "download_as_png": {
+      "label": "Ladda ned som PNG"
+    },
+    "download_as_exr": {
+      "label": "Ladda ned som EXR"
+    },
+    "copy_render_settings": {
+      "label": "Kopiera renderingsinställningar"
+    },
+    "reset_settings": {
+      "label": "Återställ",
+      "description": ""
+    },
+    "buy_credits": {
+      "label": "Köp krediter",
+      "description": ""
+    },
+    "back_to_plans": {
+      "label": "Tillbaka till sidan"
+    },
+    "checkbox": {
+      "label": "Aktivera"
+    },
+    "select_all_matching_objects": {
+      "label": "Markera alla matchande objekt"
+    },
+    "cancel": {
+      "label": "Avbryt"
+    },
+    "bulk_delete_shots": {
+      "label": "Ta bort markerade shots"
+    },
+    "confirm_rename": {
+      "label": "Bekräfta nytt namn"
+    },
+    "pin_track": {
+      "label": "Fäst spår"
+    },
+    "pin_a_render": {
+      "label": "Fäst en rendering"
+    },
+    "add": {
+      "label": "Lägg till"
+    },
+    "try_again": {
+      "label": "Försök igen"
+    },
+    "renew_plan": {
+      "label": "Förnya planen"
+    },
+    "update_card_info": {
+      "label": "Uppdatera kortuppgifter"
+    },
+    "choose_picture": {
+      "label": "Välj bild"
+    },
+    "copy_settings": {
+      "label": "Kopiera",
+      "ariaLabel": "Kopiera inställningar"
+    },
+    "paste_settings": {
+      "label": "Klistra in",
+      "ariaLabel": "Klistra in inställningar"
+    },
+    "create_image": {
+      "label": "Skapa bild"
+    },
+    "set_as_favorite": {
+      "label": "Ange som favorit"
+    },
+    "single_view": {
+      "label": "Enkel vy"
+    },
+    "overlay_view": {
+      "label": "Överlagrad vy"
+    },
+    "side_by_side_view": {
+      "label": "Sida vid sida"
+    },
+    "create_new_project": {
+      "label": "Skapa ett projekt"
+    },
+    "create_project": {
+      "label": "Skapa projekt"
+    },
+    "all_projects": {
+      "label": "Visa alla"
+    },
+    "sort_alphabetically": {
+      "label": "I bokstavsordning"
+    },
+    "sort_ascending": {
+      "label": "Sortera stigande"
+    },
+    "sort_descending": {
+      "label": "Sortera fallande"
+    },
+    "delete_project": {
+      "ariaLabel": "Ta bort projekt"
+    },
+    "folder_stats": {
+      "label": "Mappstatistik"
+    },
+    "new_folder": {
+      "label": "Lägg till mapp"
+    },
+    "sort_alphabetical": {
+      "label": "Bokstavsordning"
+    },
+    "sort_last_edited": {
+      "label": "Datum skapat"
+    },
+    "search_projects": {
+      "label": "Sök",
+      "placeholder": "Sök"
+    },
+    "delete": {
+      "label": "Ta bort"
+    },
+    "retry": {
+      "label": "Försök igen"
+    },
+    "dismiss": {
+      "label": "Stäng"
+    },
+    "share": {
+      "label": "Dela"
+    },
+    "delete_it_anyway": {
+      "label": "Ta bort ändå"
+    },
+    "dont_show_again": {
+      "label": "Visa inte igen",
+      "description": ""
+    },
+    "download": {
+      "label": "Ladda ned",
+      "description": ""
+    },
+    "zoom_in": {
+      "label": "Zooma in"
+    },
+    "zoom_out": {
+      "label": "Zooma ut"
+    },
+    "duplicate_settings": {
+      "label": "Duplicera inställningar",
+      "description": ""
+    },
+    "generate_image": {
+      "label": "Generera bild",
+      "description": ""
+    },
+    "generate_my_video": {
+      "label": "Generera min video",
+      "description": ""
+    },
+    "play_tutorial": {
+      "label": "Spela upp instruktionsvideo",
+      "description": ""
+    },
+    "generate_frame": {
+      "label": "Generera bildruta",
+      "description": ""
+    },
+    "generate": {
+      "label": "Generera",
+      "description": ""
+    },
+    "setup_local_render": {
+      "label": "Konfigurera lokal rendering"
+    },
+    "go_back": {
+      "label": "Tillbaka"
+    },
+    "continue": {
+      "label": "Fortsätt"
+    },
+    "hide_all_hints": {
+      "label": "Dölj alla tips",
+      "description": ""
+    },
+    "hide_details": {
+      "label": "Dölj detaljer",
+      "description": ""
+    },
+    "iterate": {
+      "label": "Iterera",
+      "description": ""
+    },
+    "loading_process": {
+      "label": "Läser in..."
+    },
+    "open_discord": {
+      "label": "Öppna Discord"
+    },
+    "send_me_home": {
+      "label": "Till startsidan"
+    },
+    "payment_flow_back_to_my_projects": {
+      "label": "Tillbaka till mina projekt"
+    },
+    "payment_flow_buy_some_credits": {
+      "label": "Köp krediter"
+    },
+    "payment_flow_buy_this": {
+      "label": "Köp nu"
+    },
+    "payment_flow_price_per_second": {
+      "label": "≈ {{currencySymbol}}{{price}} per sekund"
+    },
+    "payment_flow_details_videos": "videor (1 sekund, 720p, 30 fps)",
+    "payment_flow_details_images": "bilder (1280x720 px)",
+    "payment_flow_switch_to_credits": {
+      "label": "Byt till krediter"
+    },
+    "reset_override": {
+      "label": "Återställ"
+    },
+    "reset_all_overrides": {
+      "label": "Återställ alla åsidosättningar"
+    },
+    "reset_onboarding": {
+      "label": "Återställ introduktionen"
+    },
+    "price_details": {
+      "label": "Prisdetaljer",
+      "description": ""
+    },
+    "test": {
+      "label": "Testa",
+      "description": ""
+    },
+    "subscribe": {
+      "label": "Prenumerera",
+      "description": ""
+    },
+    "to_my_projects": {
+      "label": "Till mina projekt"
+    },
+    "tweak_it": {
+      "label": "Läs in inställningar",
+      "description": ""
+    },
+    "upload_image": {
+      "label": "Ladda upp bild"
+    },
+    "use_this": {
+      "label": "Använd den här",
+      "description": ""
+    },
+    "use_this_frame_as": {
+      "label": "Använd den här bildrutan som:",
+      "description": "Som standard används den här bildrutan som första bildruta för det valda intervallet, men du kan välja vilken bildruta som helst som referensbildruta. Det kan vara användbart om din karaktär inte syns i de första bildrutorna av klippet"
+    },
+    "first_frame": {
+      "label": "Första bildrutan"
+    },
+    "select_frame": {
+      "label": "Välj bildruta"
+    },
+    "watch_video": {
+      "label": "Titta på video"
+    },
+    "open_youtube": {
+      "label": "Öppna YouTube"
+    },
+    "unsubscribe_me": {
+      "label": "Ja, avsluta prenumerationen"
+    },
+    "update_billing_info": {
+      "label": "Uppdatera faktureringsuppgifter"
+    },
+    "its_fine": {
+      "label": "Det är okej"
+    },
+    "select_range": {
+      "label": "Intervall"
+    },
+    "create_new_track": {
+      "label": "Skapa nytt spår"
+    },
+    "apply_preset": {
+      "label": "Använd förinställning"
+    },
+    "share_project": {
+      "label": "Dela"
+    },
+    "bulk_import": {
+      "label": "Massimport"
+    },
+    "upload_video": {
+      "label": "Ladda upp video"
+    },
+    "add_video": {
+      "label": "Lägg till video"
+    },
+    "generate_with_ai": {
+      "label": "Generera med AI"
+    },
+    "create_folder": {
+      "label": "Skapa mapp"
+    },
+    "close": {
+      "label": "Stäng"
+    },
+    "toggle_presets_list": {
+      "label": "Visa/dölj förinställningar"
+    }
+  },
+  "buttonTooltips": {
+    "preview_button_one": {
+      "label": "En video"
+    },
+    "preview_button_split": {
+      "label": "Delad vy med reglage"
+    },
+    "preview_button_compare": {
+      "label": "Jämför två videospår"
+    },
+    "crop_toggle_button": {
+      "label": "Rita en beskärning för att bara rendera det området"
+    },
+    "zoom_reset_button": {
+      "label": "Återställ"
+    },
+    "fullscreen_viewport_button": {
+      "label": "Öppna visningsfönstret i helskärm"
+    },
+    "download_sbs_video_button": {
+      "label": "Ladda ned jämförelsevideo sida vid sida"
+    },
+    "download_sbs_video_button_disabled": {
+      "label": "Välj ett enda färdigrenderat spår för att ladda ned jämförelsevideo"
+    },
+    "download_sbs_video_button_cropped": {
+      "label": "Jämförelsevideo är inte tillgänglig för beskurna renderingar än"
+    },
+    "disclosure_settings_panel_button": {
+      "label": "Visa eller dölj inställningar"
+    },
+    "nav_credits_button": {
+      "label": "Kreditsaldo, klicka för att fylla på"
+    },
+    "like_button": {
+      "label": "Markera ett resultat"
+    },
+    "add_to_prompt_button": {
+      "label": "Klistra in hela beskrivningen i prompten"
+    },
+    "use_this_button": {
+      "label": "Välj den här bilden för videogenerering",
+      "disabledTooltip": "Du kan inte använda den här bilden direkt med den valda modellen"
+    },
+    "tweak_it_button": {
+      "disabledTooltip": "Den här modellen är inte längre tillgänglig"
+    },
+    "pin_to_global_preview": {
+      "label": "Fäst i global förhandsvisning",
+      "disabledTooltip": "Bara färdiga renderingar kan fästas"
+    },
+    "reuse_settings": {
+      "label": "Återanvänd inställningar"
+    },
+    "iterate_render": {
+      "label": "Redigera den här renderingen"
+    },
+    "download_video_button": {
+      "label": "Ladda ned klipp"
+    },
+    "to_source_button": {
+      "label": "Till källan",
+      "tooltip": "Välj källvideon som användes för att skapa den här renderingen",
+      "deleted_tooltip": "Källspåret har tagits bort och är inte längre tillgängligt"
+    },
+    "click_to_rename_button": {
+      "label": "Klicka för att byta namn"
+    },
+    "generated_img2img_preview_button": {
+      "label": "Klicka för att zooma"
+    },
+    "create_image_button": {
+      "label": "Generera en stiliserad bildruta (img2img)"
+    },
+    "paste_disabled_completed_render": {
+      "label": "Du kan inte klistra in i en färdig rendering"
+    },
+    "copy_all_info": {
+      "label": "Kopiera appinfo"
+    },
+    "copy_section": {
+      "label": "Kopiera avsnitt"
+    },
+    "copy_all_debug_info": {
+      "label": "Kopiera allt"
+    }
+  },
+  "titles": {
+    "or": {
+      "label": "eller"
+    },
+    "tutorial_script_to_movie": {
+      "label": "Så går du från manus till film med Mago"
+    },
+    "tutorial_iterating_on_renders": {
+      "label": "Mago-guide | Iterera på renderingar och bygg i omgångar"
+    },
+    "tutorial_compare_renders": {
+      "label": "Mago-guide | Jämför renderingar sida vid sida"
+    },
+    "onboarding_upload": {
+      "label": "Välj en video för att börja redigera:",
+      "or_upload": "Eller ladda upp en egen fil",
+      "description": "Dra och släpp eller klicka för att ladda upp din fil",
+      "hint": "Du kan använda videoformaten .mp4 eller .mov"
+    },
+    "onboarding_questionnaire": {
+      "name": {
+        "title": "Berätta lite mer om dig själv",
+        "first_name": "Förnamn",
+        "last_name": "Efternamn"
+      },
+      "profession": {
+        "title": "Vad arbetar du med?",
+        "subtitle": "Det hjälper oss att anpassa appen efter dina behov",
+        "2d_animation": "2D-animation",
+        "3d_animation": "3D-animation",
+        "vfx": "VFX",
+        "vertical_drama": "Vertikal drama",
+        "social_media_content": "Innehåll för sociala medier",
+        "other": "Annat",
+        "other_placeholder": "Berätta vad du gör"
+      },
+      "referral_source": {
+        "title": "Hur hörde du talas om Mago?",
+        "instagram": "Instagram",
+        "youtube": "Youtube",
+        "linkedin": "Linkedin",
+        "google": "Google",
+        "friend": "Från en vän",
+        "tiktok": "Tiktok"
+      }
+    },
+    "onboarding_image_step": {
+      "label": "Beskriv hur du vill ändra din video",
+      "default_prompt": "Täck allt med snö"
+    },
+    "onboarding_stylize_header": {
+      "label": "Första steget för att ändra din video är att stilisera en bildruta"
+    },
+    "onboarding_style_reference": {
+      "label": "Lägg till stilreferens eller karaktär"
+    },
+    "onboarding_use_this_hint": {
+      "label": "Klicka här för att använda den här bilden som referens"
+    },
+    "onboarding_render_prompt": {
+      "placeholder": "Beskriv ändringarna du vill göra i din video",
+      "default_prompt": "Täck allt med snö"
+    },
+    "onboarding_render_sending": {
+      "label": "Beskriv i prompten vad du vill ändra i videon, som komplement till din nya bildruta"
+    },
+    "onboarding_render_frame_edited": {
+      "label": "Redigerad bildruta"
+    },
+    "onboarding_render_frame_input": {
+      "label": "Indata"
+    },
+    "onboarding_render_apply_to": {
+      "label": "Tillämpa på"
+    },
+    "onboarding_render_done": {
+      "label": "Introduktionen är klar och din rendering har skickats till kön. Vi meddelar dig med ett ljud när den är klar! Tillåt Mago att skicka aviseringar i webbläsaren för att få det."
+    },
+    "onboarding_tutorial": {
+      "label": "Medan du väntar kan du lära dig mer om vad Mago kan"
+    },
+    "trim_your_video": {
+      "label": "Trimma din video"
+    },
+    "video_upload_limit": {
+      "label": "Gränsen är för närvarande 1 minut"
+    },
+    "or_use_template_video": {
+      "label": "Eller använd en av våra videor"
+    },
+    "maintenance": {
+      "label": "Mago genomgår underhåll. Besök vår Discord för mer information"
+    },
+    "cloud_maintenance": {
+      "label": "Mago Cloud genomgår underhåll."
+    },
+    "crash_page": {
+      "label": "Något gick fel! Vårt räddningsteam är på väg"
+    },
+    "frame_modification": {
+      "label": "Ändring av bildruta"
+    },
+    "generate_images": {
+      "label": "Genererade bilder"
+    },
+    "input_track_selector": {
+      "label": "Valt indataspår"
+    },
+    "render_settings": {
+      "label": "Inställningar"
+    },
+    "settings_view": {
+      "label": "Renderingsinfo"
+    },
+    "technical_settings": {
+      "label": "Tekniska inställningar"
+    },
+    "quality_settings": {
+      "label": "Kvalitetsinställningar"
+    },
+    "advanced_settings": {
+      "label": "Avancerade inställningar"
+    },
+    "mask_settings": {
+      "label": "Maskinställningar"
+    },
+    "other_settings": {
+      "label": "Övriga inställningar"
+    },
+    "scheduled_from": {
+      "label": "Schemalagd"
+    },
+    "changes_after": {
+      "label": "Efter {{date}} byts du till planen {{plan}}"
+    },
+    "relaxed": {
+      "label": "Relaxed"
+    },
+    "unlimited_mode": {
+      "label": "Unlimited"
+    },
+    "relaxed_mode": {
+      "label": "Relaxed"
+    },
+    "reference_images": {
+      "label": "Bilder (jpg eller png)",
+      "description": "Ladda upp upp till 2 referensbilder för videogenerering med Kling"
+    },
+    "reference_image_slot": {
+      "label": "Bild {{number}}",
+      "labelTag": "@Image{{number}}",
+      "first_angle": "Första vinkeln",
+      "second_angle": "Andra vinkeln",
+      "elementTag": "@Element{{number}}",
+      "pictureTag": "Bild {{number}}"
+    },
+    "no_mask": {
+      "label": "Ingen mask"
+    },
+    "mask_input": {
+      "label": "Maskindata"
+    },
+    "discord_community": {
+      "label": "Discord-community"
+    },
+    "discord": {
+      "label": "discord"
+    },
+    "email": {
+      "label": "e-post"
+    },
+    "how_to_work_with_settings": {
+      "label": "Så arbetar du med inställningar"
+    },
+    "youtube_tutorials": {
+      "label": "Se våra guider på YouTube"
+    },
+    "frame_range": {
+      "label": "Bildruteintervall",
+      "description": ""
+    },
+    "generation_cost": {
+      "label": "Genereringskostnad",
+      "description": ""
+    },
+    "modal_video_tutorial": {
+      "label": "Mago-guidevideo"
+    },
+    "my_projects": {
+      "label": "Mina projekt"
+    },
+    "all_projects_modal": {
+      "label": "Alla projekt"
+    },
+    "project_modal": {
+      "label": "Projekt"
+    },
+    "drag_drop_files": {
+      "label": "Dra och släpp dina videofiler här för att komma igång",
+      "description": "Du kan ladda upp flera filer samtidigt. Vi kan skapa en mapp för alla filer eller en separat mapp för varje fil. Lägg till en fil för att välja uppladdningsalternativ."
+    },
+    "untitled_project": {
+      "label": "Namnlöst"
+    },
+    "onboarding_sticker_title": {
+      "label": "Så gör du"
+    },
+    "project_loading": {
+      "label": "Projekt"
+    },
+    "project_loading_date": {
+      "label": "00.00.00"
+    },
+    "project_loading_subtitle": {
+      "label": "x renderingar, x bilder"
+    },
+    "folder_stats": {
+      "label": "Mappstatistik"
+    },
+    "project_stats": {
+      "label": "Projektstatistik"
+    },
+    "project_stats_total_renders": {
+      "label": "Totalt antal renderingar"
+    },
+    "project_stats_success_rate": {
+      "label": "Lyckandegrad"
+    },
+    "project_stats_render_details": {
+      "label": "Renderingsdetaljer"
+    },
+    "project_stats_total_frames": {
+      "label": "Totalt antal bildrutor"
+    },
+    "project_stats_total_cost": {
+      "label": "Total kostnad"
+    },
+    "project_stats_total_time": {
+      "label": "Total renderingstid"
+    },
+    "project_stats_avg_time_per_frame": {
+      "label": "Genomsnittlig tid per bildruta"
+    },
+    "project_stats_model_info": {
+      "label": "Modellinfo"
+    },
+    "project_stats_most_used_model": {
+      "label": "Mest använda modell"
+    },
+    "project_stats_successful_renders": {
+      "label": "Lyckade renderingar"
+    },
+    "project_stats_avg_cost_per_frame": {
+      "label": "Snittkostnad per bildruta"
+    },
+    "project_stats_avg_cost_per_second": {
+      "label": "Snittkostnad per sekund"
+    },
+    "project_stats_earliest_render": {
+      "label": "Första renderingen"
+    },
+    "project_stats_latest_render": {
+      "label": "Senaste renderingen"
+    },
+    "project_stats_models_used": {
+      "label": "Använda modeller"
+    },
+    "project_stats_queue_wait_time": {
+      "label": "Väntetid i kö"
+    },
+    "project_stats_individual_renders": {
+      "label": "Enskilda renderingar"
+    },
+    "project_stats_frames": {
+      "label": "Bildrutor"
+    },
+    "project_stats_resolution": {
+      "label": "Upplösning"
+    },
+    "project_stats_fps": {
+      "label": "FPS"
+    },
+    "project_stats_model": {
+      "label": "Modell"
+    },
+    "project_stats_render_time": {
+      "label": "Renderingstid"
+    },
+    "project_stats_cost": {
+      "label": "Kostnad"
+    },
+    "input_video_resolution": {
+      "label": "Upplösning"
+    },
+    "input_video_ratio": {
+      "label": "Bildformat"
+    },
+    "input_video_duration": {
+      "label": "Längd"
+    },
+    "input_video_fps": {
+      "label": "FPS"
+    },
+    "input_video_total_frames": {
+      "label": "Totalt antal bildrutor"
+    },
+    "renders_count": {
+      "label": "{{count}} rendering",
+      "label_one": "{{count}} rendering",
+      "label_other": "{{count}} renderingar"
+    },
+    "shots_count": {
+      "label": "{{count}} shot",
+      "label_one": "{{count}} shot",
+      "label_other": "{{count}} shots"
+    },
+    "payment_flow_credits_page_kicker": {
+      "label": "renderad video i 1080p"
+    },
+    "payment_flow_credits_page_subtitle": {
+      "label": "1000 krediter motsvarar ungefär 6 sekunder"
+    },
+    "our_plans_and_credits": {
+      "label": "Våra planer och krediter"
+    },
+    "pricing": {
+      "label": "Priser",
+      "sales_label": "Priser"
+    },
+    "pricing_page": {
+      "heading": "Låt oss bygga tillsammans",
+      "subheading": "Våra experter hjälper dig att utforma en lösning som passar din skala, budget och dina tekniska krav",
+      "hint": "Ingen modellträning görs. Inga data skickas någon annanstans. Om du tar bort ditt projekt raderas det permanent",
+      "faq_title": "Vanliga frågor",
+      "custom_solutions_badge": "SKRÄDDARSYDDA LÖSNINGAR",
+      "custom_solutions_title": "Mago Enterprise",
+      "custom_solutions_description": "Ta vara på Magos fulla potential med en skräddarsydd plan anpassad efter din organisations volym och tekniska krav.",
+      "checklist_item_1": "Bygg ditt AI-produktionsflöde",
+      "checklist_item_2": "Personlig implementering och support",
+      "checklist_item_3": "Behåll visuell konsekvens och kreativt ägarskap över serier och sekvenser",
+      "checklist_item_4": "Renderingskö och processhantering",
+      "checklist_item_5": "Snabbare produktionsarbetsflöde",
+      "checklist_item_6": "Dina filer är säkra i vårt moln",
+      "faq_q1": "Hur integreras Mago i befintliga produktionsflöden?",
+      "faq_a1": "Mago passar direkt in i ditt nuvarande VFX- och efterproduktionsflöde. Vårt team hjälper dig att koppla Mago till din resurshantering, dina granskningsverktyg och din renderingsinfrastruktur så att införandet går smidigt.",
+      "faq_q2": "Hur hanterar ni sekretess och skydd av immateriella rättigheter?",
+      "faq_a2": "Dina data förblir dina. Vi använder aldrig kunders resurser för modellträning, alla filer krypteras både i vila och under överföring, och projekt raderas permanent när du tar bort dem. Vi kan också skriva på anpassade sekretessavtal (NDA) och personuppgiftsbiträdesavtal (DPA).",
+      "faq_q3": "Vad ingår i anpassad modellträning?",
+      "faq_a3": "Vi finjusterar våra basmodeller på dina specifika stilguider, varumärkesresurser och referensmaterial så att resultatet matchar din kreativa vision från början – utan tidskrävande promptarbete.",
+      "faq_q4": "Hur ser ett typiskt pilotprojekt ut?",
+      "faq_a4": "Ett pilotprojekt pågår oftast i 2–4 veckor. Vi introducerar ditt team, konfigurerar Mago för ett representativt projekt och mäter kvalitet, hastighet och kostnadsbesparingar jämfört med ditt nuvarande arbetsflöde innan vi skalar upp."
+    },
+    "best_offer": {
+      "label": "Bästa erbjudandet"
+    },
+    "payment_flow_current_amount_of_credits": {
+      "label": "Nuvarande antal krediter"
+    },
+    "payment_flow_history_of_purchases": {
+      "label": "Köphistorik"
+    },
+    "payment_flow_not_enough_credits": {
+      "label": "Inte tillräckligt med krediter?"
+    },
+    "payment_flow_payment_page_title": {
+      "label": "Faktureringsuppgifter"
+    },
+    "payment_flow_per_credit": {
+      "label": "per kredit"
+    },
+    "setting_name": {
+      "label": "Inställningens namn",
+      "description": ""
+    },
+    "test_cost": {
+      "label": "Testkostnad",
+      "description": ""
+    },
+    "total_amount": {
+      "label": "Totalbelopp",
+      "description": ""
+    },
+    "queue": {
+      "label": "Kö",
+      "description": ""
+    },
+    "create": {
+      "label": "Skapa"
+    },
+    "preview": {
+      "label": "Förhandsvisning"
+    },
+    "allProjects": {
+      "label": "Alla projekt",
+      "description": ""
+    },
+    "modal_generate_image_from_frame": {
+      "label": "Generera en stiliserad bildruta (img2img)"
+    },
+    "generated_images": {
+      "label": "Genererade bilder"
+    },
+    "frame_number": {
+      "label": "Bildrutenummer"
+    },
+    "no_generated_images": {
+      "label": "Inga bilder har genererats än"
+    },
+    "img2img_empty_state": {
+      "no_modified_frames_yet": "Inga ändrade bildrutor än",
+      "guidance": "Om du vill ändra din video börjar du med att ändra en enskild bildruta med en prompt eller en referensbild. Du kan använda några av dessa promptexempel:",
+      "recommended_model_prefix": "Rekommenderad modell:",
+      "preset_cinematic_illustrated": {
+        "title": "Filmisk illustrerad stil",
+        "recommended_model": "GPT Image 2",
+        "prompt": "Filmisk illustrerad stil, rå fantasyrealism."
+      },
+      "preset_change_weather": {
+        "title": "Ändra vädret",
+        "recommended_model": "GPT Image 2",
+        "prompt": "Ändra vädret till en snöscen, behåll originalbildens komposition"
+      },
+      "preset_clean_plate": {
+        "title": "Skapa en clean plate",
+        "recommended_model": "GPT Image 2",
+        "prompt": "Skapa en clean plate"
+      }
+    },
+    "image_settings": {
+      "label": "Bildinställningar"
+    },
+    "no_projects_yet": {
+      "label": "Inga projekt än"
+    },
+    "no_results_found": {
+      "label": "Inga resultat hittades"
+    },
+    "video_preupload_modal_title": {
+      "label": "Trimma och ladda upp bara den del du behöver"
+    },
+    "video_preupload_modal_subtitle": {
+      "label": "Gränsen är för närvarande 1 minut"
+    },
+    "video_preupload_modal_trim_instruction": {
+      "label": "Välj den del av videon som du vill behålla"
+    },
+    "subscriptions": {
+      "label": "Planer"
+    },
+    "credits": {
+      "label": "Krediter"
+    },
+    "current_plan": {
+      "label": "Nuvarande plan"
+    },
+    "monthly_subscription": {
+      "label": "Månadsprenumeration"
+    },
+    "free_plan": {
+      "label": "Gratis"
+    },
+    "free_forever": {
+      "label": "gratis för alltid"
+    },
+    "beginner_plan": {
+      "label": "Beginner (utgången)"
+    },
+    "pro_plan": {
+      "label": "Pro"
+    },
+    "studio_plan": {
+      "label": "Studio"
+    },
+    "enterprise": {
+      "label": "Enterprise"
+    },
+    "buy_credits_for_your_plan": {
+      "label": "Köp krediter för din plan"
+    },
+    "expires": {
+      "label": "Upphör"
+    },
+    "expired": {
+      "label": "Har upphört"
+    },
+    "model": {
+      "label": "Modell",
+      "description": "Välj vilken modell som ska användas för bildgenereringen"
+    },
+    "projects": {
+      "label": "Projekt"
+    },
+    "shots": {
+      "label": "Shots"
+    },
+    "project_view": {
+      "label": "Projektvy"
+    },
+    "render_video": {
+      "label": "Rendera video"
+    },
+    "upscale": {
+      "label": "Skala upp"
+    },
+    "mask": {
+      "label": "Mask"
+    },
+    "modify_frame": {
+      "label": "Ändra bildruta"
+    },
+    "global_timeline": {
+      "label": "Global tidslinje"
+    },
+    "plan_tab": {
+      "label": "Plan"
+    },
+    "edit_frame": {
+      "label": "Redigera bildruta"
+    },
+    "my_account": {
+      "label": "Mitt konto"
+    },
+    "local_settings": {
+      "label": "Inställningar"
+    },
+    "account_info": {
+      "label": "Kontoinformation"
+    },
+    "subscriptions_and_credits": {
+      "label": "Prenumerationer och krediter"
+    },
+    "billing_info": {
+      "label": "Faktureringsuppgifter"
+    },
+    "sign_out": {
+      "label": "Logga ut"
+    },
+    "app_info": {
+      "label": "Appinfo"
+    },
+    "debug_info": {
+      "label": "Felsökningsinfo"
+    },
+    "commit_hash": {
+      "label": "Commit"
+    },
+    "build_time": {
+      "label": "Byggd"
+    },
+    "backend_url": {
+      "label": "Backend"
+    },
+    "backend_version": {
+      "label": "API-version"
+    },
+    "app_version": {
+      "label": "Appversion"
+    },
+    "local_app_version": {
+      "label": "Mago Studio {{version}} ({{commitHash}})"
+    },
+    "feature_flags": {
+      "label": "Funktionsflaggor"
+    },
+    "browser_info": {
+      "label": "Webbläsare"
+    },
+    "dev_overrides": {
+      "label": "Utvecklaråsidosättningar"
+    },
+    "subscription_override": {
+      "label": "Åsidosätt prenumeration"
+    },
+    "legacy_user_override": {
+      "label": "Äldre användare"
+    },
+    "created_at_override": {
+      "label": "Skapad"
+    },
+    "force_non_team_member_override": {
+      "label": "Tvinga icke-teammedlem"
+    },
+    "mock_onboarding_incomplete_override": {
+      "label": "Simulera ofullständig introduktion"
+    },
+    "force_onboarding_complete_override": {
+      "label": "Tvinga slutförd introduktion"
+    },
+    "force_onboarding_enabled_override": {
+      "label": "Tvinga aktiverad introduktion"
+    },
+    "relaxed_day_pct_override": {
+      "label": "Lägets dagliga användning %"
+    },
+    "relaxed_day_reset_override": {
+      "label": "Lägets dagliga återställning"
+    },
+    "relaxed_week_pct_override": {
+      "label": "Lägets veckoanvändning %"
+    },
+    "relaxed_week_reset_override": {
+      "label": "Lägets veckoåterställning"
+    },
+    "override_none": {
+      "label": "Ingen"
+    },
+    "user_subscription": {
+      "label": "Användare och prenumeration"
+    },
+    "current_project": {
+      "label": "Aktuellt projekt"
+    },
+    "app_environment": {
+      "label": "App och miljö"
+    },
+    "user_id": {
+      "label": "Användar-ID"
+    },
+    "user_email": {
+      "label": "E-post"
+    },
+    "credit_balance": {
+      "label": "Krediter"
+    },
+    "reserved_credits": {
+      "label": "Reserverade"
+    },
+    "subscription_status": {
+      "label": "Prenumeration"
+    },
+    "renders_in_progress": {
+      "label": "Renderingar"
+    },
+    "project_id": {
+      "label": "Projekt-ID"
+    },
+    "shot_id": {
+      "label": "Shot-ID"
+    },
+    "track_ids": {
+      "label": "Spår-ID:n"
+    },
+    "asset_id": {
+      "label": "Resurs-ID"
+    },
+    "filepath": {
+      "label": "Filsökväg"
+    },
+    "queue_id": {
+      "label": "Kö-ID"
+    },
+    "user_agent": {
+      "label": "Användaragent"
+    },
+    "help_button": {
+      "shortcut": "Kortkommandon",
+      "support": "Kontakta support",
+      "discord": "Få hjälp på Discord"
+    },
+    "keyboard_shortcuts_title": "Kortkommandon",
+    "modifier_key_mac": "Cmd",
+    "modifier_key_win": "Ctrl",
+    "toggle_settings_action": "Öppna/stäng inställningspanelen",
+    "toggle_settings_key": "Shift+S",
+    "play_action": "Spela upp video",
+    "play_key": "Mellanslag",
+    "beginning_action": "Gå till klippets början",
+    "beginning_key": "Dubbelklicka på spåret",
+    "tracks_action": "Byt spår",
+    "tracks_key": "Pil upp/ned",
+    "frames_action": "Byt bildruta",
+    "frames_key": "Pil vänster/höger",
+    "compare_action": "Välj och jämför flera spår",
+    "compare_key": "{{modifierKey}}+klicka på spåret"
+  },
+  "notifications": {
+    "cloud_sign_in_failed": {
+      "description": "Det gick inte att öppna inloggningen. Försök igen."
+    },
+    "error": {
+      "description": "Något gick fel. Försök igen."
+    },
+    "cloud_sync_project": {
+      "description": "Förbereder molnprojekt…"
+    },
+    "cloud_sync_asset": {
+      "description": "Förbereder video…"
+    },
+    "cloud_sync_encoding": {
+      "description": "Kodar video…"
+    },
+    "cloud_sync_uploading": {
+      "description": "Laddar upp video…"
+    },
+    "cloud_sync_ingesting": {
+      "description": "Bearbetar video…"
+    },
+    "questionnaire_save_failed": {
+      "label": "Något gick fel när dina svar skulle sparas. Försök igen."
+    },
+    "video_above_4k": {
+      "description": "Videon är större än 4K. Ladda ned den för att få den okomprimerade filen"
+    },
+    "upload_in_progress_warning": {
+      "description": "Stäng inte fliken medan videon laddas upp"
+    },
+    "secure_payments_by": {
+      "description": "Säkra betalningar via"
+    },
+    "cancel_anytime": {
+      "description": "Avsluta när du vill • Visa, MasterCard, UnionPay med flera"
+    },
+    "enjoy_early_access": {
+      "description": "Ta del av priserna för tidig åtkomst medan vi är i sluten beta – saker kommer att ändras när vi lanserar"
+    },
+    "you_need_to_add_the_ff_to_work_with_V3": {
+      "description": "Du måste lägga till den första bildrutan för att arbeta med V3"
+    },
+    "are_you_sure": {
+      "description": "Är du säker?"
+    },
+    "img2img_use_this_replaces_crop": {
+      "description": "Det här shotet har redan en beskärning. Om du använder den här bilden ersätts den med den genererade bildens beskärning."
+    },
+    "img2img_use_this_removes_crop": {
+      "description": "Den här genererade bilden har ingen beskärning. Om du använder den tas beskärningen som är inställd på det här shotet bort."
+    },
+    "confirm_delete_folder": {
+      "description": "Du håller på att ta bort mappen: {{name}}"
+    },
+    "confirm_delete_shot_folder": {
+      "description": "Du håller på att ta bort: {{name}}. Det går inte att ångra."
+    },
+    "bulk_delete_shots": {
+      "description": "Du håller på att ta bort {{count}} shots och deras renderingar. Är du säker? Det går inte att ångra."
+    },
+    "bulk_delete_shots_and_project": {
+      "description": "Du håller på att ta bort de sista {{count}} shotsen och deras renderingar. Då tas även projektet bort. Är du säker? Det går inte att ångra."
+    },
+    "confirm_delete_project": {
+      "description": "Du håller på att ta bort projektet ”{{name}}”. Det går inte att ångra."
+    },
+    "copied_to_clipboard": {
+      "description": "Kopierat till urklipp"
+    },
+    "settings_copied_to_clipboard": {
+      "description": "Inställningarna har kopierats till urklipp"
+    },
+    "info_copied": {
+      "description": "Appinformationen har kopierats till urklipp"
+    },
+    "settings_pasted_successfully": {
+      "description": "Inställningarna har klistrats in"
+    },
+    "pasted": {
+      "description": "Inklistrat"
+    },
+    "failed_to_paste_settings": {
+      "description": "Det gick inte att klistra in inställningarna"
+    },
+    "clipboard_is_empty": {
+      "description": "Urklipp är tomt"
+    },
+    "nothing_to_copy": {
+      "description": "Inget att kopiera"
+    },
+    "failed_to_copy_to_clipboard": {
+      "description": "Det gick inte att kopiera till urklipp"
+    },
+    "failed_to_copy_settings": {
+      "description": "Det gick inte att kopiera inställningarna"
+    },
+    "selected_track_is_locked": {
+      "description": "Det valda spåret är låst, men du kan duplicera alla inställningar"
+    },
+    "settings_reused": {
+      "description": "Renderingsinställningarna har klistrats in i inställningsredigeraren."
+    },
+    "settings_pasted": {
+      "description": "Inställningarna har klistrats in"
+    },
+    "we_were_unable_to_charge_the_card": {
+      "description": "Vi kunde inte debitera kortet"
+    },
+    "unfortunately_we_were_unable_to_charge_the_card": {
+      "description": "Tyvärr kunde vi inte debitera ditt kort. Kontrollera dina betalningsuppgifter eller prova ett annat betalningssätt. Du flyttas till gratisplanen så snart din nuvarande prenumeration upphör, från och med"
+    },
+    "unfortunately_we_were_unable_to_charge_the_card_expired": {
+      "description": "Tyvärr kunde vi inte debitera ditt kort. Kontrollera dina betalningsuppgifter eller prova ett annat betalningssätt. Din prenumeration har upphört och åtkomsten byttes till gratisplanen den"
+    },
+    "subscription_will_remain_active_until": {
+      "description": "Din prenumeration är aktiv till och med {{ expirationDate }}. Därefter flyttas du till gratisplanen. Oanvända krediter från din {{ currentPlan }}-plan förs över till gratisplanen."
+    },
+    "buy_credits_rendering_priority": {
+      "description": "Med krediter får du prioritet vid rendering och behöver inte vänta på att andra användare ska bli klara"
+    },
+    "current_plan": {
+      "description": "Du har tillgång till gränssnittet och dina tidigare renderingar, men det fungerar bara med krediter. För att rendera behöver du köpa och använda krediter. Prenumerationen inkluderar en engångsbonus på {{creditsCount}} gratis krediter."
+    },
+    "beginner_plan": {
+      "description": "Få obegränsade renderingar i ett långsamt läge. Du kan också köpa extra krediter och arbeta i vanligt läge."
+    },
+    "pro_plan": {
+      "description": "Få 15 000 krediter i månaden och obegränsade renderingar i ett långsamt läge. Du kan också köpa extra krediter och arbeta i vanligt läge."
+    },
+    "project_quota_reached": {
+      "description": "Du har nått det högsta antalet projekt"
+    },
+    "project_create_failed": {
+      "description": "Det gick inte att skapa projektet. Försök igen."
+    },
+    "onboarding_template_error": {
+      "description": "Det gick inte att börja från den här videon. Försök igen."
+    },
+    "create_project_upload_video": {
+      "label": "",
+      "description": "Kom igång genom att skapa ett projekt och ladda upp en video"
+    },
+    "queue_completed_renders": {
+      "label": "Slutförda renderingar",
+      "description": "Renderingshistorik som är äldre än 3 dagar tas bort automatiskt"
+    },
+    "queue_empty": {
+      "description": "Hej, det var ett tag sedan din senaste rendering – saknar du magin?"
+    },
+    "upload_image_file": {
+      "description": "Dra och släpp eller klicka för att ladda upp en bild"
+    },
+    "upload_video_file": {
+      "description": "Dra och släpp eller klicka för att ladda upp en videofil"
+    },
+    "drag_drop_upload_file": {
+      "description": "Dra och släpp eller klicka för att ladda upp"
+    },
+    "use_image_format": {
+      "description": "Du kan använda bildformaten .jpg och .png"
+    },
+    "use_image_format_short": {
+      "description": "Format .jpg eller .png"
+    },
+    "upload_files": {
+      "label": "Ladda upp filer",
+      "description": "Du kan använda bildformaten .jpg och .png"
+    },
+    "use_video_format": {
+      "description": "Du kan använda videoformaten .mp4 och .mov"
+    },
+    "upload_button_notification": {
+      "description": "Du kan använda MP4 eller MOV. Videor som är större än 1 GB kan inte laddas upp – prova att korta klippet innan du laddar upp det"
+    },
+    "upload_button_notification_image_file_format": {
+      "description": "Vi har inte stöd för det här filformatet än. Du kan använda JPG eller PNG"
+    },
+    "upload_button_notification_image_large_file": {
+      "description": "Filen är större än 50 MB"
+    },
+    "upload_button_image_input_limits": {
+      "description": "Bilden är för stor.\nLadda upp en bild mellan 300 px och 5600 px som är mindre än 50 MB"
+    },
+    "upload_button_image_input_too_small": {
+      "description": "Bilden är för liten. Ladda upp en bild mellan 300 px och 5600 px som är mindre än 50 MB"
+    },
+    "upload_button_image_input_too_big": {
+      "description": "Bilden är för stor. Ladda upp en bild mellan 300 px och 5600 px som är mindre än 50 MB"
+    },
+    "upload_button_file_empty": {
+      "description": "Filen är tom"
+    },
+    "upload_button_file_corrupted": {
+      "description": "Filen är skadad"
+    },
+    "upload_button_file_read_error": {
+      "description": "Det gick inte att läsa filen. Filen kan vara för stor"
+    },
+    "two_angle_uploader_missing_image": {
+      "description": "Lägg till en andra bild för att skapa ett element"
+    },
+    "render_generation_failed": {
+      "description": "Genereringen misslyckades. Försök igen."
+    },
+    "failed_to_create_track": {
+      "description": "Det gick inte att skapa spåret. Försök igen."
+    },
+    "bulk_renders_run_launch_failed": {
+      "description": "Det gick inte att starta massrenderingen. Försök igen."
+    },
+    "bulk_renders_run_cancel_failed": {
+      "description": "Det gick inte att avbryta massrenderingen. Försök igen."
+    },
+    "bulk_renders_run_resume_failed": {
+      "description": "Det gick inte att återuppta massrenderingen. Försök igen."
+    },
+    "bulk_renders_run_auto_prompt_unavailable": {
+      "description": "Det finns ingen beskrivning för det här shotet än."
+    },
+    "optimize_prompt_failed": {
+      "description": "Det gick inte att optimera prompten. Försök igen."
+    },
+    "adapt_prompt_failed": {
+      "description": "Det gick inte att anpassa prompten. Försök igen."
+    },
+    "adapt_prompt_partial": {
+      "description": "Vissa referenser kunde inte matchas. Granska prompten."
+    },
+    "image_to_video_setup_failed": {
+      "description": "Det gick inte att konfigurera arbetsytan för bild till video. Försök igen."
+    },
+    "image_to_video_create_shot_failed": {
+      "description": "Det gick inte att skapa ett shot från den här renderingen. Försök igen."
+    },
+    "upload_cancel_confirm": {
+      "description": "Din videouppladdning pågår fortfarande. Om du lämnar nu avbryts uppladdningen och alla framsteg går förlorade."
+    },
+    "upload_button_file_processing_error": {
+      "description": "Fel. Konvertera till MP4 och försök igen"
+    },
+    "upload_button_network_error_412": {
+      "description": "Fel 412: Nätverksproblem. Försök igen eller använd en annan video. Om problemet kvarstår kontaktar du oss på Discord eller på hello@mago.studio"
+    },
+    "upload_button_processing_error_422": {
+      "description": "Fel 422: Bearbetningen misslyckades. Försök igen. Om felet kvarstår kontaktar du oss på Discord eller på hello@mago.studio"
+    },
+    "drawer_settings_no_parameters_to_show": {
+      "description": "Inga parametrar att visa"
+    },
+    "hint_weve_added_credits_to_your_account": {
+      "description": "Vi har lagt till {{defaultCredits}} krediter på ditt konto som välkomstgåva. Mycket nöje med Mago!"
+    },
+    "hint_press_duplicate_button": {
+      "description": "Om du vill ändra inställningarna för det här spåret trycker du på knappen Duplicera."
+    },
+    "hint_learn_how_to_work_with_settings": {
+      "description": "Lär dig arbeta med inställningar i en video på 2 minuter."
+    },
+    "hint_here_you_can_see_all_your_recent_queues": {
+      "description": "Här ser du alla dina senaste köer."
+    },
+    "hint_ready_to_start_your_project": {
+      "description": "Redo att starta ditt projekt?"
+    },
+    "hint_create_render_track": {
+      "description": "Skapa ett renderingsspår från den här videon genom att klicka på stjärnknappen."
+    },
+    "hint_with_range_tool_select_desire_number_of_frames": {
+      "description": "Välj önskat antal bildrutor med intervallverktyget."
+    },
+    "hint_learn_how_to_side_by_side_tracks": {
+      "description": "Lär dig jämföra spår sida vid sida med skillnaderna i deras inställningar."
+    },
+    "hint_double_click_on_track_to_place_playhead": {
+      "description": "Dubbelklicka på ett spår för att placera uppspelningshuvudet på första bildrutan."
+    },
+    "hint_double_click_to_rename": {
+      "description": "Dubbelklicka för att byta namn."
+    },
+    "hint_copy_settings_between_projects": {
+      "description": "Kopiera inställningar mellan projekt."
+    },
+    "hint_prompt_doesnt_influence_the_result": {
+      "description": "Påverkar inte prompten resultatet? Med ”Bildvikt” på 1 har prompten liten effekt. Sänk ”Bildvikt” innan du höjer ”CFG”."
+    },
+    "hint_style_from_the_image_doesnt_influence_the_result": {
+      "description": "Påverkar inte bildens stil resultatet? Prova att höja ”Utdatastorlek” eller sänka Tile-ControlNet."
+    },
+    "hint_how_to_refine_the_style_image_reference": {
+      "description": "Så förfinar du stilreferensbilden – du kan stilisera videons första bildruta och ladda upp den som ”Stilreferensbild” för bättre resultat."
+    },
+    "hint_too_much_flickering_max_size": {
+      "description": "För mycket flimmer? Höj ”Utdatastorlek”."
+    },
+    "hint_too_much_flickering_steps": {
+      "description": "För mycket flimmer? Lägg till fler ”Steg”."
+    },
+    "hint_too_much_flickering_tile": {
+      "description": "För mycket flimmer? Höj vikten för Tile-ControlNet."
+    },
+    "hint_weird_elements_appearing_prompt": {
+      "description": "Dyker konstiga element upp? Skriv en mer beskrivande prompt."
+    },
+    "hint_weird_elements_appearing_tile": {
+      "description": "Dyker konstiga element upp? Höj vikten för Tile- och Canny-ControlNet."
+    },
+    "hint_weird_elements_appearing_max_size": {
+      "description": "Dyker konstiga element upp? Höj ”Utdatastorlek”."
+    },
+    "hint_all_articles_are_available_here": {
+      "description": "Alla artiklar och supportresurser finns här."
+    },
+    "payment_flow_canceled_redirection": {
+      "description": "Du omdirigeras till betalningssidan"
+    },
+    "payment_flow_canceled": {
+      "description": "Din betalning har avbrutits. Inga avgifter har dragits från ditt konto."
+    },
+    "payment_flow_checkout_session_error": {
+      "description": "Det gick inte att skapa en betalningssession. Försök igen."
+    },
+    "payment_flow_error": {
+      "description": "Ett fel uppstod. Försök igen senare."
+    },
+    "your_subscription_is_working_now": {
+      "description": "Din prenumeration är nu aktiv"
+    },
+    "payment_flow_success_redirection": {
+      "description": "Du omdirigeras till startsidan"
+    },
+    "payment_flow_success": {
+      "description": "Dina krediter är redo att användas – spendera dem klokt! Eller vårdslöst. Jag är bara ett meddelande, inte din finansiella rådgivare"
+    },
+    "payment_flow_relaxed_mode_render_limit_video": {
+      "description_one": "I Relaxed mode kan du bara rendera {{count}} video åt gången. Byt till krediter om du vill rendera fler samtidigt",
+      "description_other": "I Relaxed mode kan du bara rendera {{count}} videor åt gången. Byt till krediter om du vill rendera fler samtidigt"
+    },
+    "payment_flow_relaxed_mode_render_limit_image": {
+      "description_one": "I Relaxed mode kan du bara rendera {{count}} bild åt gången. Byt till krediter om du vill rendera fler samtidigt.",
+      "description_other": "I Relaxed mode kan du bara rendera {{count}} bilder åt gången. Byt till krediter om du vill rendera fler samtidigt."
+    },
+    "comfy_not_running": {
+      "description": "ComfyUI körs inte. Starta det för att rendera lokalt."
+    },
+    "local_setup_required": {
+      "description": "Du måste slutföra installationen för att kunna rendera lokalt."
+    },
+    "payment_flow_relaxed_mode_model_restriction": {
+      "description": "Den här modellen är inte tillgänglig i Relaxed mode"
+    },
+    "payment_flow_daily_limit_reached": {
+      "description_one": "Du har nått din dagliga gräns. Den återställs om {{count}} timme. Du kan fortfarande rendera med krediter",
+      "description_other": "Du har nått din dagliga gräns. Den återställs om {{count}} timmar. Du kan fortfarande rendera med krediter"
+    },
+    "payment_flow_weekly_limit_reached": {
+      "description_one": "Du har nått din veckogräns. Den återställs om {{count}} timme. Du kan fortfarande rendera med krediter",
+      "description_other": "Du har nått din veckogräns. Den återställs om {{count}} timmar. Du kan fortfarande rendera med krediter"
+    },
+    "payment_flow_relaxed_usage_tooltip": {
+      "description": "{{pct}} % använt"
+    },
+    "payment_flow_subscription_not_active": {
+      "description": "Din prenumeration är inte aktiv. Prenumerera eller förnya för att fortsätta rendera."
+    },
+    "payment_flow_unlimited_not_available": {
+      "description": "Det här läget är inte tillgängligt i din nuvarande plan."
+    },
+    "payment_flow_unable_to_access_portal": {
+      "description": "Det gick inte att öppna portalen. Försök igen senare."
+    },
+    "model_not_available_in_mode": {
+      "description": "{{modelName}} är inte tillgänglig i läget {{mode}}"
+    },
+    "preview_area_your_render_is_here": {
+      "description": "Här är din rendering, hurra!"
+    },
+    "preview_select_track_with_ctrl_click": {
+      "description": "Välj ett spår med Ctrl eller Cmd + klick"
+    },
+    "render_queue_confirmation": {
+      "description": "Renderingen skickas till kön om 5 sekunder. Därefter kan den inte avbrytas eller återbetalas.",
+      "cancel": "Avbryt rendering",
+      "submit": "Skicka direkt"
+    },
+    "preview_area_current_frame_outside_of_range": {
+      "description": "Aktuell bildruta ligger utanför de renderade bildrutorna"
+    },
+    "preview_area_no_track_selected": {
+      "description": "Inget spår valt. Välj ett spår på tidslinjen för att förhandsvisa det här"
+    },
+    "your_input_video_was_changed": {
+      "description": "Din indatavideo har ändrats"
+    },
+    "preview_area_nothing_to_show": {
+      "description": "Inget att visa här än. Starta en rendering från ett inställningsfönster"
+    },
+    "preview_area_one_of_tracks_has_no_clips_available": {
+      "description": "Ett av de valda spåren har inga tillgängliga klipp"
+    },
+    "img2img_generation_failed": {
+      "description": "Genereringen misslyckades. Krediterna har återbetalats"
+    },
+    "api_key_error": {
+      "title": {
+        "label": "Programfel"
+      },
+      "description": "Det gick inte att initiera appen. Försök igen."
+    },
+    "payment_flow_enough_coins": {
+      "description": "Du behöver krediter eller en prenumeration för att generera fler videor",
+      "buy_credits": "Köp krediter",
+      "try_relaxed": "Visa planer",
+      "enable_relaxed": "Aktivera Relaxed mode"
+    },
+    "timeline_hide_from_timeline": {
+      "description": "Renderingen pågår. Vi kan dölja den från tidslinjen och ta bort den när processen är klar. Krediterna återbetalas dock inte"
+    },
+    "quick_tips_image_weight_prompt_impact": {
+      "description": "Påverkar inte prompten resultatet? Med ”Bildvikt” på 1 har prompten liten effekt. Sänk ”Bildvikt” innan du höjer ”CFG”."
+    },
+    "quick_tips_image_style_max_size_tile_control_net": {
+      "description": "Påverkar inte bildens stil resultatet? Prova att höja ”Utdatastorlek” eller sänka Tile-ControlNet."
+    },
+    "quick_tips_refine_the_style_image_reference": {
+      "description": "Så förfinar du stilreferensbilden – du kan stilisera videons första bildruta och ladda upp den som ”Stilreferensbild” för bättre resultat."
+    },
+    "quick_tips_flickering_increase_max_size": {
+      "description": "För mycket flimmer? Höj ”Utdatastorlek”."
+    },
+    "quick_tips_flickering_increase_steps": {
+      "description": "För mycket flimmer? Lägg till fler ”Steg”."
+    },
+    "quick_tips_flickering_increase_tile_control_net": {
+      "description": "För mycket flimmer? Höj vikten för Tile-ControlNet."
+    },
+    "quick_tips_weird_elements_appearing_descriptive_prompt": {
+      "description": "Dyker konstiga element upp? Skriv en mer beskrivande prompt."
+    },
+    "quick_tips_weird_elements_appearing_increase_tile_control_net": {
+      "description": "Dyker konstiga element upp? Höj vikten för Tile- och Canny-ControlNet."
+    },
+    "quick_tips_weird_elements_appearing_increase_max_size": {
+      "description": "Dyker konstiga element upp? Höj ”Utdatastorlek”."
+    },
+    "render_finished_title": {
+      "description": "Ny rendering klar 🟢"
+    },
+    "render_finished_body": {
+      "description": "En ny rendering är just klar. Kolla kön för att se resultatet."
+    },
+    "render_finished_tab": {
+      "description": "🟢 Ny rendering klar | Mago.studio"
+    },
+    "render_failed_title": {
+      "description": "Ny rendering misslyckades 🔴"
+    },
+    "render_failed_body": {
+      "description": "En ny rendering misslyckades just. Kolla kön för att se resultatet."
+    },
+    "render_failed_tab": {
+      "description": "🔴 Ny rendering misslyckades | Mago.studio"
+    },
+    "video_too_short": {
+      "description": "Videon är för kort. Ladda upp en video som är minst 1 sekund lång."
+    },
+    "video_too_short_for_model": {
+      "description": "Din video är kortare än den minsta längd som krävs för den här modellen ({{minFrames}} bildrutor). Välj en annan modell eller ladda upp en längre video."
+    },
+    "not_render_track": {
+      "description": "Videospår valt. Klicka på renderingsspåret för att välja det och se renderingsinformation."
+    },
+    "not_a_video_file": {
+      "description": "Det här är inte en giltig videofil. Ladda upp en MP4- eller MOV-fil."
+    },
+    "undefined_duration": {
+      "description": "Videons längd är odefinierad eller ogiltig. Det kan tyda på en skadad fil eller saknade metadata. Prova att konvertera videon till ett standardformat för MP4."
+    },
+    "container_format_mismatch": {
+      "description": "Containerformatet stämmer inte. Filen verkar ha ett annat format än filändelsen anger. Kontrollera att filen är korrekt kodad som MP4 eller MOV."
+    },
+    "sbs_video_download_started": {
+      "description": "Förbereder video sida vid sida för nedladdning..."
+    },
+    "sbs_video_download_success": {
+      "description": "Videon sida vid sida har laddats ned"
+    },
+    "sbs_video_download_failed": {
+      "description": "Det gick inte att skapa videon sida vid sida. Försök igen."
+    },
+    "sbs_video_videos_not_loaded": {
+      "description": "Det gick inte att läsa in videorna. Försök igen."
+    },
+    "info_rich_video_download_started": {
+      "description": "Förbereder video med information... det kan ta en stund."
+    },
+    "info_rich_video_download_succeeded": {
+      "description": "Videon med information har laddats ned."
+    },
+    "info_rich_video_download_failed": {
+      "description": "Det gick inte att skapa videon med information. Försök igen."
+    },
+    "timeline_pinned_download_started": {
+      "description": "Förbereder fästa klipp för nedladdning..."
+    },
+    "timeline_pinned_download_succeeded": {
+      "description": "De fästa klippen har laddats ned."
+    },
+    "timeline_pinned_download_failed": {
+      "description": "Det gick inte att ladda ned de fästa klippen. Försök igen."
+    },
+    "timeline_pinned_download_empty": {
+      "description": "Inga fästa klipp att ladda ned."
+    },
+    "timeline_download_navigation_warning": {
+      "description": "En nedladdning pågår fortfarande. Om du lämnar nu avbryts den. Vill du lämna ändå?"
+    },
+    "download_failed": {
+      "description": "Nedladdningen misslyckades. Försök igen."
+    },
+    "share_project": {
+      "description": "Du håller på att dela det här projektet med ditt team"
+    },
+    "no_stats_available": {
+      "description": "Ingen statistik tillgänglig"
+    },
+    "aspect_ratio_mismatch_warning": {
+      "description": "Videons bildformat blir detsamma som karaktärens indata. Vi rekommenderar ”Ändra bildruta” för att behålla samma bildformat"
+    },
+    "bulk_upload_complete": {
+      "description": "Alla uppladdningar är klara – {{successCount}} av {{totalCount}} lyckades"
+    },
+    "bulk_upload_complete_with_errors": {
+      "description": "Uppladdningen slutfördes med fel – {{successCount}} av {{totalCount}} lyckades"
+    }
+  },
+  "bulk_upload": {
+    "uploading": {
+      "label": "Laddar upp {{current}} av {{total}}"
+    },
+    "uploading_title": {
+      "label": "Laddar upp {{total}} objekt"
+    },
+    "done_count": {
+      "label": "Klart: {{completed}} av {{total}} videor"
+    },
+    "complete": {
+      "label": "Uppladdningen är klar"
+    },
+    "see_progress": {
+      "label": "Visa förlopp"
+    },
+    "hide_progress": {
+      "label": "Dölj förlopp"
+    },
+    "cancel_all": {
+      "label": "Avbryt alla"
+    },
+    "cancel": {
+      "label": "Avbryt"
+    },
+    "cancelled": {
+      "label": "Avbruten"
+    },
+    "open_project": {
+      "label": "Öppna projekt"
+    },
+    "video_too_long": {
+      "label": "Vår nuvarande gräns för video är 60 sekunder"
+    },
+    "file_too_large": {
+      "label": "Filen är större än 1 GB"
+    },
+    "unsupported_format": {
+      "label": "Vi har inte stöd för det här filformatet än. Du kan använda MP4 eller MOV"
+    },
+    "video_too_short": {
+      "label": "Videor kortare än en sekund stöds inte"
+    },
+    "video_broken": {
+      "label": "Videofilen är skadad"
+    },
+    "server_error": {
+      "label": "Uppladdningen av videofilen misslyckades hos oss. Försök igen"
+    },
+    "start_upload": {
+      "label": "Starta uppladdning"
+    },
+    "upload_blocked": {
+      "label": "En uppladdning pågår redan"
+    },
+    "hide": {
+      "label": "Dölj"
+    },
+    "error": {
+      "label": "Fel"
+    },
+    "pending": {
+      "label": "Väntar"
+    },
+    "completed": {
+      "label": "Slutförd"
+    },
+    "not_started": {
+      "label": "Inte startad"
+    },
+    "done": {
+      "label": "Klar"
+    },
+    "uploading_status": {
+      "label": "Laddar upp"
+    },
+    "cancel_all_files": {
+      "label": "Avbryt uppladdningen av alla filer"
+    },
+    "done_count_with_errors": {
+      "label": "Uppladdade: {{completed}} av {{total}} videor, fel: {{errors}}"
+    }
+  },
+  "script_project": {
+    "text_access_title": {
+      "label": "Välj hur du vill köra ditt manus"
+    },
+    "text_access_sign_in_description": {
+      "label": "Chatt och rollsättning kräver Mago Cloud eller en fungerande lokal Qwen3.8 27B-installation. Ingen användbar lokal installation hittades. Logga in för att använda Mago Cloud, eller installera lokalt på en kompatibel dator."
+    },
+    "text_access_enable_description": {
+      "label": "Mago Cloud är inaktiverat och ingen användbar lokal Qwen3.8 27B-installation hittades. Aktivera Mago Cloud för chatt och rollsättning, eller installera lokalt på en kompatibel dator."
+    },
+    "text_access_cancel": {
+      "label": "Avbryt"
+    },
+    "text_access_sign_in": {
+      "label": "Logga in på Mago Cloud"
+    },
+    "text_access_enable_cloud": {
+      "label": "Aktivera Mago Cloud"
+    },
+    "text_access_local_setup": {
+      "label": "Installationsguide för lokal körning"
+    },
+    "text_access_cloud_failed": {
+      "label": "Det gick inte att aktivera Mago Cloud. Försök igen."
+    },
+    "version_settings_missing": {
+      "description": "Inga återanvändbara inställningar sparades för den här versionen."
+    },
+    "version_rendered_at": {
+      "label": "Renderad {{timestamp}}"
+    },
+    "version_new_badge": {
+      "label": "Ny"
+    },
+    "rate_version_down_button": {
+      "label": "Gilla inte den här versionen"
+    },
+    "rate_version_up_button": {
+      "label": "Gilla den här versionen"
+    },
+    "asset_references": {
+      "label": "Referensbilder",
+      "hint": "Lägg till upp till {{count}} bilder och beskriv vad som ska hämtas från var och en.",
+      "add": "Lägg till referens",
+      "instruction": "Instruktioner för referenser",
+      "default_instruction": "Använd de här bilderna som visuella referenser för den här entiteten.",
+      "remove": "Ta bort referens"
+    },
+    "render_blocked_run_active": {
+      "label": "Vänta tills den pågående körningen är klar."
+    },
+    "render_blocked_reference_uploading": {
+      "label": "Laddar upp referensbild…"
+    },
+    "shot_dialogue_input": {
+      "label": "Dialog",
+      "placeholder": "TALARE: Replik"
+    },
+    "create_dialog_title": {
+      "label": "Vilken typ av projekt vill du skapa?"
+    },
+    "create_destination": {
+      "label": "Skapa projekt i"
+    },
+    "create_destination_local": {
+      "label": "Lokalt bibliotek",
+      "description": "Lagras på den här datorn och renderas med ComfyUI."
+    },
+    "create_destination_cloud": {
+      "label": "Mago Cloud",
+      "description": "Lagras i ditt Mago-konto och renderas med molnmodeller."
+    },
+    "create_destination_dialog_title": {
+      "label": "Nytt {{projectType}}-projekt"
+    },
+    "create_local_project_button": {
+      "label": "Skapa lokalt projekt"
+    },
+    "create_cloud_project_button": {
+      "label": "Skapa molnprojekt"
+    },
+    "create_destination_cloud_sign_in_tooltip": {
+      "label": "Logga in på Mago Cloud för att skapa molnprojekt."
+    },
+    "start_from_scenario": {
+      "label": "Mago Director",
+      "description": "Berätta din idé för agenten och chatta fram ett manus scen för scen. Rollsätt det sedan, generera resurser för varje karaktär, miljö, rekvisita osv. och rendera hela dramat. Steg för kontroll, redigering och iteration finns för mer kontroll."
+    },
+    "start_from_video": {
+      "label": "Omvandla dina egna videor",
+      "description": "Utgå från befintligt material och ge det ny stil, lägg till vfx osv.… shot för shot eller i bulk."
+    },
+    "tab_script": {
+      "label": "Manus"
+    },
+    "tab_assets": {
+      "label": "Resurser"
+    },
+    "tab_storyboard": {
+      "label": "Storyboard"
+    },
+    "tab_shots": {
+      "label": "Scener"
+    },
+    "tab_post": {
+      "label": "Post"
+    },
+    "tab_timeline": {
+      "label": "Tidslinje"
+    },
+    "stats_title": {
+      "label": "Projektstatistik"
+    },
+    "stats_button": {
+      "ariaLabel": "Visa projektstatistik"
+    },
+    "stats_assets": {
+      "label": "Resurser"
+    },
+    "stats_asset_images": {
+      "label": "Resursbilder"
+    },
+    "stats_sequences": {
+      "label": "Sekvenser"
+    },
+    "stats_shots": {
+      "label": "Scener"
+    },
+    "stats_rendered_videos": {
+      "label": "Renderade videor"
+    },
+    "stats_image_cost": {
+      "label": "Bildkostnad",
+      "value": "≈{{credits}} kred."
+    },
+    "stats_video_cost": {
+      "label": "Videokostnad",
+      "value": "≈{{credits}} kred."
+    },
+    "stats_total_cost": {
+      "label": "Total kostnad",
+      "value": "{{credits}} kred."
+    },
+    "timeline_ready_count": {
+      "label": "{{count}} av {{total}} scener renderade"
+    },
+    "download_cut_button": {
+      "label": "Ladda ned alla"
+    },
+    "download_shot_button": {
+      "label": "Ladda ned den här scenen"
+    },
+    "shot_filmstrip": {
+      "alt": "Förhandsvisning av scen"
+    },
+    "download_cut_failed": {
+      "label": "Det gick inte att ladda ned klippet. Försök igen."
+    },
+    "export_refused_mixed_profile": {
+      "label": "Alla scener har inte samma storlek (scener: {{shots}})."
+    },
+    "export_refused_missing_pin": {
+      "label": "Inget är fäst för scenerna: {{shots}}."
+    },
+    "export_refused_unknown_profile": {
+      "label": "Ingen storlek sparad för scenerna: {{shots}}."
+    },
+    "export_refused_unknown_reason": {
+      "label": "Det här klippet kan inte sammanfogas till en fil."
+    },
+    "export_unavailable": {
+      "label": "Det går inte att sammanfoga klippet till en fil just nu."
+    },
+    "export_timed_out": {
+      "label": "Sammanfogningen av klippet tog för lång tid och avbröts."
+    },
+    "export_failed_reason": {
+      "label": "Något gick fel när klippet skulle sammanfogas."
+    },
+    "export_failed_title": {
+      "label": "Det gick inte att ladda ned klippet som en video"
+    },
+    "export_failed_offer_zip": {
+      "label": "Du kan ladda ned scenerna som separata filer i en zip i stället."
+    },
+    "export_failed_cancel_button": {
+      "label": "Avbryt"
+    },
+    "export_failed_download_zip_button": {
+      "label": "Ladda ned separata filer"
+    },
+    "export_will_be_separate_files": {
+      "label": "Det här klippet kan inte sammanfogas till en video än"
+    },
+    "download_shots_button": {
+      "label": "Ladda ned scener"
+    },
+    "download_shot_failed": {
+      "label": "Det gick inte att ladda ned scenen. Försök igen."
+    },
+    "run_paused_insufficient_credits": {
+      "description": "Du har inte tillräckligt med krediter för att slutföra den här körningen."
+    },
+    "run_failed": {
+      "description": "Körningen slutfördes inte. Inget ändrades – försök igen."
+    },
+    "run_progress_unavailable": {
+      "description": "Tappade bort körningen. Den kan fortfarande pågå – läs in sidan igen för att se hur långt den har kommit."
+    },
+    "cast_script_failed": {
+      "description": "Det gick inte att läsa manuset. Försök igen."
+    },
+    "generate_shots_failed": {
+      "description": "Det gick inte att starta renderingen av scenerna. Försök igen."
+    },
+    "shot_run_refused_in_progress": {
+      "description": "Renderas redan i den pågående körningen – den visas här när den är klar."
+    },
+    "shot_run_refused_unchanged": {
+      "description": "Inget att rendera: exakt de här indata har redan renderats."
+    },
+    "shot_run_refused_blocked": {
+      "description": "Blockerad – en referensbild saknas."
+    },
+    "shot_run_refused_dropped": {
+      "description": "Den senaste rollsättningen av ditt manus tog bort den här scenen, så den renderas inte."
+    },
+    "shot_run_refused_unknown": {
+      "description": "Inget startades. Läs in igen för att se hur långt projektet har kommit."
+    },
+    "generate_sheets_failed": {
+      "description": "Det gick inte att starta renderingen av entiteterna. Försök igen."
+    },
+    "upscale_shots_failed": {
+      "description": "Det gick inte att starta uppskalningen. Försök igen."
+    },
+    "edit_shot_failed": {
+      "description": "Det gick inte att spara scenen. Försök igen."
+    },
+    "add_shot_failed": {
+      "description": "Det gick inte att lägga till scenen. Försök igen."
+    },
+    "shot_insert_button": {
+      "ariaLabel": "Lägg till en scen här",
+      "tooltip": "Lägg till en scen här"
+    },
+    "add_shot_dialog_title": {
+      "label": "Lägg till scen"
+    },
+    "add_shot_name_input": {
+      "label": "Scennamn",
+      "placeholder": "Ny scen"
+    },
+    "add_shot_assets_input": {
+      "label": "Resurser"
+    },
+    "add_shot_hint": {
+      "label": "Ange längden på scenkortet."
+    },
+    "add_shot_submit_button": {
+      "label": "Lägg till"
+    },
+    "hide_shot_button": {
+      "ariaLabel": "Dölj scen"
+    },
+    "show_shot_button": {
+      "ariaLabel": "Visa scen"
+    },
+    "shot_drag_handle": {
+      "ariaLabel": "Dra för att flytta scenen"
+    },
+    "shot_run_refused_unsaved_prompt": {
+      "description": "Inget renderades. Spara din prompt och försök sedan igen."
+    },
+    "pin_shot_failed": {
+      "description": "Det gick inte att fästa versionen. Försök igen."
+    },
+    "edit_entity_failed": {
+      "description": "Det gick inte att spara entiteten. Försök igen."
+    },
+    "pin_entity_image_failed": {
+      "description": "Det gick inte att fästa bilden. Försök igen."
+    },
+    "render_entity_failed": {
+      "description": "Det gick inte att starta renderingen av entiteten. Försök igen."
+    },
+    "upload_reference_failed": {
+      "description": "Det gick inte att ladda upp referensen. Försök igen."
+    },
+    "upload_entity_image_failed": {
+      "description": "Det gick inte att ladda upp bilden. Försök igen."
+    },
+    "script_input": {
+      "label": "Ditt manus",
+      "placeholder": "Klistra in ditt manus här."
+    },
+    "generate_from_script_button": {
+      "label": "Kör produktionsflödet"
+    },
+    "planned_length": {
+      "label": "Planerat {{planned}} s"
+    },
+    "planned_length_with_target": {
+      "label": "Planerat {{planned}} s · mål {{target}} s"
+    },
+    "script_agent_intro": {
+      "label": "Berätta din idé för agenten. Ditt manus visas här, skrivet för arbetsflödet för AI-videogenerering."
+    },
+    "script_ideas_title": {
+      "label": "Vet du inte var du ska börja? Prova någon av de här:"
+    },
+    "own_script_button": {
+      "label": "Jag har ett eget manus"
+    },
+    "script_idea_blood_cells": {
+      "label": "Jag vill ha en serie i 12 delar där en nyfiken röd blodkropp besöker ett nytt organ i varje avsnitt."
+    },
+    "script_idea_everyday_object": {
+      "label": "Jag vill ha en serie i 15 delar där ett vardagsföremål berättar hur det uppfanns."
+    },
+    "script_idea_tiny_astronaut": {
+      "label": "Jag vill ha en serie i 20 delar om en pytteliten astronaut som hittar en märklig sak på varje planet."
+    },
+    "chat": {
+      "input_placeholder": {
+        "label": "Beskriv din idé"
+      },
+      "send": {
+        "label": "Skicka"
+      },
+      "thinking": {
+        "label": "Tänker…"
+      },
+      "script_updated": {
+        "label": "Manuset har uppdaterats. Fortsätt chatta för att uppdatera ditt manus."
+      },
+      "empty_response": {
+        "label": "Inget svar kom tillbaka. Försök skicka igen."
+      },
+      "insufficient_balance": {
+        "label": "Du har slut på krediter. Fyll på för att fortsätta skriva."
+      },
+      "failed": {
+        "description": "Agenten kunde inte svara. Försök skicka igen."
+      }
+    },
+    "script_locked": {
+      "ariaLabel": "Manuset har skickats och kan inte längre redigeras"
+    },
+    "versions_title": {
+      "label": "Versioner"
+    },
+    "shot_version_current": {
+      "label": "Aktuell"
+    },
+    "use_shot_version_button": {
+      "label": "Använd den här versionen"
+    },
+    "unpin_shot_version_button": {
+      "label": "Lossa"
+    },
+    "lock_shot_button": {
+      "label": "Lås scen"
+    },
+    "unlock_shot_button": {
+      "label": "Lås upp scen"
+    },
+    "shot_lock_status_locked": {
+      "label": "Låst"
+    },
+    "shot_lock_status_unlocked": {
+      "label": "Upplåst"
+    },
+    "sequence_timeline": {
+      "label": "Scentidslinje"
+    },
+    "sequence_timeline_score": {
+      "label": "{{score}}"
+    },
+    "sequence_timeline_rendering": {
+      "label": "Renderar"
+    },
+    "sequence_timeline_sequential": {
+      "label": "Fortsätter från föregående sekvens"
+    },
+    "sequence_timeline_changed": {
+      "label": "Ändrad"
+    },
+    "sequence_timeline_changed_help": {
+      "label": "Ändrad och kan renderas om i bulk"
+    },
+    "version_review_good": {
+      "label": "Det som fungerar",
+      "placeholder": "Bra detaljer att behålla"
+    },
+    "version_review_bad": {
+      "label": "Det som inte fungerar",
+      "placeholder": "Problem i den här versionen"
+    },
+    "version_review_todo": {
+      "label": "Nästa ändringar",
+      "placeholder": "Vad du ska prova härnäst"
+    },
+    "version_name": {
+      "label": "v{{version}}"
+    },
+    "version_number": {
+      "label": "Version {{number}}"
+    },
+    "version_active": {
+      "label": "Aktiv"
+    },
+    "version_status": {
+      "label": "Rollsätter…"
+    },
+    "version_failed": {
+      "label": "Rollsättningen misslyckades"
+    },
+    "activate_version_button": {
+      "label": "Gör v{{version}} aktiv"
+    },
+    "summary_shots_kept": {
+      "label": "{{count}} scener följer med"
+    },
+    "summary_shots_added": {
+      "label": "{{count}} nya"
+    },
+    "summary_shots_dropped": {
+      "label": "{{count}} finns inte längre i manuset – deras renderingar finns kvar, skrivskyddade"
+    },
+    "summary_keys_added": {
+      "label": "{{count}} nya entiteter i rollbesättningen"
+    },
+    "summary_keys_unused": {
+      "label": "{{count}} entiteter inaktiverade, bilderna sparas"
+    },
+    "no_versions": {
+      "label": "Inget manus har rollsatts än. Klistra in ett manus och rollsätt det för att börja."
+    },
+    "section_character": {
+      "label": "Karaktärer"
+    },
+    "section_environment": {
+      "label": "Miljöer"
+    },
+    "section_prop": {
+      "label": "Rekvisita"
+    },
+    "section_uncategorised": {
+      "label": "Övrigt"
+    },
+    "generate_sheets_button": {
+      "label": "Generera",
+      "count": "({{count}})"
+    },
+    "price_calculating": {
+      "label": "Beräknar priset"
+    },
+    "generate_shots_button": {
+      "label": "Generera",
+      "count": "({{count}})"
+    },
+    "generate_storyboards_button": {
+      "label": "Generera",
+      "count": "({{count}})"
+    },
+    "toolbar_nothing_to_generate": {
+      "noChanges": "Inga ändringar sedan senaste genereringen",
+      "noSceneAwaitingStoryboard": "Ingen scen väntar på en storyboard"
+    },
+    "upscale_button": {
+      "label": "Skala upp",
+      "count": "{{count}} fästa",
+      "nothing": "inget att skala upp"
+    },
+    "pin_button": {
+      "label": "Fäst",
+      "ariaLabel": "Fäst den här versionen"
+    },
+    "pinned_badge": {
+      "label": "Fäst"
+    },
+    "stats_cloud_cost": {
+      "label": "Kostnad i Mago Cloud"
+    },
+    "stats_local_render_time": {
+      "label": "Lokal renderingstid"
+    },
+    "stats_h3_max_equivalent": {
+      "label": "Motsvarande Mago Cloud H3 Max"
+    },
+    "effective_badge": {
+      "label": "Kommer att användas"
+    },
+    "newer_version_badge": {
+      "label": "Nyare version finns"
+    },
+    "use_newest_button": {
+      "label": "Använd överallt"
+    },
+    "disable_entity_button": {
+      "label": "Ta bort från rollbesättningen"
+    },
+    "enable_entity_button": {
+      "label": "Lägg tillbaka i rollbesättningen"
+    },
+    "disabled_entity_badge": {
+      "label": "Inaktiverad"
+    },
+    "show_earlier_version_items": {
+      "label": "Visa {{count}} från en tidigare manusversion"
+    },
+    "section_removed_from_cast": {
+      "label": "Borttagna från rollbesättningen"
+    },
+    "confirm_remove_entity_title": {
+      "label": "Vill du ta bort {{name}} från rollbesättningen?"
+    },
+    "confirm_remove_entity_body": {
+      "label": "Bilderna sparas och entiteten finns kvar i {{count}} scen(er) tills du taggar om dem. Markera ”Visa från en tidigare manusversion” för att lägga tillbaka den."
+    },
+    "confirm_remove_entity_cancel_button": {
+      "label": "Behåll i rollbesättningen"
+    },
+    "confirm_remove_entity_confirm_button": {
+      "label": "Ta bort från rollbesättningen"
+    },
+    "rerender_button": {
+      "label": "Rendera om",
+      "ariaLabel": "Rendera en ny version"
+    },
+    "render_button": {
+      "label": "Rendera",
+      "ariaLabel": "Rendera det här facket"
+    },
+    "describe_entity_button": {
+      "label": "Beskriv utifrån bild"
+    },
+    "describe_entity_failed": {
+      "description": "Det gick inte att skriva en beskrivning av den här entiteten."
+    },
+    "entity_prompt_input": {
+      "label": "Renderingsprompt"
+    },
+    "prompt_is_sent_hint": {
+      "label": "Det här får bildmodellen när referensen renderas."
+    },
+    "no_images": {
+      "label": "Ingen bild än"
+    },
+    "shot_prompt_input": {
+      "label": "Videoprompt"
+    },
+    "shot_blocked": {
+      "label": "Blockerad – {{entities}}"
+    },
+    "shot_blocked_disabled": {
+      "label": "{{name}} är inaktiverad"
+    },
+    "shot_blocked_no_image": {
+      "label": "{{name}} har ingen fäst bild"
+    },
+    "shot_blocked_unavailable": {
+      "label": "{{name}} är inte tillgänglig"
+    },
+    "shot_blocked_no_reference_image": {
+      "label": "Blockerad – lägg till en referensbild för att generera den här scenen."
+    },
+    "cut_title": {
+      "label": "Klipp – fäst uppskalning, annars fäst rendering"
+    },
+    "cut_missing": {
+      "label": "{{count}} scener har inget att bidra med än"
+    },
+    "shot_versions_title": {
+      "label": "{{shot}} · versioner"
+    },
+    "version_not_ready": {
+      "label": "Renderar…"
+    },
+    "generate_scene_no_changes_note": {
+      "label": "Inga ändringar sedan senaste genereringen"
+    },
+    "shot_lock_button": {
+      "ariaLabel": "Lås den här scenen",
+      "lockTooltip": "Godkänn och lås den här scenen",
+      "unlockTooltip": "Låst · lås upp för att redigera"
+    },
+    "show_all_shot_versions_link": {
+      "label": "Visa alla versioner ({{count}})"
+    },
+    "version_more_menu_button": {
+      "label": "Fler versionsåtgärder"
+    },
+    "play_shot_button": {
+      "label": "Spela upp den här scenen"
+    },
+    "pause_shot_button": {
+      "label": "Pausa den här scenen"
+    },
+    "play_cut_button": {
+      "label": "Spela upp klippet"
+    },
+    "pause_cut_button": {
+      "label": "Pausa klippet"
+    },
+    "compare_versions_timeline": {
+      "label": "Tidslinje för versionsjämförelse"
+    },
+    "play_all_versions_button": {
+      "label": "Spela upp alla versioner"
+    },
+    "pause_all_versions_button": {
+      "label": "Pausa alla versioner"
+    },
+    "upscale_badge": {
+      "label": "Uppskalad"
+    },
+    "dry_run_blocked": {
+      "label": "{{count}} blockerade"
+    },
+    "dry_run_skipped": {
+      "label": "{{count}} oförändrade"
+    },
+    "dry_run_pinned_upload": {
+      "label": "{{count}} fäst uppladdning – genereras inte om"
+    },
+    "dry_run_render_in_progress": {
+      "label": "{{count}} renderas…"
+    },
+    "empty_state": {
+      "label": "Rollsätt ett manus först – det börjar på fliken Manus."
+    },
+    "assets_empty_state": {
+      "label": "Inga resurser har skapats än. Skicka manuset till den första fliken."
+    },
+    "no_search_results": {
+      "label": "Inget matchar ”{{query}}”."
+    },
+    "run_in_progress": {
+      "label": "Arbetar – nästa flik öppnas när det är klart."
+    },
+    "run_step_count": {
+      "label": "{{completed}} av {{total}} steg"
+    },
+    "unpin_button": {
+      "label": "Fäst"
+    },
+    "drop_image_hint": {
+      "label": "Släpp eller klicka"
+    },
+    "upload_reference_dialog_title": {
+      "label": "Ladda upp en referens för den här scenen"
+    },
+    "upload_reference_dialog_body": {
+      "label": "Bilden blir en entitet i rollbesättningen, så att andra scener också kan använda den, och den får egna versioner."
+    },
+    "choose_image_button": {
+      "label": "Välj bild"
+    },
+    "no_file_chosen": {
+      "label": "Ingen bild vald"
+    },
+    "upload_reference_submit_button": {
+      "label": "Ladda upp och tagga"
+    },
+    "aspect_ratio_input": {
+      "label": "Bildformat"
+    },
+    "resolution_input": {
+      "label": "Upplösning"
+    },
+    "sheet_resolution_input": {
+      "label": "Bildupplösning"
+    },
+    "sheet_resolution_1m": {
+      "label": "1 MP"
+    },
+    "sheet_resolution_2m": {
+      "label": "2 MP"
+    },
+    "will_rerender_because": {
+      "label": "Renderas om – du ändrade: {{fields}}"
+    },
+    "changed_prompt": {
+      "label": "prompten"
+    },
+    "changed_dialogue": {
+      "label": "dialogen"
+    },
+    "changed_description": {
+      "label": "beskrivningen"
+    },
+    "changed_model": {
+      "label": "modellen"
+    },
+    "changed_output_size": {
+      "label": "storleken"
+    },
+    "changed_duration": {
+      "label": "scenens längd"
+    },
+    "changed_retries": {
+      "label": "antalet nya försök"
+    },
+    "changed_render_speed": {
+      "label": "renderingshastigheten"
+    },
+    "changed_visual_style": {
+      "label": "den visuella stilen"
+    },
+    "changed_characters": {
+      "label": "en karaktärsbild"
+    },
+    "changed_environments": {
+      "label": "en miljöbild"
+    },
+    "changed_props": {
+      "label": "en rekvisitabild"
+    },
+    "changed_references": {
+      "label": "referensbilderna"
+    },
+    "metrics_score": {
+      "label": "{{score}}/{{max}}"
+    },
+    "metrics_axis_score": {
+      "label": "{{score}}/{{max}}"
+    },
+    "metrics_pending": {
+      "label": "Poängsätter…"
+    },
+    "metrics_passed": {
+      "label": "Godkänd i kvalitetskontrollen"
+    },
+    "metrics_failed": {
+      "label": "Underkänd i kvalitetskontrollen"
+    },
+    "metrics_next_prompt": {
+      "label": "Förslag: {{suggestion}}"
+    },
+    "metrics_not_scored": {
+      "label": "Inte poängsatt"
+    },
+    "metrics_error_reason": {
+      "label": "Kvalitetskontrollen kunde inte köras ({{stage}}): {{message}}"
+    },
+    "metric_style": {
+      "label": "Stil"
+    },
+    "metric_content": {
+      "label": "Innehåll"
+    },
+    "metric_identity": {
+      "label": "Identitet"
+    },
+    "metric_lighting": {
+      "label": "Belysning"
+    },
+    "metric_quality": {
+      "label": "Kvalitet"
+    },
+    "metric_temporal_style": {
+      "label": "Stil över tid"
+    },
+    "metric_temporal_identity": {
+      "label": "Identitet över tid"
+    },
+    "metric_prompt_adherence": {
+      "label": "Följer prompten"
+    },
+    "metric_coherence": {
+      "label": "Hänger ihop"
+    },
+    "metric_usability": {
+      "label": "Användbar som referens"
+    },
+    "score_assets_toggle": {
+      "label": "Poängsätt varje bild"
+    },
+    "score_assets_hint": {
+      "label": "En extra AI-kontroll per bild. Du debiteras inte för den."
+    },
+    "shot_retries_input": {
+      "label": "Nya försök"
+    },
+    "retries_cost_hint": {
+      "label": "upp till {{attempts}} försök vardera, debiteras per försök"
+    },
+    "sheet_render_model_input": {
+      "label": "Modell för referensbilder"
+    },
+    "storyboard_render_model_input": {
+      "label": "Bildmodell för storyboard"
+    },
+    "visual_style_input": {
+      "label": "Visuell stil",
+      "placeholder": "t.ex. dämpad koboltpalett, kopparfärgade halvtoner, mjukt filmkorn",
+      "hint": "Tillämpas på alla resursbilder och scenvideor. Lämna tomt för ingen stil.",
+      "save_error": "Det gick inte att spara den visuella stilen."
+    },
+    "sheet_render_model_seedream_5_pro_t2i": {
+      "label": "Seedream 5 Pro"
+    },
+    "sheet_render_model_gpt_image_2_t2i": {
+      "label": "GPT Image 2"
+    },
+    "sheet_render_model_nanobanana_2_t2i": {
+      "label": "Nano Banana 2"
+    },
+    "sheet_render_model_qwen_image_2512_local": {
+      "label": "Qwen Image 2512 (lokal)"
+    },
+    "sheet_render_model_flux2_klein_4b_q8_local": {
+      "label": "Flux 2 Klein 4B Q8 (lokal)"
+    },
+    "sheet_render_model_flux2_klein_9b_q8_local": {
+      "label": "Flux 2 Klein 9B Q8 (lokal)"
+    },
+    "local_h3_steps_input": {
+      "label": "Lokal H3-renderingsförinställning"
+    },
+    "local_h3_steps_3": {
+      "label": "H3 · 3 steg"
+    },
+    "local_h3_steps_4": {
+      "label": "H3 · 4 steg"
+    },
+    "local_h3_steps_8": {
+      "label": "H3 · 8 steg"
+    },
+    "local_h3_legacy_workflow_toggle": {
+      "label": "Äldre KSampler"
+    },
+    "local_h3_text_encoder_input": {
+      "label": "Lokal H3-textkodare"
+    },
+    "local_h3_text_encoder_heretic": {
+      "label": "Qwen3-VL Heretic"
+    },
+    "local_h3_text_encoder_vanilla": {
+      "label": "Qwen3-VL Vanilla"
+    },
+    "local_h3_model_input": {
+      "label": "Lokal H3-modell"
+    },
+    "local_h3_model_base": {
+      "label": "MiniMax H3 Base INT8"
+    },
+    "local_h3_model_singularity": {
+      "label": "MiniMax H3 Singularity v1.3 INT8"
+    },
+    "shot_render_speed_input": {
+      "label": "Renderingshastighet"
+    },
+    "shot_render_speed_slow": {
+      "label": "Långsam rendering"
+    },
+    "shot_render_speed_fast": {
+      "label": "Snabb rendering"
+    },
+    "shot_render_seedance_2_5": {
+      "label": "Seedance 2.5"
+    },
+    "sequential_chain_start": {
+      "label": "Startar en kedja – renderas parallellt"
+    },
+    "shot_chain_button": {
+      "ariaLabel": "Inställningar för fortsättning",
+      "unchainedTooltip": "Inte länkad. Den här scenen renderas fristående, parallellt med de andra.\nKlicka för att låta den fortsätta från föregående scen.",
+      "chainedTooltip": "Länkad. Den här scenen fortsätter från föregående scens fästa version och renderas efter den.\nKlicka för att ändra eller stänga av fortsättningen."
+    },
+    "shot_sequential_settings_dialog_title": {
+      "label": "Fortsätt från föregående scen"
+    },
+    "image_description_title": {
+      "label": "Beskrivning"
+    },
+    "image_description_absent": {
+      "label": "Inte beskriven än"
+    },
+    "image_description_cleared": {
+      "label": "Ingen beskrivning"
+    },
+    "image_description_inherited": {
+      "label": "Från facket i rollbesättningen. Beskriv eller redigera för att ge den här versionen en egen."
+    },
+    "edit_description_failed": {
+      "description": "Det gick inte att spara beskrivningen."
+    },
+    "edit_description_button": {
+      "label": "Redigera"
+    },
+    "save_button": {
+      "label": "Spara"
+    },
+    "cancel_button": {
+      "label": "Avbryt"
+    },
+    "sequential_source_shot": {
+      "label": "Fortsätter från {{shot}}"
+    },
+    "sequential_mode_input": {
+      "label": "Vad som ska fortsättas från"
+    },
+    "sequential_mode_off": {
+      "label": "Av"
+    },
+    "sequential_mode_last_frame": {
+      "label": "Sista bildrutan"
+    },
+    "sequential_mode_key_frames": {
+      "label": "Nyckelbildrutor"
+    },
+    "sequential_key_frame_count": {
+      "label": "Bildrutor att välja (1–4)"
+    },
+    "sequential_prompt_appendix_input": {
+      "label": "Fortsättningsprompt",
+      "placeholder": "Fortsätt rörelsen; upprepa inte handlingen."
+    },
+    "sequential_prompt_default_hint": {
+      "label": "Standard för den här fortsättningen. Redigera för att skriva din egen."
+    },
+    "sequential_prompt_reset_button": {
+      "label": "Återställ till standard"
+    },
+    "sequential_opening_frame_input": {
+      "label": "Hur den fortsätter"
+    },
+    "sequential_opening_frame_cut": {
+      "label": "Klipp till en ny vinkel på samma ögonblick"
+    },
+    "sequential_opening_frame_pin": {
+      "label": "Börja på föregående bildruta (experimentellt)"
+    },
+    "sequential_opening_frame_off": {
+      "label": "Endast lös referens"
+    },
+    "sequential_pin_hint": {
+      "label": "Fortsätter från föregående scens fästa version. Om du fäster en annan blir den här scenen inaktuell."
+    },
+    "suspend_sequential_for_run": {
+      "label": "Ignorera fortsättning för den här körningen ({{count}})"
+    },
+    "shot_blocked_sequential_unsupported_engine": {
+      "label": "Blockerad – den här motorn kan inte använda en referens mellan scener än. Bara MiniMax kan det."
+    },
+    "shot_sequential_reference_ignored": {
+      "label": "Renderas utan referens – det finns inget före den att fortsätta från."
+    },
+    "shot_blocked_sequential_no_predecessor_render": {
+      "label": "Blockerad – föregående scen har ingen färdig rendering. Rendera den först eller fäst en av dess versioner."
+    },
+    "shot_blocked_sequential_unsupported_mode": {
+      "label": "Blockerad – den här fortsättningen stöds inte. Välj Sista bildrutan eller Nyckelbildrutor."
+    },
+    "shot_blocked_sequential_unsupported_opening_frame": {
+      "label": "Blockerad – den här motorn kan inte börja på föregående bildruta än. Välj Klipp till en ny vinkel."
+    },
+    "shot_duration_out_of_bounds": {
+      "label": "Scener renderas {{minSeconds}}–{{maxSeconds}} s. Den här scenen är {{seconds}} s."
+    },
+    "shot_duration_hint": {
+      "label": "{{seconds}} s"
+    },
+    "atomic_shots_toggle": {
+      "label": "Låt AI bestämma antal scener och längd utifrån manuset"
+    },
+    "sequential_shots_casting_toggle": {
+      "label": "Använd sammanhängande scener när kontinuiteten kräver det"
+    },
+    "character_design_versions_toggle": {
+      "label": "Skapa designversioner av karaktärer och resurser"
+    },
+    "separate_style_toggle": {
+      "label": "Skapa en separat prompt för visuell stil"
+    },
+    "separate_camera_toggle": {
+      "label": "Skapa separata kameraprompter"
+    },
+    "visual_style_prompt": {
+      "label": "Prompt för visuell stil",
+      "placeholder": "Beskriv det gemensamma visuella språket för projektet."
+    },
+    "edit_visual_style_failed": {
+      "description": "Det gick inte att spara prompten för visuell stil."
+    },
+    "no_design_versions_found": {
+      "label": "Designversioner var aktiverade, men manuset innehöll inga distinkta designer för karaktärer, miljöer eller rekvisita."
+    },
+    "camera_prompt": {
+      "label": "Kameraprompt"
+    },
+    "camera_prompt_edit_button": {
+      "label": "Redigera kameraprompt"
+    },
+    "camera_framing": {
+      "label": "Bildutsnitt"
+    },
+    "camera_movement": {
+      "label": "Rörelse"
+    },
+    "camera_lens": {
+      "label": "Objektiv"
+    },
+    "render_defaults_hint": {
+      "label": "{{width}}×{{height}}, {{seconds}} s ({{frames}} bildrutor) för varje scen i projektet"
+    },
+    "production_total_hint": {
+      "label": "cirka {{credits}} krediter för att generera allt – {{entityCount}} referenser och {{shotCount}} scener"
+    },
+    "cut_load_failed": {
+      "label": "Det gick inte att läsa in klippet. Läs in igen eller kontrollera konsolen."
+    },
+    "loading": {
+      "label": "Läser in…"
+    },
+    "no_shot_renders_yet": {
+      "label": "Ingen av de {{count}} scenerna har en färdig rendering."
+    },
+    "no_shot_renders_hint": {
+      "label": "Om renderingar har slutförts har de inte nått klippet – kontrollera renderingskön."
+    },
+    "no_shots_in_cut": {
+      "label": "Projektet har inga scener än – rollsätt ett manus först."
+    },
+    "no_render_yet": {
+      "label": "Ingen rendering än"
+    },
+    "shot_render_failed": {
+      "label": "Renderingen av scenen misslyckades."
+    },
+    "shot_storyboard_failed": {
+      "label": "Scenens storyboard misslyckades."
+    },
+    "video_without_failed_storyboard": {
+      "label": "Scenens storyboard misslyckades. Videon renderas utan den."
+    },
+    "video_without_stale_storyboard": {
+      "label": "Scenens storyboard är inaktuell. Videon renderas utan den tills du genererar en ny."
+    },
+    "storyboard_stale": {
+      "label": "Shotsen har ändrats sedan storyboarden ritades. Videorenderingar hoppar över den tills du genererar en ny."
+    },
+    "storyboard_last_attempt_failed": {
+      "label": "Det senaste storyboardförsöket misslyckades. Den tidigare versionen används fortfarande."
+    },
+    "storyboard_too_many_shots": {
+      "label": "En storyboard kan visa högst {{count}} shots."
+    },
+    "storyboard_versions_link": {
+      "label": "Versioner ({{count}})"
+    },
+    "storyboard_versions_title": {
+      "label": "{{scene}} · storyboardversioner"
+    },
+    "storyboard_version_failed": {
+      "label": "Den här versionen misslyckades"
+    },
+    "storyboard_used_in_video_switch": {
+      "label": "Använd i video"
+    },
+    "update_storyboard_failed": {
+      "description": "Det gick inte att uppdatera storyboarden. Försök igen."
+    },
+    "sent_prompt_field": {
+      "label": "Prompt som skickades till videomodellen"
+    },
+    "generate_scene_button": {
+      "label": "Generera ({{seconds}} s)"
+    },
+    "scene_references_heading": {
+      "label": "Referenser"
+    },
+    "generate_storyboard_button": {
+      "label": "Generera storyboard"
+    },
+    "generate_storyboard_failed": {
+      "description": "Det gick inte att generera storyboarden."
+    },
+    "storyboard_sheet_setup_failed": {
+      "description": "Storyboarden renderas, men dess referenser kunde inte uppdateras. Försök igen."
+    },
+    "no_storyboard_yet": {
+      "label": "Ingen storyboard än"
+    },
+    "storyboard_version_badge": {
+      "label": "Storyboard"
+    },
+    "remove_storyboard_button": {
+      "ariaLabel": "Ta bort storyboard från scenen"
+    },
+    "scene_shot_table": {
+      "column_duration": {
+        "label": "Längd (s)"
+      },
+      "column_camera": {
+        "label": "Kamerarörelse"
+      },
+      "column_framing": {
+        "label": "Bildutsnitt"
+      },
+      "column_description": {
+        "label": "Beskrivning"
+      },
+      "shot_number": {
+        "label": "Shot {{number}}"
+      },
+      "camera_placeholder": {
+        "label": "Statisk"
+      },
+      "framing_placeholder": {
+        "label": "Halvnära"
+      },
+      "add_shot": {
+        "label": "Lägg till shot"
+      },
+      "delete_shot": {
+        "ariaLabel": "Ta bort shot {{number}}"
+      }
+    },
+    "scenes_interface": {
+      "layout_cards": {
+        "label": "Kort"
+      },
+      "layout_list": {
+        "label": "Lista"
+      }
+    },
+    "confirm_pin_title": {
+      "label": "Det här påverkar efterföljande scener"
+    },
+    "confirm_pin_body": {
+      "label": "{{count}} scener använder {{name}}. Om du ändrar den fästa bilden markeras de som ändrade, så nästa Generera renderar om dem."
+    },
+    "confirm_pin_cancel_button": {
+      "label": "Avbryt"
+    },
+    "confirm_pin_confirm_button": {
+      "label": "Ändra fäst bild"
+    },
+    "uploaded_badge": {
+      "label": "Uppladdad"
+    },
+    "pinned_upload_hint": {
+      "label": "Din bild är fäst – bulkkörningar hoppar över den här entiteten."
+    },
+    "add_entity_button": {
+      "label": "Lägg till entitet"
+    },
+    "add_entity_name_input": {
+      "label": "Namn"
+    },
+    "add_entity_kind_input": {
+      "label": "Kategori"
+    },
+    "new_entity_default_name": {
+      "character": "Ny karaktär",
+      "environment": "Ny miljö",
+      "prop": "Ny rekvisita"
+    },
+    "add_entity_token_taken": {
+      "label": "Rollbesättningen har redan en entitet med det här namnet."
+    },
+    "draft_entity_hint": {
+      "label": "Rendera den eller släpp in en bild för att spara den. Tills dess sparas den inte."
+    },
+    "discard_draft_entity_button": {
+      "ariaLabel": "Släng ny entitet"
+    },
+    "add_reference_button": {
+      "label": "Lägg till referens"
+    },
+    "remove_reference_button": {
+      "ariaLabel": "Ta bort {{name}} från den här scenen"
+    },
+    "zoom_reference_button": {
+      "ariaLabel": "Öppna {{name}} i full storlek"
+    },
+    "download_version_button": {
+      "ariaLabel": "Ladda ned den här versionen"
+    },
+    "reuse_settings_button": {
+      "label": "Återanvänd inställningar",
+      "ariaLabel": "Läs in den här versionens inställningar i prompten"
+    },
+    "image_inputs_title": {
+      "label": "Vad som användes i {{version}}"
+    },
+    "image_inputs_loading": {
+      "label": "Läser in indata…"
+    },
+    "image_inputs_model": {
+      "label": "Modell · {{model}}"
+    },
+    "image_inputs_size": {
+      "label": "Storlek · {{width}}×{{height}}"
+    },
+    "image_inputs_missing": {
+      "label": "Ingen prompt sparades för den här versionen."
+    },
+    "cut_membership_count": {
+      "label": "{{count}} av {{total}} i klippet"
+    },
+    "section_group_count": {
+      "label": "{{count}}"
+    }
+  },
+  "bulk_rendering": {
+    "apply_settings_button": {
+      "label": "Tillämpa inställningar på flera shots"
+    },
+    "info_button": {
+      "ariaLabel": "Vad är massrendering"
+    },
+    "popover_title": {
+      "label": "Vad är massrendering"
+    },
+    "video_caption": {
+      "label": "Video om funktionen"
+    },
+    "hide_button": {
+      "label": "Dölj"
+    },
+    "shot_selection_title": {
+      "label": "Välj shots att tillämpa inställningar på"
+    },
+    "shot_selection_close_button": {
+      "ariaLabel": "Stäng"
+    },
+    "shot_selection_cancel_button": {
+      "label": "Avbryt"
+    },
+    "shot_selection_next_button": {
+      "label": "Nästa"
+    },
+    "shot_selection_select_all": {
+      "label": "Markera alla"
+    },
+    "first_frame_source_choice_title": {
+      "label": "Har du egna redigerade bildrutor redo att använda \neller vill du skapa dem utifrån inställningarna för Shot_01? "
+    },
+    "first_frame_source_choice_generate_button": {
+      "label": "Nej, visa genereringssteget"
+    },
+    "first_frame_source_choice_upload_button": {
+      "label": "Ja, det har jag"
+    },
+    "first_frame_bulk_drop_zone_title": {
+      "label": "Massuppladdning"
+    },
+    "first_frame_bulk_drop_zone_hint": {
+      "label": "Ladda upp alla första bildrutor på en gång så kopplar vi dem automatiskt efter filnamn"
+    },
+    "first_frame_upload_modal_title": {
+      "label": "Laddar upp {{count}} objekt",
+      "label_one": "Laddar upp {{count}} objekt",
+      "label_other": "Laddar upp {{count}} objekt"
+    },
+    "first_frame_upload_modal_description": {
+      "label": "Uppladdat: {{uploadedCount}} av {{count}} bild, fel: {{errorCount}}",
+      "label_one": "Uppladdat: {{uploadedCount}} av {{count}} bild, fel: {{errorCount}}",
+      "label_other": "Uppladdat: {{uploadedCount}} av {{count}} bilder, fel: {{errorCount}}"
+    },
+    "first_frame_upload_modal_cancel_all_button": {
+      "label": "Avbryt uppladdning av alla filer"
+    },
+    "first_frame_upload_modal_close_button": {
+      "label": "Stäng"
+    },
+    "first_frame_upload_row_linked_status": {
+      "label": "Kopplad till {{shotName}}"
+    },
+    "first_frame_upload_row_unlinked_status": {
+      "label": "Den här bilden är inte kopplad till något shot och hoppas över vid genereringen"
+    },
+    "first_frame_upload_row_upload_failed_status": {
+      "label": "Uppladdningsfel"
+    },
+    "first_frame_upload_row_not_started_status": {
+      "label": "Inte startad"
+    },
+    "first_frame_upload_row_dismiss_button": {
+      "ariaLabel": "Stäng"
+    },
+    "first_frame_upload_row_cancel_button": {
+      "ariaLabel": "Avbryt uppladdning"
+    },
+    "shot_selection_name_input": {
+      "label": "Körningens namn"
+    },
+    "run_view_close_button": {
+      "ariaLabel": "Stäng"
+    },
+    "run_view_image_step_tab": {
+      "label": "Bildsteg"
+    },
+    "run_view_video_step_tab": {
+      "label": "Videosteg"
+    },
+    "draft_close_button": {
+      "ariaLabel": "Stäng"
+    },
+    "draft_image_step_tab": {
+      "label": "Bildsteg"
+    },
+    "draft_video_step_tab": {
+      "label": "Videosteg"
+    },
+    "draft_untitled_run": {
+      "label": "Massrendering"
+    },
+    "draft_image_step_back_button": {
+      "label": "Tillbaka"
+    },
+    "draft_image_step_check_video_settings_button": {
+      "label": "Kontrollera videoinställningar"
+    },
+    "draft_video_step_back_button": {
+      "label": "Tillbaka"
+    },
+    "draft_video_step_generate_button": {
+      "label": "Generera"
+    },
+    "draft_first_frame_source_choice_back_button": {
+      "label": "Tillbaka"
+    },
+    "draft_first_frame_source_choice_generate_button": {
+      "label": "Generera bilder"
+    },
+    "draft_credits_mode_only_notice": {
+      "label": "Massrendering använder bara krediter. Stäng av Unlimited mode för att generera."
+    },
+    "draft_shot_missing_uploaded_first_frame_error": {
+      "label": "Det här shotet har ingen uppladdad första bildruta"
+    },
+    "draft_shot_card_auto_linking_failed_badge": {
+      "label": "Automatisk koppling misslyckades"
+    },
+    "draft_shot_card_frame_chip": {
+      "label": "Bildruta 0"
+    },
+    "draft_shot_card_frame_label": {
+      "label": "Bildruta"
+    },
+    "draft_shot_card_original_chip": {
+      "label": "Original"
+    },
+    "draft_shot_card_frame_info": {
+      "ariaLabel": "Om den här bildrutan"
+    },
+    "draft_shot_card_prompt_label": {
+      "label": "Prompt"
+    },
+    "draft_shot_card_prompt_field": {
+      "ariaLabel": "Prompt för {{shotName}}"
+    },
+    "draft_shot_card_optimize_button": {
+      "label": "Optimera"
+    },
+    "draft_shot_card_model_label": {
+      "label": "Modell"
+    },
+    "draft_shot_card_image_reference_label": {
+      "label": "Lägg till referensbild"
+    },
+    "draft_shot_card_regenerate_button": {
+      "label": "Generera igen"
+    },
+    "draft_shot_card_settings_label": {
+      "label": "Inställningar"
+    },
+    "draft_shot_card_settings_value": {
+      "label": "Huvudinställningar"
+    },
+    "draft_shot_card_settings_value_unique": {
+      "label": "Unika inställningar"
+    },
+    "draft_shot_card_settings_edit_button": {
+      "ariaLabel": "Redigera inställningar"
+    },
+    "draft_video_step_master_settings_label": {
+      "label": "Huvudinställningar"
+    },
+    "draft_video_step_master_settings_show_button": {
+      "label": "Visa"
+    },
+    "draft_video_step_master_settings_hide_button": {
+      "label": "Dölj"
+    },
+    "shot_settings_panel_title": {
+      "label": "Ställ in unika inställningar för den här videon"
+    },
+    "shot_settings_panel_dialog": {
+      "ariaLabel": "Inställningar för {{shotName}}"
+    },
+    "shot_settings_panel_save_button": {
+      "label": "Spara"
+    },
+    "shot_settings_panel_cancel_button": {
+      "label": "Avbryt"
+    },
+    "draft_discard_warning_description": {
+      "label": "Om du går tillbaka förlorar du de promptar du har redigerat för den här körningen. Det går inte att ångra."
+    },
+    "draft_discard_warning_cancel_button": {
+      "label": "Fortsätt redigera"
+    },
+    "draft_discard_warning_confirm_button": {
+      "label": "Släng"
+    },
+    "shot_phase_in_progress": {
+      "label": "Pågår"
+    },
+    "shot_phase_completed": {
+      "label": "Klar"
+    },
+    "run_view_error": {
+      "description": "Det gick inte att läsa in körningen."
+    },
+    "run_view_untitled_run": {
+      "label": "Massrendering"
+    },
+    "navbar_entry": {
+      "label": "Massrendering"
+    },
+    "panel_title": {
+      "label": "Massrendering"
+    },
+    "panel_close_button": {
+      "ariaLabel": "Stäng"
+    },
+    "panel_section_in_progress": {
+      "label": "Pågår"
+    },
+    "panel_section_history": {
+      "label": "Historik"
+    },
+    "panel_empty_in_progress": {
+      "label": "Inga pågående körningar"
+    },
+    "panel_empty_history": {
+      "label": "Inga slutförda körningar än"
+    },
+    "panel_row_step": {
+      "label": "Steg {{stepNumber}}: {{stepName}}"
+    },
+    "panel_row_images_stat": {
+      "label": "Bilder: {{completed}}/{{total}}"
+    },
+    "panel_row_videos_stat": {
+      "label": "Videor: {{completed}}/{{total}}"
+    },
+    "panel_row_duration": {
+      "label": "Längd: {{duration}}"
+    },
+    "panel_row_errors_none": {
+      "label": "Fel: {{count}}"
+    },
+    "panel_row_errors_present": {
+      "label": "Fel – bild: {{imageErrors}}, video: {{videoErrors}}"
+    },
+    "panel_row_current_step_image": {
+      "label": "Bild"
+    },
+    "panel_row_current_step_video": {
+      "label": "Video"
+    },
+    "panel_row_queued_status": {
+      "label": "I kö"
+    },
+    "panel_row_cancel_button": {
+      "label": "Avbryt"
+    },
+    "panel_row_continue_button": {
+      "label": "Fortsätt"
+    },
+    "panel_row_resume_insufficient_credits": {
+      "description": "Du har inte tillräckligt med krediter för att slutföra körningen."
+    },
+    "panel_row_status_error": {
+      "label": "Okänt fel"
+    },
+    "panel_row_toggle_history_row": {
+      "ariaLabel": "{{runName}}, aktivera för att se resultat"
+    },
+    "panel_row_toggle_in_progress_row": {
+      "ariaLabel": "{{runName}}, aktivera för att se förloppet"
+    },
+    "panel_shot_card_failed_quality_test": {
+      "label": "Underkänd i kvalitetstest"
+    },
+    "panel_shot_card_unknown_error": {
+      "label": "Okänt fel"
+    },
+    "panel_shot_card_unknown_error_description": {
+      "label": "Inget har genererats"
+    },
+    "panel_shot_card_unknown_error_info": {
+      "ariaLabel": "Om det här felet"
+    },
+    "panel_shot_card_play_video": {
+      "ariaLabel": "Spela upp {{shotName}}"
+    },
+    "panel_shot_card_pause_video": {
+      "ariaLabel": "Pausa {{shotName}}"
+    },
+    "run_view_image_card_quality_failure_status": {
+      "label": "Underkänd i kvalitetstest"
+    },
+    "run_view_image_card_infrastructure_failure_status": {
+      "label": "Misslyckades"
+    },
+    "run_view_image_card_quality_failure_tile": {
+      "label": "Underkänd i kvalitetstest"
+    },
+    "run_view_image_card_infrastructure_failure_tile": {
+      "label": "Inget har genererats"
+    },
+    "run_view_image_card_quality_failure_tooltip": {
+      "description": "Massrenderingsagenten har en funktion för kvalitetsförsök som kontrollerar kvaliteten på varje rendering. Om den inte uppfyller kvalitetskraven skriver agenten om prompten, renderar på nytt och kontrollerar kvaliteten igen. Högst tre nya försök görs. Därefter visas felet Underkänd i kvalitetstest."
+    },
+    "draft_shot_card_result_chip": {
+      "label": "Resultat"
+    },
+    "run_view_video_card_settings_info": {
+      "label": "Info om renderingsinställningar"
+    },
+    "run_view_video_card_settings_view_button": {
+      "ariaLabel": "Visa inställningar"
+    },
+    "run_view_video_card_play_video": {
+      "ariaLabel": "Spela upp {{shotName}}"
+    },
+    "run_view_video_card_pause_video": {
+      "ariaLabel": "Pausa {{shotName}}"
+    },
+    "run_view_video_card_quality_failure_status": {
+      "label": "Underkänd i kvalitetstest"
+    },
+    "run_view_video_card_infrastructure_failure_status": {
+      "label": "Misslyckades"
+    },
+    "run_view_video_card_quality_failure_tile": {
+      "label": "Underkänd i kvalitetstest"
+    },
+    "run_view_video_card_infrastructure_failure_tile": {
+      "label": "Inget har genererats"
+    },
+    "run_view_video_card_quality_failure_tooltip": {
+      "description": "Massrenderingsagenten har en funktion för kvalitetsförsök som kontrollerar kvaliteten på varje rendering. Om den inte uppfyller kvalitetskraven skriver agenten om prompten, renderar på nytt och kontrollerar kvaliteten igen. Högst tre nya försök görs. Därefter visas felet Underkänd i kvalitetstest."
+    },
+    "run_view_footer_close_button": {
+      "label": "Stäng"
+    },
+    "run_view_footer_cancel_button": {
+      "label": "Avbryt massrendering"
+    },
+    "run_view_cancel_confirmation": {
+      "description": "Avbryta den här massrenderingen? Det går inte att ångra."
+    },
+    "run_view_cancel_confirmation_dismiss_button": {
+      "label": "Fortsätt rendera"
+    }
+  },
+  "renderSettings": {
+    "minimaxH3EditedFrame": {
+      "notAtRangeStart": "Din redigerade bildruta kommer från en annan bildruta än intervallets start. Låt intervallet börja på bildrutan du redigerade."
+    },
+    "tabs": {
+      "basic": {
+        "label": "Grundläggande"
+      },
+      "advanced": {
+        "label": "Avancerat"
+      },
+      "controlnets": {
+        "label": "ControlNets"
+      },
+      "main": {
+        "label": "Huvud"
+      },
+      "consistency": {
+        "label": "Konsekvens"
+      },
+      "masking": {
+        "label": "Maskering"
+      },
+      "other": {
+        "label": "Övrigt"
+      },
+      "firstframecontrol": {
+        "label": "Kontroll"
+      }
+    },
+    "sections": {
+      "qualitySettings": "Kvalitetsinställningar",
+      "imageInfluence": "Bildpåverkan",
+      "promptInfluence": "Promptpåverkan",
+      "loras": "LoRA",
+      "other": "Övrigt",
+      "depthAndStyleReference": "Djup- och stilreferens",
+      "contextSettings": "Kontextinställningar"
+    },
+    "mago_engine": {
+      "label": "Modell",
+      "labelNotFound": "Modellen hittades inte",
+      "cloudComingSoon": "Molnrendering är inte tillgänglig i skrivbordsappen än",
+      "requiresSignIn": "Logga in på Mago för att rendera med den här modellen"
+    },
+    "model_categories": {
+      "transformation_vfx": {
+        "label": "Transformering (VFX)"
+      },
+      "stylization": {
+        "label": "Stilisering"
+      },
+      "character_replacement": {
+        "label": "Karaktärsbyte"
+      },
+      "upscale": {
+        "label": "Uppskalning"
+      },
+      "private": {
+        "label": "Privat"
+      }
+    },
+    "preset": {
+      "label": "Förinställning"
+    },
+    "select_placeholder": {
+      "label": "Välj"
+    },
+    "preset_edited": {
+      "label": "redigerad"
+    },
+    "engine": {
+      "description": "Mago-motorn fungerar utmärkt för att stilisera eller transformera alla slags videor. Du behöver stilisera/transformera en bildruta som används som referens för klippet.\n\nMagos karaktärsmotor passar bäst för karaktärsbyte där läppsynk och ansiktsuttryck är viktiga.\n\nDreamlike-motorn är en äldre motor som passar för mer konstnärliga renderingar."
+    },
+    "upscale_engine": {
+      "description": "Upscaler håller sig trogen källan – inga tillagda detaljer, ingen omtolkning.\n\nCreative Upscaler genererar nya detaljer. Användbar när Upscaler inte räcker.\n\nMago SDR-to-HDR utökar ljusstyrka och färgomfång för HDR-skärmar, utan att ändra upplösning eller detaljer."
+    },
+    "style_reference": {
+      "label": "Stilreferens",
+      "mago_engine_v2": {
+        "description": "Använd en stilreferensbild för att styra stiliseringen. Tänk på att alla detaljer i bilden följer med (färger, former, karaktärer, objekt). Undvik bilder med artefakter och försök använda en stiliserad bildruta från din video om möjligt."
+      },
+      "mago_engine_v3": {
+        "description": "Lägg in eller generera klippets första bildruta i den stil du vill ha. Den används som referens vid renderingen. Du kan försöka transformera element genom att ändra dem i referensen för första bildrutan."
+      }
+    },
+    "magov2": {
+      "chunk_size": {
+        "label": "Kontextstorlek",
+        "description": "Storleken på kontextfönstret för genereringen. Lägre värden genererar snabbare och behåller stilen bättre, men tappar kontext från tidigare bildrutor."
+      },
+      "chunk_overlap": {
+        "label": "Kontextöverlapp",
+        "description": "Överlapp mellan kontextfönster. Minskar tvära övergångar mellan bildrutor."
+      },
+      "control_type": {
+        "label": "Typ",
+        "description": "Välj en ControlNet att använda för genereringen."
+      },
+      "lineart": {
+        "label": "Linjeteckning",
+        "description": "Kantdetektering (dvs. konturer) för att bevara former och övergripande detaljer i indatavideon."
+      },
+      "cn_canny_resolution": {
+        "label": "Canny-upplösning",
+        "description": "Upplösning som används för ControlNet-kartor. Högre upplösning ger fler detaljer."
+      },
+      "cn_canny_range": {
+        "label": "Aktivt intervall",
+        "description": "Avgör när ControlNet-informationen används i genereringsprocessen – 0 till 1 betyder att den är aktiv under hela genereringen, 0 till 0,8 betyder att de sista 20 % genereras utan ControlNets påverkan."
+      },
+      "cn_canny_strength": {
+        "label": "Canny-vikt",
+        "description": "Kantdetektering (dvs. konturer) för att bevara former och övergripande detaljer i indatavideon. Vikten avgör hur stark påverkan konturinformationen har."
+      },
+      "cfg": {
+        "label": "CFG",
+        "description": "Ju högre CFG (promptstyrka), desto mer påverkar prompten stiliseringen. Sänk bildvikten först så att prompten verkligen tas med, och försök hålla dig mellan 2 och 3 för de flesta resultat."
+      },
+      "cn_depth_range": {
+        "label": "Aktivt intervall",
+        "description": "Avgör när ControlNet-informationen används i genereringsprocessen – 0 till 1 betyder att den är aktiv under hela genereringen, 0 till 0,8 betyder att de sista 20 % genereras utan ControlNets påverkan."
+      },
+      "cn_depth_resolution": {
+        "label": "Djupupplösning",
+        "description": "Upplösning som används för ControlNet-kartor. Högre upplösning ger fler detaljer."
+      },
+      "cn_depth_strength": {
+        "label": "Djupvikt",
+        "description": "Djupdetektering för att avgöra scenens 3D-volymer. Hjälper till att dela upp bildrutan i bakgrund, förgrund och specifika element. Vikten avgör hur stark påverkan djupinformationen har."
+      },
+      "cn_tile_range": {
+        "label": "Aktivt intervall",
+        "description": "Avgör när ControlNet-informationen används i genereringsprocessen – 0 till 1 betyder att den är aktiv under hela genereringen, 0 till 0,8 betyder att de sista 20 % genereras utan ControlNets påverkan."
+      },
+      "cn_tile_resolution": {
+        "label": "Tile-upplösning",
+        "description": "Upplösning som används för ControlNet-kartor. Högre upplösning ger fler detaljer."
+      },
+      "cn_tile_strength": {
+        "label": "Tile-vikt",
+        "description": "Används för uppskalning/oskärpeborttagning. Hjälper resultatet att hålla sig koherent med indatavideon och bevara detaljer och färger. Vikten avgör hur stark påverkan de tillagda detaljerna har."
+      },
+      "context_mode": {
+        "label": "Stabilitet",
+        "description": ""
+      },
+      "control_sdxl_xinsir_canny": {
+        "label": "Canny",
+        "description": "En metod som hittar kanterna i en bild och gör om den till en svartvit kontur. Då kan du designa om objekt men behålla samma kontur."
+      },
+      "control_sdxl_xinsir_depth": {
+        "label": "Djup",
+        "description": "Djupdetektering för att avgöra avståndet till varje pixel i bildrutan. Hjälper till att dela upp bildrutan i bakgrund, förgrund och specifika element."
+      },
+      "control_sdxl_xinsir_tile": {
+        "label": "Tile",
+        "description": "Delar upp bildrutan i små rutor och kontrollerar att detaljerna i varje ruta är koherenta och stämmer med prompten. Hjälper till att bli av med dåliga detaljer och förfina bra detaljer."
+      },
+      "denoise": {
+        "label": "Brusreducering",
+        "description": "Brusreducering (eller diffusionsstyrka) anger hur mycket utdatabildrutan skiljer sig från indatabildrutan. Värdet 1 betyder att stilen tillämpas fullt ut utan påverkan från originalbilden. Värdet 0 betyder att ingen stil tillämpas och att du behåller originalbilden. Påverkar både bild- och promptpåverkan."
+      },
+      "enable_interpolation": {
+        "label": "Interpolering",
+        "description": "Interpoleringsläget renderar bara varannan bildruta och fyller i luckorna med interpolering. Det gör renderingen snabbare och den kostar färre krediter. Resultatet kan ibland bli mindre detaljerat."
+      },
+      "ipadapter_strength": {
+        "label": "Bildvikt",
+        "description": "Styr hur starkt referensbilden påverkar slutresultatet. Högre vikt gör att genereringen följer referensbildens stil och egenskaper närmare, medan lägre vikt ger en subtilare påverkan och lägger större vikt vid prompten."
+      },
+      "max_size": {
+        "label": "Utdatastorlek",
+        "description": "Längden på den längsta sidan i önskad utdataupplösning. Om utdata är 1920x1080 är maxstorleken 1920. Utdata följer automatiskt indatavideons bildformat."
+      },
+      "negative_prompt": {
+        "label": "Negativ prompt",
+        "description": "Beskriv vad du inte vill se i resultatet. Det kan vara specifika element som dyker upp i dina resultat och som du vill ta bort, eller allmänna kvalitetsbegrepp (låg upplösning, felaktig anatomi)."
+      },
+      "prompt": {
+        "label": "Prompt",
+        "description": "Skriv prompten här"
+      },
+      "seed": {
+        "label": "Seed",
+        "description": "Slumptal som blir genereringens startpunkt. Prova olika värden för små variationer."
+      },
+      "steps": {
+        "label": "Steg",
+        "description": "Totalt antal diffusionssteg: fler steg ger skarpare och mer detaljerade resultat men långsammare bearbetning. Färre steg kan ge mindre förfinade stilar. Håll värdena mellan 3 och 10."
+      },
+      "enable_unsampling": {
+        "label": "Unsampling",
+        "description": ""
+      },
+      "enable_cache": {
+        "label": "Cache",
+        "description": ""
+      },
+      "weight_type": {
+        "label": "Stilläge",
+        "description": ""
+      },
+      "mago_engine": {
+        "label": "Mago-motor",
+        "description": "Välj vilken motorversion som ska användas. Olika versioner kan ge olika resultat."
+      },
+      "firstframe_control_strength": {
+        "label": "Styrka",
+        "description": "Styr hur starkt konsekvensen i videons attention upprätthålls. Högre värden ger bättre konsekvens över tid."
+      },
+      "firstframe_control_range": {
+        "label": "Aktivt intervall",
+        "description": "Anger intervallet av bildrutor som tillämpas i diffusionsprocessen (intervall 0–1)."
+      },
+      "shift": {
+        "label": "Förskjutning",
+        "description": "Styr hur mycket bildrutorna förskjuts för tidsmässig justering. Högre värden ökar sökområdet för matchande drag."
+      },
+      "blending_factor": {
+        "label": "Blandningsfaktor",
+        "description": "Styr blandningsfaktorn för ControlNets för djup och linjeteckning. Högre värden blandar de två mer."
+      },
+      "cn_lineart_resolution": {
+        "label": "Linjeteckningsupplösning",
+        "description": "Styr upplösningen för ControlNet för linjeteckning. Högre värden ger fler detaljer."
+      },
+      "cn_normal_map_resolution": {
+        "label": "Normalkartsupplösning",
+        "description": "Styr upplösningen för ControlNet för normalkarta. Högre värden ger fler detaljer."
+      },
+      "cn_pose_resolution": {
+        "label": "Poseupplösning",
+        "description": "Styr upplösningen för ControlNet för pose. Högre värden ger fler detaljer."
+      },
+      "cn_softedge_resolution": {
+        "label": "SoftEdge-upplösning",
+        "description": "Styr upplösningen för ControlNet för SoftEdge. Högre värden ger fler detaljer."
+      },
+      "long_context_lora_strength": {
+        "label": "Lång kontext",
+        "description": "Styr styrkan på LoRA-anpassningen för lång kontext. Högre värden ger bättre kontextförståelse."
+      },
+      "highres_lora_strength": {
+        "label": "Hög upplösning",
+        "description": "Styr styrkan på LoRA-anpassningen för hög upplösning. Högre värden förbättrar detaljåtergivningen."
+      },
+      "style_lora": {
+        "label": "Välj en LoRA",
+        "description": "Välj en LoRA att tillämpa på genereringen."
+      },
+      "lora_strength": {
+        "label": "LoRA-vikt",
+        "description": "Styr LoRA:ns vikt i slutresultatet. Högre värden förstärker LoRA:ns påverkan på resultatet."
+      },
+      "enable_facemesh_blending": {
+        "label": "Facemesh",
+        "description": "Aktivera facemesh-blandning"
+      },
+      "color_match_strength": {
+        "label": "Styrka för färgmatchning",
+        "description": "Styr hur starkt färgerna från referensbildrutan påverkar resultatet. Högre värden bevarar mer av originalfärgerna, medan lägre värden ger utrymme för en mer kreativ färgtolkning."
+      }
+    },
+    "auto_prompt_unavailable": {
+      "label": "Automatisk prompt är inte tillgänglig för det här lagret."
+    },
+    "video_description_detailed_prompt": {
+      "label": "Detaljerad prompt för videobeskrivning"
+    },
+    "image_description_detailed_prompt": {
+      "label": "Detaljerad prompt för bildbeskrivning"
+    },
+    "use_auto_prompt": {
+      "label": "Använd automatisk prompt"
+    },
+    "regenerate_auto_prompt": {
+      "label": "Generera om"
+    },
+    "show_auto_prompt": {
+      "label": "Visa automatisk prompt"
+    },
+    "show_image_description": {
+      "label": "Visa bildbeskrivning"
+    },
+    "show_video_description": {
+      "label": "Visa videobeskrivning"
+    },
+    "add_to_prompt": {
+      "label": "Lägg till i prompten"
+    },
+    "prompt_placeholder": {
+      "label": "Skriv din prompt här"
+    },
+    "control_type": {
+      "depth": "Djup",
+      "pose": "Pose",
+      "pose_depth": "Pose+djup",
+      "normal_map": "Normalkarta (beta)",
+      "softedge": "SoftEdge (beta)"
+    }
+  },
+  "trackSettings": {
+    "chara_only": {
+      "label": "endast karaktär"
+    },
+    "with_background": {
+      "label": "m. bakgrund"
+    }
+  },
+  "range": {
+    "max_in_credits_mode": {
+      "description": "Maximal renderingslängd i kreditläget är {{maxCredits}} bildrutor"
+    },
+    "max_in_relaxed_mode": {
+      "description": "{{maxFrames}} bildrutor är det maximala intervallet i Relaxed mode"
+    },
+    "no_interpolation_min_range": {
+      "description": "{{minDefault}} bildrutor är det minsta intervallet"
+    },
+    "interpolation_min_range": {
+      "description": "{{minFrames}} bildrutor är det minsta intervallet"
+    },
+    "min_duration_seconds": {
+      "description": "Minsta renderingslängd för den här modellen är {{minSeconds}} sekunder"
+    },
+    "max_duration_seconds": {
+      "description": "Maximal renderingslängd för den här modellen är {{maxSeconds}} sekunder"
+    }
+  },
+  "presets": {
+    "modal": {
+      "title": {
+        "label": "Mago-förinställningar"
+      },
+      "subtitle": {
+        "label": "Om du inte vet var du ska börja kan du prova våra förinställningar"
+      }
+    }
+  },
+  "payment": {
+    "downgrade_confirmation": {
+      "description": "Din plan {{currentPlan}} avslutas men förblir aktiv till {{expirationDate}}. Därefter flyttas du automatiskt till planen {{targetPlan}}. Oanvända krediter förs över."
+    },
+    "unlimited": {
+      "label": "Unlimited"
+    },
+    "simultaneous_image_renders": {
+      "description": "Samtidiga bildrenderingar"
+    },
+    "buy_credits_to_generate_renders": {
+      "description": "Köp krediter för att generera renderingar"
+    },
+    "monthly_credits": {
+      "description": "Månadskrediter"
+    },
+    "per_month": {
+      "description": "per månad"
+    },
+    "relaxed_mode": {
+      "description": "Relaxed/Unlimited mode"
+    },
+    "relaxed_mode_cell": {
+      "description": "Relaxed mode"
+    },
+    "unlimited_mode_cell": {
+      "description": "Unlimited mode"
+    },
+    "relaxed_mode_cell_tooltip": {
+      "description": "Med Relaxed mode får du gratis renderingar med alla Mago-modeller"
+    },
+    "unlimited_mode_cell_tooltip": {
+      "description": "Med Unlimited mode får du gratis renderingar med alla Mago-modeller och API-modeller (Seedance, Kling m.fl.)"
+    },
+    "credit_mode": {
+      "description": "Kreditläge"
+    },
+    "custom": {
+      "description": "Anpassat"
+    },
+    "simultaneous_video_renders": {
+      "description": "Samtidiga videorenderingar"
+    },
+    "max_frames_in_a_single_run": {
+      "description": "Max. bildrutor per körning"
+    },
+    "frames_count": {
+      "description": "{{count}} bildrutor"
+    },
+    "relaxed_basic_month": {
+      "description": "Relaxed mode och {{count}} krediter i månaden"
+    },
+    "relaxed_pro_month": {
+      "description": "Relaxed mode och {{count}} krediter i månaden"
+    },
+    "custom_separate_infrastructure": {
+      "description": "Separat infrastruktur, anpassade modeller, dedikerad support"
+    },
+    "cost_details": {
+      "title": "Kostnadsdetaljer",
+      "description": "Krediter beräknas utifrån modeller, bildruteintervall, upplösning och steg."
+    },
+    "extra_credits": {
+      "title": "Behöver du fler krediter?"
+    },
+    "relaxed_mode_plan_tooltip": {
+      "description": "Begränsat till {{ frames }} bildrutor per rendering"
+    },
+    "basic_mounthly_tooltip": {
+      "description": "500 krediter ≈ 1 video (5 s, 720p, 24fps)\n500 krediter ≈ 3 bilder"
+    },
+    "pro_mounthly_tooltip": {
+      "description": "15000 krediter ≈ 25 videor (5 s, 720p, 24fps)\n15000 krediter ≈ 90 bilder"
+    },
+    "studio_month": {
+      "description": "{{count}} krediter per månad + tillgång till Relaxed mode"
+    },
+    "studio_monthly_tooltip": {
+      "description": "{{count}} krediter ingår varje månad"
+    },
+    "credit_mode_tooltip": {
+      "description": "Använder krediter. Starta så många samtidiga renderingar du vill, med en gräns på {{ frames }} bildrutor. Perfekt för snäva deadlines och slutliga produktionsrenderingar"
+    },
+    "faq_title": {
+      "title": "Vanliga frågor"
+    },
+    "credits_card_01": {
+      "videos": "8 videor (5 sekunder, 720p, 24fps)",
+      "images": "142 bilder",
+      "price": "0,25 € per sekund"
+    },
+    "credits_card_02": {
+      "videos": "24 videor (5 sekunder, 720p, 24fps)",
+      "images": "428 bilder",
+      "price": "0,23 € per sekund"
+    },
+    "credits_card_03": {
+      "videos": "72 videor (5 sekunder, 720p, 24fps)",
+      "images": "1285 bilder",
+      "price": "0,21 € per sekund"
+    },
+    "faq_disclosure_01": {
+      "title": "Vad är skillnaden mellan Relaxed mode, Unlimited mode och kreditläge?",
+      "paragraph_01": "Relaxed mode:\nObegränsad rendering med alla Mago-modeller, kräver inga krediter, begränsat till 200 bildrutor och två renderingar åt gången. Perfekt för experiment och projekt som inte är brådskande. Ingår i planen Pro.",
+      "paragraph_02": "Unlimited mode:\nObegränsad rendering med alla Mago-modeller och API-modeller (Seedance, Kling m.fl.), kräver inga krediter, begränsat till 300 bildrutor och tre renderingar åt gången. Perfekt för experiment och projekt som inte är brådskande. Ingår i planen Studio.",
+      "paragraph_03": "Kreditläge:\nAnvänder krediter. Starta så många samtidiga renderingar du vill, med en gräns på {{ count }} bildrutor. Perfekt för snäva deadlines och slutliga produktionsrenderingar. Ingår i alla planer."
+    },
+    "faq_disclosure_02": {
+      "title": "Hur många renderingar kan jag göra med mina krediter?",
+      "paragraph_01": "1 sekund resultat kostar runt 100 krediter, vilket betyder:\n– 10000 krediter räcker till 85 sekunder\n– 30000 krediter räcker till 250 sekunder\n– 90000 krediter räcker till 750 sekunder"
+    },
+    "faq_disclosure_03": {
+      "title": "Kan jag säga upp min prenumeration när som helst?",
+      "paragraph_01": "Du kan säga upp den när som helst. Prenumerationen upphör i slutet av din faktureringsperiod. Krediter som du har köpt eller vunnit i Discord-tävlingar finns kvar på ditt konto i två (2) år. Därefter upphör oanvända krediter att gälla."
+    },
+    "faq_disclosure_04": {
+      "title": "Jag har ett annat problem. Hur kontaktar jag support?",
+      "paragraph_01": "Du kan kontakta support genom att gå med i vår {{ discord }} eller skicka oss ett {{ email }} direkt."
+    },
+    "yearly_discount": "Årsvis ({{annualDiscount}} % rabatt)",
+    "monthly": "Månadsvis",
+    "pack_discount": {
+      "description": "–{{discount}} % paketrabatt"
+    },
+    "support": {
+      "description": "Support"
+    },
+    "support_free": {
+      "description": "Discord-community"
+    },
+    "support_studio": {
+      "description": "Privat kanal (Discord/Slack)"
+    },
+    "support_enterprise": {
+      "description": "Anpassat",
+      "subtitle": "(privat kanal, kundansvarig, SLA:er)"
+    },
+    "onboarding_session": {
+      "description": "Introduktionssession"
+    },
+    "team_training": {
+      "description": "Teamutbildning"
+    },
+    "dedicated_infrastructure": {
+      "description": "Dedikerad infrastruktur"
+    },
+    "custom_models": {
+      "description": "Anpassade modeller"
+    },
+    "custom_moderation_and_safeguards": {
+      "description": "Anpassad moderering och skyddsåtgärder"
+    }
+  },
+  "modals": {
+    "mobile_not_supported": {
+      "description": "Mago finns inte för mobilen än. För bästa upplevelse öppnar du det på en bärbar dator, stationär dator eller surfplatta.",
+      "confirm_desktop": "Fortsätt ändå"
+    }
+  },
+  "img2imgForms": {
+    "common": {
+      "drag_and_drop_stylized_frame": {
+        "label": "Dra och släpp stiliserad bildruta"
+      },
+      "input_frame_loading_error": {
+        "label": "Det gick inte att läsa in indatabildrutan. Prova att uppdatera sidan."
+      },
+      "iteration_on_frame": {
+        "label": "Iteration på bildruta {{frameNumber}}"
+      },
+      "iteration_on_file": {
+        "label": "Iteration på {{fileName}}"
+      },
+      "prompt": {
+        "label": "Prompt",
+        "tooltip": "Beskriv omvandlingen du vill tillämpa på bilden"
+      },
+      "negative_prompt": {
+        "label": "Negativ prompt",
+        "tooltip": "Beskriv vad du inte vill se i resultatet. Det kan vara specifika element som dyker upp i dina resultat och som du vill ta bort, eller allmänna kvalitetsbegrepp (låg upplösning, dålig anatomi)."
+      },
+      "image_style_reference": {
+        "label": "Stilreferensbild",
+        "tooltip": "Lägg till en bild och infoga den i scenen med prompten som vägledning",
+        "upload_text": "Dra och släpp eller klicka för att ladda upp en referens"
+      },
+      "seed": {
+        "label": "Seed"
+      },
+      "cfg": {
+        "label": "CFG"
+      },
+      "sections": {
+        "prompt_influence": {
+          "label": "Promptens inverkan"
+        },
+        "image_influence": {
+          "label": "Bildens inverkan"
+        },
+        "quality_settings": {
+          "label": "Kvalitetsinställningar"
+        },
+        "other": {
+          "label": "Övrigt"
+        }
+      },
+      "frame_type": {
+        "from_video": {
+          "label": "Från video"
+        },
+        "image_upload": {
+          "label": "Bilduppladdning"
+        }
+      },
+      "tabs": {
+        "basic": {
+          "label": "Grundläggande"
+        },
+        "advanced": {
+          "label": "Avancerat"
+        },
+        "controlnets": {
+          "label": "ControlNets"
+        }
+      }
+    },
+    "nanobanana_pro": {
+      "prompt": {
+        "tooltip": "Ge instruktioner som om du pratade med en konstnär. Till exempel: ändra vädret till regn och ta bort karaktären"
+      },
+      "image_style_reference": {
+        "description": "Du kan använda upp till nio bilder för att ge mer sammanhang för stilen"
+      }
+    },
+    "nanobanana_2": {
+      "prompt": {
+        "tooltip": "Ge instruktioner som om du pratade med en konstnär. Till exempel: ändra vädret till regn och ta bort karaktären"
+      },
+      "resolution": {
+        "label": "Upplösning",
+        "tooltip": "Välj upplösning för resultatet. Högre upplösningar kostar fler krediter"
+      }
+    },
+    "gpt_image_2": {
+      "prompt": {
+        "tooltip": "Beskriv ändringen du vill göra. Du kan lämna fältet tomt för att bara använda referenser och mask."
+      },
+      "quality": {
+        "label": "Kvalitet",
+        "tooltip": "Resultatet är 2K. Kvalitetsinställningarna ändrar inte storleken men påverkar detaljnivån i resultatet. Välj Hög om du behöver exakta detaljer (till exempel liten text)."
+      },
+      "mask_image": {
+        "label": "Maskbild",
+        "tooltip": "Lägg till din bildruta med området du vill redigera målat i svart. Den används som maskreferens.",
+        "upload_text": "Dra och släpp eller klicka för att ladda upp en mask"
+      }
+    },
+    "draw_mask": {
+      "create": "Lägg till mask",
+      "edit": "Redigera mask",
+      "add": "Lägg till mask",
+      "hint": "Tryck och dra markören för att börja rita",
+      "draw": "Rita",
+      "erase": "Sudda",
+      "clear_all": "Rensa allt",
+      "brush_size": "Penselstorlek",
+      "cancel": "Avbryt och stäng",
+      "save": "Spara",
+      "back_to_masked_frame": "Tillbaka till maskerad bildruta",
+      "delete": "Ta bort mask",
+      "frame_mismatch_warning": "Masken ritades på en annan bildruta. Det maskerade området kanske inte matchar den aktuella bildrutan. Överväg att återställa och rita om.",
+      "save_mask_to_continue": "Spara masken för att fortsätta",
+      "red_area_tip": "Tips: skriv ”i det röda området” i din prompt."
+    },
+    "qwen": {
+      "prompt": {
+        "tooltip": "Ge direkta instruktioner som om du pratade med en konstnär. Till exempel: ändra vädret till regn och ta bort karaktären"
+      },
+      "image_style_reference": {
+        "description": "Du kan använda upp till nio bilder för att ge mer sammanhang för stilen"
+      }
+    },
+    "seedream_5_pro": {
+      "prompt": {
+        "tooltip": "Ge instruktioner som om du pratade med en konstnär. Till exempel: ändra vädret till regn och ta bort karaktären"
+      },
+      "image_style_reference": {
+        "description": "Du kan använda upp till nio bilder för att ge mer sammanhang för stilen"
+      }
+    }
+  },
+  "auth": {
+    "email_placeholder": {
+      "label": "Ange din e-postadress"
+    },
+    "signin_title": {
+      "label": "Logga in på Mago Studio"
+    },
+    "signup_title": {
+      "label": "Registrera dig för Mago Studio"
+    }
+  },
+  "masking": {
+    "mask_mode_prompt": {
+      "label": "Prompt",
+      "placeholder": "t.ex. ”Person”"
+    },
+    "mask_mode_visual_selection": {
+      "label": "Punkter"
+    },
+    "mask_mode_prompt_and_visual_selection": {
+      "label": "Prompt+punkter",
+      "placeholder": "Komplettera dina punkter med prompten"
+    },
+    "mask_mode": {
+      "tooltip": "Skapa en mask med en prompt eller segment. Använd prompter för att välja alla personer i en bildruta. Om du vill välja en viss person använder du Visuellt val eller beskriver personen exakt, till exempel: person till vänster i gul tröja. Om inget annat fungerar kan du prova Prompt + punkter"
+    },
+    "prompt_required": {
+      "label": "Ange en maskeringsprompt"
+    },
+    "generate_disabled_add_prompt": {
+      "label": "Lägg till prompt"
+    },
+    "generate_disabled_add_points": {
+      "label": "Lägg till punkter"
+    },
+    "generate_disabled_add_prompt_and_points": {
+      "label": "Lägg till punkter och prompt"
+    },
+    "sam_frame_not_in_range": {
+      "description": "Punkternas bildruta ligger utanför renderingsintervallet. Justera intervallet eller placera nya punkter."
+    },
+    "mask_tab": {
+      "info_hint": {
+        "description": "Skapa en mask med en prompt eller segment. Använd prompter för att välja alla personer i en bildruta. Om du vill välja en viss person använder du Visuellt val eller beskriver personen exakt, till exempel: ”person till vänster i gul tröja”."
+      },
+      "mode_switcher": {
+        "tooltip": "Prompt: beskriv området som ska maskeras med vanligt språk. Visuellt val: klicka i bildrutan för att placera punkter som markerar området som ska tas med eller uteslutas."
+      }
+    },
+    "visual_selection": {
+      "instruction": {
+        "label": "Klicka i bildrutan för att välja ett område för masken"
+      },
+      "add_point": {
+        "label": "Lägg till"
+      },
+      "remove_point": {
+        "label": "Ta bort"
+      },
+      "clear_all": {
+        "label": "Rensa alla"
+      },
+      "help_text": {
+        "description": "Välj + för att lägga till områden i objektet och - för att ta bort områden från objektet. Klicka på en befintlig punkt för att ta bort den."
+      },
+      "loading_model": {
+        "label": "Läser in segmenteringsmodell..."
+      },
+      "computing_embedding": {
+        "label": "Bearbetar bild..."
+      },
+      "no_input_track": {
+        "label": "Välj en indatavideo först"
+      },
+      "enlarge": {
+        "label": "Förstora"
+      },
+      "loading_error": {
+        "label": "Det gick inte att läsa in segmenteringsmodellen. Uppdatera sidan."
+      },
+      "points_required": {
+        "label": "Placera minst en punkt i bildrutan"
+      },
+      "open_mask_editor": {
+        "label": "Öppna maskredigeraren"
+      },
+      "editor_empty_state": {
+        "label": "Klicka för att börja skapa"
+      },
+      "editor_hint": {
+        "label": "Klicka på ”Lägg till” och välj områden och objekt som ska ingå i masken. Klicka på ”Ta bort” och välj områden och objekt som ska uteslutas ur masken. Klicka på en befintlig punkt för att ta bort den."
+      }
+    },
+    "frame_warning_toast": {
+      "title": {
+        "label": "Din nuvarande mask gäller inte för den här bildrutan. Du kan skapa en ny"
+      },
+      "start_new": {
+        "label": "Skapa en ny mask"
+      },
+      "undo": {
+        "label": "Ångra ändringar av bildruta"
+      }
+    }
+  },
+  "projectTimeline": {
+    "play": {
+      "label": "Spela upp"
+    },
+    "pause": {
+      "label": "Pausa"
+    },
+    "sourceVideoTrack": {
+      "label": "Källvideo"
+    },
+    "pinnedTrack": {
+      "label": "Fäst rendering"
+    },
+    "emptyState": {
+      "label": "Inga shots i det här projektet"
+    },
+    "zoomIn": {
+      "label": "Zooma in"
+    },
+    "zoomOut": {
+      "label": "Zooma ut"
+    },
+    "imageToVideo": {
+      "modalTitle": {
+        "label": "Generera med AI"
+      },
+      "prototypeWarning": {
+        "label": "Det här är en prototypfunktion och den kan vara instabil."
+      },
+      "generationsTitle": {
+        "label": "Genereringar"
+      },
+      "emptyState": {
+        "label": "Inga genereringar än"
+      },
+      "generateButton": {
+        "label": "Generera"
+      },
+      "useAsInputVideo": {
+        "label": "Använd som indatavideo för ett shot"
+      },
+      "downloadFailed": {
+        "label": "Det gick inte att ladda ned videon. Försök igen."
+      },
+      "reuseSettings": {
+        "label": "Återanvänd inställningar"
+      },
+      "engineTier": {
+        "ariaLabel": "Genereringskvalitet",
+        "standard": {
+          "label": "Standard"
+        },
+        "fast": {
+          "label": "Snabb"
+        },
+        "comparison": {
+          "title": {
+            "label": "Standard jämfört med Snabb (krediter/sekund)"
+          },
+          "ariaLabel": "Jämförelse av Standard och Snabb",
+          "resolutionColumn": {
+            "label": "Upplösning"
+          },
+          "creditsPerSecond": {
+            "label": "{{credits}}/s"
+          },
+          "unavailable": {
+            "label": "—"
+          }
+        }
+      },
+      "disabledReason": {
+        "missingProject": {
+          "label": "Välj ett projekt för att generera en video."
+        }
+      }
+    }
+  },
+  "crop": {
+    "mask_crop_mismatch": {
+      "description": "Den valda masken skapades med en annan beskärning. Justera beskärningen eller använd en matchande mask för att fortsätta."
+    },
+    "image_source_crop_mismatch": {
+      "description": "Referensbildrutan skapades med en annan beskärning. Du behöver göra om bildrutan."
+    },
+    "missing_input_dimensions": {
+      "description": "Videons dimensioner är okända, så beskärningen kan inte tillämpas. Prova att läsa in källvideon igen."
+    },
+    "key_frame_not_cropped_warning": {
+      "description": "Din referensbildruta är inte beskuren, så hela bildrutan visas i stället för bara det beskurna området."
+    }
+  },
+  "inpainting": {
+    "basic": {
+      "edit_first_frame": {
+        "label": "Redigera första bildrutan här",
+        "empty_caption": "Börja med att redigera eller ladda upp din första bildruta",
+        "edit_button": {
+          "label": "Redigera"
+        },
+        "upload_button": {
+          "label": "Ladda upp"
+        }
+      },
+      "mask_input": {
+        "label": "Masken visas här",
+        "empty_caption": "Skapa en mask för att ange området som ska redigeras",
+        "create_mask_button": {
+          "label": "Skapa mask"
+        },
+        "change_mask_button": {
+          "label": "Ändra mask"
+        }
+      },
+      "prompt": {
+        "placeholder": "Förtydliga dina ändringar med en prompt"
+      }
+    },
+    "modify_frame": {
+      "frame_pill": {
+        "label": "Bildruta {{frame}}"
+      },
+      "edit_key_frame": {
+        "label": "Redigera nyckelbildruta {{frame}}"
+      },
+      "upload_failed": {
+        "description": "Uppladdningen misslyckades på vår sida. Försök igen."
+      }
+    },
+    "generate_disabled": {
+      "missing_image": {
+        "label": "Lägg till en referensbild"
+      },
+      "missing_mask": {
+        "label": "Beskriv eller skapa en mask för att börja generera"
+      },
+      "missing_both": {
+        "label": "Lägg till en referensbild och beskriv eller skapa en mask"
+      }
+    },
+    "use_this_mask": {
+      "label": "Använd den här"
+    },
+    "mask_range_error": {
+      "pill_short": {
+        "label": "Intervallfel {{from}}—{{to}}",
+        "prefix": "Intervallfel",
+        "range": "{{from}}—{{to}}"
+      },
+      "not_in_range": {
+        "timeline_pill": "Masken ligger inte inom intervallet",
+        "description": "Masken ligger inte inom intervallet. Anpassa intervallet efter masken, eller skapa en mask för hela klippet"
+      },
+      "shorter_than_range": {
+        "timeline_pill": "Masken är kortare än intervallet",
+        "description": "Masken är kortare än intervallet. Anpassa intervallet efter masken, eller skapa en mask för hela klippet"
+      }
+    }
+  },
+  "plan": {
+    "title": {
+      "label": "Batchplaner"
+    },
+    "create": {
+      "label": "Skapa plan"
+    },
+    "name_placeholder": {
+      "label": "Planens namn (valfritt)"
+    },
+    "timeline_selection": {
+      "label": "Välj shots (tidslinjer)"
+    },
+    "shot_picker_title": {
+      "label": "Välj shots"
+    },
+    "shot_picker_done": {
+      "label": "Klar"
+    },
+    "select_shots": {
+      "label": "Välj shots"
+    },
+    "shots_selected": {
+      "label": "{{count}} shots valda"
+    },
+    "no_timelines": {
+      "label": "Inga tidslinjer i det här projektet"
+    },
+    "open_modal": {
+      "label": "Agentplan"
+    },
+    "select_all": {
+      "label": "Markera alla"
+    },
+    "clear_selection": {
+      "label": "Rensa"
+    },
+    "selected_count": {
+      "label": "{{selected}} / {{total}} valda"
+    },
+    "render_full_shots": {
+      "label": "Rendera hela shots"
+    },
+    "render_full_shots_hint": {
+      "label": "Renderar varje shots hela längd. Kostnaden uppskattas utifrån kända shotlängder."
+    },
+    "frame_range": {
+      "label": "Bildruteintervall"
+    },
+    "frame_range_start": {
+      "label": "Start"
+    },
+    "frame_range_end": {
+      "label": "Slut"
+    },
+    "frame_range_invalid": {
+      "label": "Start måste vara mindre än slut"
+    },
+    "img2img_settings": {
+      "label": "Bildinställningar"
+    },
+    "video_settings": {
+      "label": "Videoinställningar"
+    },
+    "prompt": {
+      "label": "Stilprompt"
+    },
+    "prompt_placeholder": {
+      "label": "t.ex. animestil, livfulla färger"
+    },
+    "prompt_required": {
+      "label": "Prompt krävs"
+    },
+    "negative_prompt": {
+      "label": "Negativ prompt"
+    },
+    "render_model": {
+      "label": "Renderingsmodell"
+    },
+    "render_mode": {
+      "label": "Renderingsläge"
+    },
+    "strength": {
+      "label": "Styrka"
+    },
+    "frame": {
+      "label": "Bildruta"
+    },
+    "img_file_type": {
+      "label": "Bildformat"
+    },
+    "engine": {
+      "label": "Motor"
+    },
+    "control_type": {
+      "label": "Kontrolltyp"
+    },
+    "steps": {
+      "label": "Steg"
+    },
+    "cfg": {
+      "label": "CFG-skala"
+    },
+    "seed": {
+      "label": "Seed"
+    },
+    "max_size": {
+      "label": "Maxstorlek"
+    },
+    "submit": {
+      "label": "Starta batch"
+    },
+    "cancel": {
+      "label": "Avbryt plan"
+    },
+    "resume": {
+      "label": "Återuppta plan"
+    },
+    "back_to_list": {
+      "label": "Tillbaka till planer"
+    },
+    "no_plans": {
+      "label": "Inga batchplaner än. Skapa en för att komma igång."
+    },
+    "plan_created": {
+      "label": "Batchplanen har skapats"
+    },
+    "plan_cancelled": {
+      "label": "Planen avbröts"
+    },
+    "plan_resumed": {
+      "label": "Planen återupptogs"
+    },
+    "error_details": {
+      "label": "Felinformation"
+    },
+    "timelines_count": {
+      "label": "{{count}} shots"
+    },
+    "timelines_count_index": {
+      "label": "Shot {{index}}"
+    },
+    "progress": {
+      "label": "{{completed}} / {{total}} steg ({{percentage}} %)"
+    },
+    "progress_timelines": {
+      "label": "{{completed}} / {{total}} shots ({{percentage}} %)"
+    },
+    "progress_pct": {
+      "label": "{{percentage}} %"
+    },
+    "progress_steps": {
+      "label": "{{completed}} / {{total}} uppgifter"
+    },
+    "summary_title": {
+      "label": "Kvalitetssammanfattning"
+    },
+    "summary_runs": {
+      "label": "{{passed}}/{{total}} lyckade körningar ({{rate}} %)"
+    },
+    "summary_img": {
+      "label": "Bild: {{passed}} godkända · {{failed}} underkända · snitt {{score}}"
+    },
+    "summary_vid": {
+      "label": "Video: {{passed}} godkända · {{failed}} underkända · snitt {{score}}"
+    },
+    "summary_attention": {
+      "label": "{{count}} behöver åtgärdas"
+    },
+    "summary_shot_img_score": {
+      "label": "bild {{score}}"
+    },
+    "summary_shot_vid_score": {
+      "label": "video {{score}}"
+    },
+    "summary_weakest": {
+      "label": "svagast: {{dim}}"
+    },
+    "summary_issues": {
+      "label": "problem: {{issues}}"
+    },
+    "attention_reason": {
+      "img_all_failed": {
+        "label": "Bilden misslyckades i alla försök"
+      },
+      "vid_never_passed": {
+        "label": "Videon blev aldrig godkänd"
+      },
+      "vid_not_evaluated": {
+        "label": "Videon har inte utvärderats"
+      },
+      "borderline_pass": {
+        "label": "Godkänd med knapp marginal"
+      },
+      "max_retries_used": {
+        "label": "Max antal omförsök använda"
+      },
+      "not_evaluated": {
+        "label": "Inte utvärderad"
+      }
+    },
+    "cancel_confirm": {
+      "label": "Vill du verkligen avbryta den här planen?"
+    },
+    "cancel_confirm_yes": {
+      "label": "Ja, avbryt"
+    },
+    "cancel_confirm_no": {
+      "label": "Nej, fortsätt köra"
+    },
+    "filter_all": {
+      "label": "Alla"
+    },
+    "filter_running": {
+      "label": "Körs"
+    },
+    "filter_completed": {
+      "label": "Slutförda"
+    },
+    "filter_failed": {
+      "label": "Misslyckade"
+    },
+    "filter_cancelled": {
+      "label": "Avbrutna"
+    },
+    "status": {
+      "PENDING": {
+        "label": "Väntar"
+      },
+      "RUNNING": {
+        "label": "Körs"
+      },
+      "PAUSED": {
+        "label": "Pausad"
+      },
+      "COMPLETED": {
+        "label": "Slutförd"
+      },
+      "FAILED": {
+        "label": "Misslyckades"
+      },
+      "CANCELLED": {
+        "label": "Avbruten"
+      }
+    },
+    "step_tool": {
+      "get_timeline_info": {
+        "label": "Hämta tidslinjeinfo"
+      },
+      "get_project_info": {
+        "label": "Hämta projektinfo"
+      },
+      "adapt_prompt_img": {
+        "label": "Anpassar prompten"
+      },
+      "submit_img2img": {
+        "label": "Skicka bildstilisering"
+      },
+      "poll_img2img": {
+        "label": "Stiliserar bildrutan"
+      },
+      "submit_img_metrics": {
+        "label": "Skicka bildmätvärden"
+      },
+      "poll_img_metrics": {
+        "label": "Kontrollerar bildkvaliteten"
+      },
+      "img_quality_gate": {
+        "label": "Kvalitetsspärr för bild"
+      },
+      "poll_img_retry": {
+        "label": "Renderar om bilden (kvalitet)"
+      },
+      "img_quality_final": {
+        "label": "Slutlig bildkvalitet"
+      },
+      "create_render_layer": {
+        "label": "Skapa renderingslager"
+      },
+      "submit_video_render": {
+        "label": "Skicka videorendering"
+      },
+      "poll_video_render": {
+        "label": "Renderar video"
+      },
+      "submit_vid_metrics": {
+        "label": "Skicka videomätvärden"
+      },
+      "poll_vid_metrics": {
+        "label": "Kontrollerar videokvaliteten"
+      },
+      "vid_quality_gate": {
+        "label": "Kvalitetsspärr för video"
+      },
+      "poll_vid_retry": {
+        "label": "Renderar om videon (kvalitet)"
+      },
+      "poll_prev_shot_complete": {
+        "label": "Väntar på föregående shot"
+      },
+      "submit_pick_keyframes": {
+        "label": "Väljer referensbildruta"
+      },
+      "poll_pick_keyframes": {
+        "label": "Väljer referensbildruta"
+      },
+      "use_provided_reference_frame": {
+        "label": "Använder uppladdad referensbild"
+      },
+      "shot_context": {
+        "label": "Läser shotet"
+      },
+      "adapt_prompt_i2v": {
+        "label": "Anpassar prompten"
+      },
+      "submit_shot_video_prompt": {
+        "label": "Skriver prompten för shotet"
+      },
+      "poll_shot_video_prompt": {
+        "label": "Väntar på prompten för shotet"
+      },
+      "submit_stitch_refs": {
+        "label": "Kombinerar referenser"
+      },
+      "poll_stitch_refs": {
+        "label": "Kombinerar referenser"
+      },
+      "submit_img2img_batch": {
+        "label": "Skicka referensbilder"
+      },
+      "poll_img2img_batch": {
+        "label": "Renderar referensbilder"
+      },
+      "submit_img_metrics_batch": {
+        "label": "Skicka bildbedömning"
+      },
+      "poll_img_metrics_batch": {
+        "label": "Bedömer referensbilder"
+      },
+      "submit_script_casting": {
+        "label": "Läser manuset"
+      },
+      "poll_script_casting": {
+        "label": "Rollbesätter manuset"
+      },
+      "plan_scenario_shots": {
+        "label": "Planerar shotsen"
+      },
+      "spawn_scenario_child": {
+        "label": "Startar renderingen av shotsen"
+      },
+      "poll_scenario_child": {
+        "label": "Renderar shotsen"
+      },
+      "create_project": {
+        "label": "Skapa projekt"
+      },
+      "create_shot": {
+        "label": "Skapa shot"
+      },
+      "materialise_project_state": {
+        "label": "Förbereder projektet"
+      },
+      "shot_video_source": {
+        "label": "Läser källvideon"
+      },
+      "submit_stitch_sheets": {
+        "label": "Kombinerar referensark"
+      },
+      "poll_stitch_sheets": {
+        "label": "Kombinerar referensark"
+      },
+      "batch_complete_gate": {
+        "label": "Spärr för referensbilder"
+      },
+      "poll_prev_step_complete": {
+        "label": "Väntar på föregående steg"
+      },
+      "run_summary": {
+        "label": "Sammanfattar körningen"
+      }
+    },
+    "step_result": {
+      "label": "Resultat"
+    },
+    "step_args": {
+      "label": "Argument"
+    },
+    "estimated_cost": {
+      "label": "Uppskattad kostnad"
+    },
+    "cost_img2img": {
+      "label": "Bild"
+    },
+    "cost_video": {
+      "label": "Video"
+    },
+    "confirm_start": {
+      "label": "Det här kostar ~{{cost}} krediter för {{count}} shots. Vill du starta?"
+    },
+    "confirm_start_yes": {
+      "label": "Starta"
+    },
+    "confirm_start_no": {
+      "label": "Avbryt"
+    },
+    "started_at": {
+      "label": "Startad"
+    },
+    "finished_at": {
+      "label": "Avslutad"
+    },
+    "retries": {
+      "label": "Omförsök"
+    },
+    "step_status": {
+      "PENDING": {
+        "label": "Väntar"
+      },
+      "RUNNING": {
+        "label": "Körs"
+      },
+      "COMPLETED": {
+        "label": "Klar"
+      },
+      "FAILED": {
+        "label": "Misslyckades"
+      },
+      "SKIPPED": {
+        "label": "Hoppades över"
+      }
+    },
+    "untitled": {
+      "label": "Namnlös plan"
+    },
+    "debug_view": {
+      "label": "Felsökningsvy"
+    },
+    "no_shots": {
+      "label": "Inga shots än"
+    },
+    "collapse": {
+      "label": "Fäll ihop shot"
+    },
+    "expand": {
+      "label": "Fäll ut shot"
+    },
+    "phase": {
+      "img2img": {
+        "label": "Stilisera bildruta"
+      },
+      "video": {
+        "label": "Rendera video"
+      },
+      "input_frame": {
+        "label": "Indata"
+      },
+      "result": {
+        "label": "Resultat"
+      },
+      "references": {
+        "label": "Referenser"
+      },
+      "waiting_prev": {
+        "label": "Väntar på föregående shot…"
+      },
+      "prev_failed": {
+        "label": "Föregående shot misslyckades – det här shotet är blockerat"
+      },
+      "keyframe_handoff": {
+        "label": "Referens för nästa shot"
+      }
+    },
+    "metric": {
+      "pass": {
+        "label": "Godkänd"
+      },
+      "fail": {
+        "label": "Underkänd"
+      },
+      "unscored": {
+        "label": "Ej bedömd"
+      },
+      "details": {
+        "label": "Kvalitetsdetaljer"
+      }
+    },
+    "timeline_summary": {
+      "running": {
+        "label": "Körs"
+      },
+      "failed": {
+        "label": "Misslyckades"
+      },
+      "done": {
+        "label": "Klar"
+      },
+      "pending": {
+        "label": "Väntar"
+      }
+    },
+    "step_result_image_alt": {
+      "label": "Stegresultat"
+    },
+    "include_video": {
+      "label": "Inkludera videorendering"
+    },
+    "skip_polling_img2img": {
+      "label": "Hoppa över avläsning (fire-and-forget)"
+    },
+    "skip_polling_video": {
+      "label": "Hoppa över videoavläsning (fire-and-forget)"
+    },
+    "skip_polling_disabled_hint": {
+      "label": "Det går inte att hoppa över img2img-avläsning när video är aktiverat"
+    },
+    "skip_metrics": {
+      "label": "Hoppa över utvärdering av mätvärden"
+    },
+    "use_adapt_prompt": {
+      "label": "Anpassa prompten till scenen (Gemini)"
+    },
+    "sequential_shots": {
+      "label": "Sekventiella shots (konsekvens mellan shots)"
+    },
+    "sequential_shots_hint": {
+      "label": "Renderar shots ett i taget i vald ordning och utgår för varje shot från föregående shots nyckelbildruta/-or."
+    },
+    "sequential_shots_disabled_hint": {
+      "label": "Aktivera videorendering för att använda sekventiella shots."
+    },
+    "label_style_refs": {
+      "label": "Märk stilreferenser (STYLE REF)"
+    },
+    "label_cross_shot_refs": {
+      "label": "Märk referenser mellan shots (PREV SHOT)"
+    },
+    "cross_shot_prompt_suffix": {
+      "label": "Promptsuffix för PREV SHOT"
+    },
+    "cross_shot_prompt_suffix_placeholder": {
+      "label": "Serverns standard (lämna tomt)"
+    },
+    "cross_shot_metrics": {
+      "label": "Bedöm konsekvens mellan shots (VLM-domare)"
+    },
+    "keyframe_num_candidates": {
+      "label": "Kandidater för nyckelbildrutor per shot"
+    },
+    "keyframe_num_select": {
+      "label": "Valda nyckelbildrutor per shot"
+    },
+    "img2img_quality_retries": {
+      "label": "Kvalitetsomförsök för img2img (0–5)"
+    },
+    "video_quality_retries": {
+      "label": "Kvalitetsomförsök för video (0–5)"
+    },
+    "video_quality_retries_unsupported_hint": {
+      "label": "Den här motorn renderar i ett svep – kvalitetsomförsök är inte tillgängliga."
+    },
+    "video_only_engine_hint": {
+      "label": "Den här motorn renderar direkt från källvideon – ingen referensbild behövs."
+    },
+    "reuse_settings": {
+      "label": "Återanvänd inställningar"
+    },
+    "reuse_failed": {
+      "label": "Det gick inte att läsa in planens inställningar"
+    },
+    "reuse_img2img_failed": {
+      "label": "Img2img-inställningarna kunde inte återställas"
+    },
+    "reuse_img2img_model_changed": {
+      "label": "Img2img-modellen återställdes – den ursprungliga modellen är inte längre tillgänglig"
+    },
+    "reuse_video_engine_excluded": {
+      "label": "Videomotorn återställdes – den ursprungliga motorn är inte tillgänglig för planer"
+    },
+    "reuse_shot_images_failed": {
+      "label": "Bildtilldelningarna för shotsen kunde inte återställas"
+    },
+    "shot_images": {
+      "title": {
+        "label": "Shotbilder"
+      },
+      "hint": {
+        "label": "Ladda upp egna referensbilder så tilldelas de automatiskt till shots vars namn matchar början av filnamnet (t.ex. \"shot_1_v2.jpg\" för ett shot som heter \"shot_1\"). Tilldelade shots hoppar över img2img och använder bilden direkt som referensbildruta för videon."
+      },
+      "upload_zone": {
+        "label": "Ladda upp shotbilder",
+        "description": "Släpp bilder här eller klicka för att bläddra"
+      },
+      "upload_failed": {
+        "description": "Uppladdningen misslyckades. Försök igen."
+      },
+      "status_matched": {
+        "label": "Matchad"
+      },
+      "status_needs_review": {
+        "label": "Behöver granskas"
+      },
+      "status_unmatched": {
+        "label": "Ingen bild"
+      },
+      "no_image_option": {
+        "label": "Ingen bild"
+      },
+      "unmatched_notice": {
+        "label": "De här uppladdade bilderna matchade inget valt shot: {{fileNames}}"
+      }
+    }
+  },
+  "longForm": {
+    "scriptPlaceholder": {
+      "label": "Klistra in ditt manus här"
+    },
+    "submit": {
+      "label": "Generera"
+    },
+    "submitFailed": {
+      "label": "Det gick inte att starta körningen. Försök igen."
+    },
+    "cancel": {
+      "label": "Avbryt körning"
+    },
+    "emptyState": {
+      "label": "Dina videor visas här när de har genererats",
+      "failed": {
+        "label": "Körningen misslyckades och inga videor genererades."
+      }
+    },
+    "phase": {
+      "readingScript": {
+        "label": "Läser manuset"
+      },
+      "planningShots": {
+        "label": "Planerar shotsen"
+      },
+      "drawingCastAndSets": {
+        "label": "Tecknar rollbesättning och miljöer"
+      },
+      "preparingReferences": {
+        "label": "Förbereder referenser"
+      },
+      "renderingShots": {
+        "label": "Renderar shotsen"
+      }
+    },
+    "outcome": {
+      "completed": {
+        "label": "Körningen är klar"
+      },
+      "failed": {
+        "label": "Körningen misslyckades"
+      }
+    },
+    "shotState": {
+      "notStarted": {
+        "label": "Inte startad"
+      },
+      "rendering": {
+        "label": "Renderar"
+      },
+      "failed": {
+        "label": "Inget har genererats"
+      }
+    },
+    "downloadPending": {
+      "label": "Alla shots måste renderas klart först."
+    },
+    "downloadAll": {
+      "label": "Ladda ned alla videor",
+      "started": {
+        "label": "Förbereder nedladdningen..."
+      },
+      "succeeded": {
+        "label": "Nedladdningen är klar"
+      },
+      "failed": {
+        "label": "Det gick inte att ladda ned några shots"
+      },
+      "partial": {
+        "label": "Vissa shots kunde inte tas med i nedladdningen"
+      },
+      "nothingGenerated": {
+        "label": "Inga shots genererades, så det finns inget att ladda ned."
+      }
+    },
+    "downloadEdit": {
+      "label": "Ladda ned som en video",
+      "started": {
+        "label": "Förbereder nedladdningen..."
+      },
+      "succeeded": {
+        "label": "Nedladdningen är klar"
+      },
+      "failed": {
+        "label": "Det gick inte att ladda ned videon"
+      },
+      "notJoinable": {
+        "label": "De här shotsen kan inte sättas ihop till en video. Använd Ladda ned alla videor i stället."
+      },
+      "requiresEveryShot": {
+        "label": "Det här kräver att alla shots har renderats utan fel. Använd Ladda ned alla videor i stället."
+      }
+    }
+  },
+  "signInGate": {
+    "skip": "Hoppa över"
+  },
+  "cloudUnreachable": {
+    "retry": "Försök igen",
+    "offlineIsFine": "Du kan arbeta offline – ditt bibliotek och dina projekt finns på den här datorn och är fortfarande helt tillgängliga.",
+    "continueOffline": "Arbeta offline"
+  },
+  "restartScenario": {
+    "label": "Starta om scenariot"
+  },
+  "project_origin": {
+    "ariaLabel": "Projektets ursprung: moln"
+  },
+  "runLocally": {
+    "title": "Kör Mago lokalt gratis",
+    "description": "Rendera på ditt eget grafikkort i stället för att använda krediter. Mago installerar en egen ComfyUI-motor och en startuppsättning modeller, och dina projekt stannar på den här datorn.",
+    "start": "Konfigurera lokal rendering"
+  },
+  "localSetupBlocked": {
+    "title": "Din lokala installation pågår fortfarande",
+    "keepWaiting": "Fortsätt vänta",
+    "connectCloud": "Anslut Mago Cloud",
+    "description": "Modellerna för lokal rendering laddas fortfarande ned, så den här renderingen kan inte köras på ditt grafikkort än. Du kan ansluta molnversionen och rendera där under tiden."
+  },
+  "authPage": {
+    "continueOffline": "Hoppa över och fortsätt offline"
+  }
+}

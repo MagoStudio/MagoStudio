@@ -2,6 +2,7 @@
 
 import { CloudReadyBoundary } from "@app/components/CloudReady/CloudReadyBoundary";
 import { ComfyLaunchDialogHost } from "@app/components/ComfyLaunchDialog/ComfyLaunchDialogHost";
+import { DocumentLanguageSync } from "@app/components/DocumentLanguageSync";
 import { LibraryHealth } from "@app/components/LibraryHealth";
 import { LocalSetupInProgressDialog } from "@app/components/LocalSetupWizard/LocalSetupInProgressDialog";
 import { LocalSetupWizardHost } from "@app/components/LocalSetupWizard/LocalSetupWizardHost";
@@ -44,6 +45,7 @@ export default function Providers({
   const content = (
     <QueryClientProvider client={queryClient}>
       <I18nextProvider i18n={i18n}>
+        <DocumentLanguageSync />
         <LibraryHealth>
           <SignInGateBoundary>
             <MaintenanceGuard>{children}</MaintenanceGuard>
