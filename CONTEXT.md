@@ -26,7 +26,7 @@ It is not a usable cloud project, so it must never appear on a dashboard. Never 
 
 ### Automatic Project Naming
 
-New projects start with the default name `Untitled` (or `Untitled_NN` when taken — `generateUntitledName`). On the **first** video uploaded into a project whose name is still that default **and** which has no video yet, the project is auto-renamed to the first 10 characters of the video's filename with the extension stripped (`AUTO_PROJECT_NAME_LENGTH`), e.g. This keeps project names distinctive and discourages a "one project = one video" mental model. The decision is a pure function (`resolveAutoProjectName`); the shared `useAutoNameProjectFromVideo` hook applies it across both upload hooks (single-video `useCreateProjectAndUploadVideo` and multi-file `useBulkUpload` — first file), renaming via `useUpdateProject` in a non-blocking try/catch. It never overrides a user-chosen name, never re-triggers once the project has content, sets the name as-is (no de-duplication), and is **skipped during onboarding** (`useIsOnboardingActive`) so onboarding's `Onboarding`/`Onboarding_N` resume-by-name is preserved.
+New projects start with the default name `Untitled` (or `Untitled_NN` when taken — `generateUntitledName`). On the **first** video uploaded into a project whose name is still that default **and** which has no video yet, the project is auto-renamed to the first 10 characters of the video's filename with the extension stripped (`AUTO_PROJECT_NAME_LENGTH`). This keeps project names distinctive and discourages a "one project = one video" mental model. The decision is a pure function (`resolveAutoProjectName`); the shared `useAutoNameProjectFromVideo` hook applies it across both upload hooks (single-video `useCreateProjectAndUploadVideo` and multi-file `useBulkUpload` — first file), renaming via `useUpdateProject` in a non-blocking try/catch. It never overrides a user-chosen name, never re-triggers once the project has content, sets the name as-is (no de-duplication), and is **skipped during onboarding** (`useIsOnboardingActive`) so onboarding's `Onboarding`/`Onboarding_N` resume-by-name is preserved.
 
 ### Shot
 
@@ -154,7 +154,7 @@ Every clip lives in two coordinate spaces: **source frames** (indices into the u
 
 - `getTimelineOffset(track)` — the offset accessor (`?? 0`).
 - `toOutputFrame({ sourceFrame, offset })` — `Math.max(0, sourceFrame - offset)`. **Clamped at 0**: an output frame index can't be negative, so a source frame before the range start (reachable via the mask numeric frame input or the global playhead when the input track is an iterated render with offset > 0) maps to output frame 0.
-- `toSourceFrame({ outputFrame, offset })` — `outputFrame + offset` (inverse; e.g. a mask points' absolute frame `mask_frame_idx + timeline_offset`).
+- `toSourceFrame({ outputFrame, offset })` — `outputFrame + offset` (inverse; e.g. a mask point's absolute frame `mask_frame_idx + timeline_offset`).
 - `toSeconds({ outputFrame, fps })` — `outputFrame / fps` (elapsed time in the output clip; compose with `toOutputFrame` from a source frame).
 - `frameRangeOf(track)` — `[offset, offset + duration]`, the source-frame range (replaces the former `getTrackFrameRange`).
 
