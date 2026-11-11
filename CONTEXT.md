@@ -154,7 +154,7 @@ Every clip lives in two coordinate spaces: **source frames** (indices into the u
 
 - `getTimelineOffset(track)` — the offset accessor (`?? 0`).
 - `toOutputFrame({ sourceFrame, offset })` — `Math.max(0, sourceFrame - offset)`. **Clamped at 0**: an output frame index can't be negative, so a source frame before the range start (reachable via the mask numeric frame input or the global playhead when the input track is an iterated render with offset > 0) maps to output frame 0.
-- `toSourceFrame({ outputFrame, offset })` — `outputFrame + offset` (inverse; e.g. a mask points' absolute frame `mask_frame_idx + timeline_offset`).
+- `toSourceFrame({ outputFrame, offset })` — `outputFrame + offset` (inverse; e.g. a mask point's absolute frame `mask_frame_idx + timeline_offset`).
 - `toSeconds({ outputFrame, fps })` — `outputFrame / fps` (elapsed time in the output clip; compose with `toOutputFrame` from a source frame).
 - `frameRangeOf(track)` — `[offset, offset + duration]`, the source-frame range (replaces the former `getTrackFrameRange`).
 
