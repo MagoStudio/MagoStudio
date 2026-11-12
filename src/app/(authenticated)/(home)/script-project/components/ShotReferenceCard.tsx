@@ -1,8 +1,8 @@
 import { Icon } from "@components/Icon";
 import { IconActionButton } from "@components/IconActionButton";
 import { ImageThumbnail } from "@components/ImageThumbnail";
-import { Text } from "@components/Text";
 import { useCachedImageUrl } from "@domains/asset/useCachedImageUrl";
+import { toDesktopCloudStorageUrl } from "@domains/asset/utils/toDesktopCloudStorageUrl";
 import { SheetImageUrls } from "@domains/scriptProject/utils/buildSheetImageUrlIndex";
 import { ShotReferenceChip } from "@domains/scriptProject/utils/buildShotReferenceChips";
 import { cn } from "@utils";
@@ -14,6 +14,7 @@ type Props = {
   chip: ShotReferenceChip;
   imageUrls: SheetImageUrls | undefined;
   isBusy: boolean;
+  hasVoice: boolean;
   onRemove: () => void;
 };
 
@@ -21,6 +22,7 @@ export const ShotReferenceCard: React.FC<Props> = ({
   chip,
   imageUrls,
   isBusy,
+  hasVoice,
   onRemove
 }) => {
   const { t } = useTranslation();
@@ -48,10 +50,16 @@ export const ShotReferenceCard: React.FC<Props> = ({
     >
       <ImageThumbnail
         assetId={chip.assetId ?? undefined}
-        src={isIntersecting ? imageUrls?.url : undefined}
+        src={
+          isIntersecting && imageUrls?.url
+            ? toDesktopCloudStorageUrl(imageUrls.url)
+            : undefined
+        }
         srcThumbnail={
           isIntersecting
-            ? (cachedDisplayedImageUrl ?? displayedImageUrl)
+            ? (cachedDisplayedImageUrl ??
+              (displayedImageUrl &&
+                toDesktopCloudStorageUrl(displayedImageUrl)))
             : undefined
         }
         name={referenceName}
@@ -73,6 +81,15 @@ export const ShotReferenceCard: React.FC<Props> = ({
         )}
       </ImageThumbnail>
 
+      {hasVoice && (
+        <div
+          className="pointer-events-none absolute bottom-1 left-1 flex size-4 items-center justify-center rounded bg-element-on-image text-glyph-primary-on-pic"
+          aria-label={t("script_project.voice.connected_voice.ariaLabel")}
+          data-testid={`shot-reference-voice-${chip.token}`}
+        >
+          <Icon iconSet="16" iconName="volume-up" className="size-3" />
+        </div>
+      )}
       <div className="absolute right-1 top-1 flex opacity-0 transition-opacity group-hover:opacity-100 group-focus-within:opacity-100">
         <IconActionButton
           aria-label={t("script_project.remove_reference_button.ariaLabel", {
@@ -86,14 +103,6 @@ export const ShotReferenceCard: React.FC<Props> = ({
           data-testid={`shot-remove-reference-${chip.token}`}
         />
       </div>
-
-      <Text
-        variant="2xs"
-        color="glyph-primary-on-pic"
-        className="pointer-events-none absolute inset-x-0 bottom-0 truncate bg-surface-on-image-opacity-80 px-1"
-      >
-        {referenceName}
-      </Text>
     </div>
   );
 };

@@ -1,0 +1,20 @@
+export const VOICE_LIBRARY_LANGUAGE_CODES = [
+  "en",
+  "fr",
+  "de",
+  "es",
+  "it",
+  "pt",
+  "nl",
+  "pl",
+  "cs",
+  "sk",
+  "ro",
+  "sv",
+  "tr",
+  "ar",
+  "hi",
+  "zh",
+  "ja",
+  "fil"
+] as const;

@@ -7,6 +7,7 @@ All paths are relative to the ComfyUI folder. The code is the source of truth:
 
 - Model files and SHA-256 hashes: [`desktop/shared/localModelManifest.ts`](../desktop/shared/localModelManifest.ts)
 - Model groups: [`desktop/shared/localModelGroups.ts`](../desktop/shared/localModelGroups.ts)
+- Settings model definitions and variants: [`desktop/shared/localModelDefinitions.ts`](../desktop/shared/localModelDefinitions.ts)
 - Node pack pins: [`desktop/shared/localNodePackPins.ts`](../desktop/shared/localNodePackPins.ts)
 - Licenses: [`desktop/shared/localModelLicenses.ts`](../desktop/shared/localModelLicenses.ts)
 
@@ -39,6 +40,84 @@ If this page and the code disagree, the code wins. Please open an issue.
 
 Install each into `custom_nodes/`, then run `pip install -r requirements.txt` with
 ComfyUI's own Python, and restart ComfyUI.
+
+### Verify the text GPU runtime
+
+Installing a node's requirements can leave `llama-cpp-python` using a CPU backend.
+In **Settings → Models**, select the local text model, open **Load settings** and
+run **Check installation**. This probes ComfyUI's detected Python interpreter,
+its installed packages and native GPU support. The setup installer also checks
+llama.cpp after installing the text node's requirements.
+
+**Repair GPU runtime** chooses a binary channel using the detected GPU driver and
+architecture. It downloads a wheel for the installed package version and Python
+ABI, checks for GPU libraries and verifies native GPU initialization after
+installation. It does not silently substitute a CPU wheel or build from source.
+If no GPU wheel of llama.cpp exists for the installed version, it installs the
+newest version that has one, or else the newest older one, and names both
+versions in the result; a
+working GPU runtime is never replaced. If a compatible wheel is unavailable,
+the result explains why. A CUDA 12.4 pip
+command is not suitable for every GPU. AMD and other runtimes without a supported
+repair channel require their platform's manual installation process.
+
+Restart ComfyUI after repairing packages. Missing custom nodes still need to be
+installed through **Set up local rendering** or the node-pack instructions above.
+
+### Choose model files and load settings
+
+**Settings → Models** keeps text routing separate from model configuration:
+
+- **Text model: Cloud / Local** selects Gemini or the configured local text model.
+- **Model type** selects local Qwen text, MiniMax H3, Qwen Image 2512, Qwen Image
+  Edit 2511 or FLUX 2 Klein. Inspecting a type does not change text routing.
+- **Files & variants** contains Q3/Q5 and the image variants, plus a component
+  selector for the main model, encoder, VAE and applicable adapters. Automatic
+  text selection follows the saved setup recommendation. Explicit variants and
+  custom files survive subsequent setup scans.
+- Put an existing custom quantization or compatible fine-tune in the corresponding
+  ComfyUI model folder, refresh the inventory, and pick it in the file list.
+  Mago Studio checks its compatibility and switches to it only when the check
+  passes. Header checks compare architecture/tensor shapes; they do not establish
+  memory fit or generation quality. A file without a comparable reference
+  requires **Test candidate load** (in the file's info popover) first. Pick the
+  recommended file, at the top of the list, to switch back. A hash check verifies
+  file integrity independently.
+
+Text **Load settings** offers automatic partial GPU offload, a custom GPU-layer
+count, all layers or explicit CPU mode, plus context, batch, KV-cache offload and
+memory mapping. Automatic offload estimates room from free VRAM and the model's
+size, reserving space for context and other allocations; a load test remains
+necessary. Start with fewer GPU layers after an allocation failure. Reducing
+context saves memory but also reduces room for long Script Project requests.
+A generic “Failed to load model” error alone does not establish GPU exhaustion.
+
+MiniMax and image models use ComfyUI/PyTorch runtime checks and component load
+tests. Encoder placement and image tiled VAE decoding are offered when the
+connected loaders support them. MiniMax overrides also reach existing
+Singularity/Heretic workflows; without an override their current files remain.
+ComfyUI's memory policy is shared by every model on that endpoint. Mago can apply
+the saved low-VRAM flag when it launches a supported portable installation;
+restart an idle ComfyUI to apply it. Configure launch flags manually for other
+hosts.
+
+Settings are scoped to the ComfyUI URL, model type, variant and component.
+Native checks, hashing and repair require a verified interpreter/file on the
+same computer. Remote endpoints retain advertised inventory and diagnostics;
+run native checks on their host. Load tests require an empty render queue and
+unload ComfyUI's idle model cache first. They test the component, rather than a
+complete generation workflow or all components' combined memory usage.
+
+### Share diagnostics
+
+Open **Debug info** in the Models tab and use the copy icon. The report includes
+CPU/GPU, RAM/VRAM, free disk space, setup kind, ComfyUI version and last-seen time,
+model inventory, selected paths, source URLs, expected/computed hashes, settings
+and recorded problems. Actual hashes appear after verification. An offline host
+retains its last successful version/inventory with a stale marker. The report
+includes the Mago version and, in development, the Git commit when available.
+Preview it before sharing: local file paths are included. It excludes account
+credentials and does not upload the report automatically.
 
 ### Not pinned (install by hand for the Wan and LTX models)
 

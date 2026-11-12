@@ -1,9 +1,10 @@
-import { ShotState } from "@schemas/scriptProject";
+import { VideoEngine } from "@models/video/types";
+import { SheetGroup, ShotState } from "@schemas/scriptProject";
 
 import { ShotRenderEngine } from "../constants";
 
-import { countShotReferenceImages } from "./countShotReferenceImages";
 import { estimateShotRenderCredits } from "./estimateShotRenderCredits";
+import { resolveShotReferenceImageSizes } from "./resolveShotReferenceImageSizes";
 import { resolveShotRenderFrames } from "./resolveShotRenderFrames";
 
 /** What the shots about to render will cost, priced one Shot at a time.
@@ -16,13 +17,15 @@ export const estimateStaleShotsCredits = ({
   shotEngine,
   outputSize,
   projectShotFrames,
-  attemptsPerShot
+  attemptsPerShot,
+  sheetGroups
 }: {
   staleShots: ShotState[];
   shotEngine: ShotRenderEngine;
   outputSize: [number, number];
   projectShotFrames: number;
   attemptsPerShot: number;
+  sheetGroups: SheetGroup[];
 }): number =>
   staleShots.reduce((totalCredits, shot) => {
     const shotFrames = resolveShotRenderFrames({
@@ -30,7 +33,10 @@ export const estimateStaleShotsCredits = ({
       projectShotFrames,
       shotEngine
     });
-    const referenceImageCount = countShotReferenceImages(shot, {
+    const referenceImageSizes = resolveShotReferenceImageSizes({
+      shot,
+      sheetGroups,
+      outputSize,
       isContinuationSent: Boolean(shot.sequential?.enabled)
     });
 
@@ -41,8 +47,7 @@ export const estimateStaleShotsCredits = ({
           shotEngine,
           outputSize,
           shotFrames,
-          referenceImageCount
+          referenceImageSizes
         })
     );
   }, 0);
-import { VideoEngine } from "@models/video/types";

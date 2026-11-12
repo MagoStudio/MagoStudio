@@ -8,6 +8,7 @@ import {
   resolveMiniMaxH3VfxMode
 } from "../../shared/minimaxH3VfxModes";
 import { normalizeComfyEndpoint } from "../comfy/normalizeComfyEndpoint";
+import { prepareModelRequirements } from "../modelSettings/prepareModelRequirements";
 
 import {
   LTX_TILED_SAMPLER_CLASS,
@@ -346,6 +347,19 @@ const record = (value: unknown): Record<string, unknown> | null =>
     ? (value as Record<string, unknown>)
     : null;
 
+export const listComfyRenderModelNodes = (
+  model: ComfyRenderModelName,
+  settings: Record<string, unknown> = {}
+): string[] => {
+  const requirements = requirementsFor(model, settings);
+  return [
+    ...new Set([
+      ...requirements.nodes,
+      ...requirements.files.map((requirement) => requirement.node)
+    ])
+  ];
+};
+
 const comboValues = (
   node: Record<string, unknown>,
   inputName: string
@@ -385,15 +399,18 @@ export const probeComfyRenderModel = async (
   settings: Record<string, unknown> = {}
 ): Promise<ComfyModelStatus> => {
   const normalized = normalizeComfyEndpoint(endpoint);
-  const requirements = requirementsFor(model, settings);
-  const nodeNames = [
-    ...new Set([
-      ...requirements.nodes,
-      ...requirements.files.map((requirement) => requirement.node)
-    ])
-  ];
-
   try {
+    const requirements = await prepareModelRequirements(
+      normalized,
+      requirementsFor(model, settings)
+    );
+    const nodeNames = [
+      ...new Set([
+        ...requirements.nodes,
+        ...requirements.files.map((requirement) => requirement.node)
+      ])
+    ];
+
     const entries = await Promise.all(
       nodeNames.map(async (nodeName) => {
         const response = await fetch(

@@ -1,4 +1,4 @@
-const REFERENCE_INSTRUCTION_PREFIX =
+export const REFERENCE_INSTRUCTION_PREFIX =
   "Use the supplied reference images as follows: ";
 
 export const buildSheetReferencePrompt = ({

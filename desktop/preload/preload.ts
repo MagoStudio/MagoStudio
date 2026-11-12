@@ -18,6 +18,10 @@ const readAppMode = (): "cloud" | "offline" | "unchosen" => {
 };
 
 const ipcChannels = {
+  modelSettingsInspect: "model-settings:inspect",
+  modelSettingsSave: "model-settings:save",
+  modelSettingsCheck: "model-settings:check",
+  modelSettingsDiagnostics: "model-settings:diagnostics",
   textModelRequest: "text-model:request",
   textModelResponse: "text-model:response",
   textModelReady: "text-model:ready",
@@ -113,6 +117,9 @@ const ipcChannels = {
   shotsUpdate: "shots:update",
   shotsDelete: "shots:delete",
   localSetupPauseDownload: "local-setup:pause-download",
+  localSetupCancelDownload: "local-setup:cancel-download",
+  localSetupRequirementDownloadStatus:
+    "local-setup:requirement-download-status",
   localSetupDownloadRequirement: "local-setup:download-requirement",
   localSetupDownloadRequirements: "local-setup:download-requirements",
   localSetupProbeHardware: "local-setup:probe-hardware",
@@ -183,6 +190,10 @@ const api: MagoDesktopApi = {
       ipcRenderer.invoke(ipcChannels.localSetupSelectStorageFolder, folderPath),
     pauseDownload: (name) =>
       ipcRenderer.invoke(ipcChannels.localSetupPauseDownload, name),
+    cancelDownload: (name) =>
+      ipcRenderer.invoke(ipcChannels.localSetupCancelDownload, name),
+    requirementDownloadStatus: (name) =>
+      ipcRenderer.invoke(ipcChannels.localSetupRequirementDownloadStatus, name),
     downloadRequirement: (name, options) =>
       ipcRenderer.invoke(
         ipcChannels.localSetupDownloadRequirement,
@@ -298,6 +309,16 @@ const api: MagoDesktopApi = {
       ipcRenderer.invoke(ipcChannels.imageRendersCancel, jobId),
     markInteracted: (jobId) =>
       ipcRenderer.invoke(ipcChannels.imageRendersMarkInteracted, jobId)
+  },
+  models: {
+    inspect: (request) =>
+      ipcRenderer.invoke(ipcChannels.modelSettingsInspect, request),
+    save: (request) =>
+      ipcRenderer.invoke(ipcChannels.modelSettingsSave, request),
+    check: (request) =>
+      ipcRenderer.invoke(ipcChannels.modelSettingsCheck, request),
+    diagnostics: (endpoint) =>
+      ipcRenderer.invoke(ipcChannels.modelSettingsDiagnostics, endpoint)
   },
   comfy: {
     launch: (options) => ipcRenderer.invoke(ipcChannels.comfyLaunch, options),

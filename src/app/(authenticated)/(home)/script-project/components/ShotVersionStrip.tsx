@@ -1,3 +1,4 @@
+import { Badge } from "@components/Badge";
 import { GhostButton } from "@components/GhostButton";
 import { Text } from "@components/Text";
 import { formatPlanTimestamp } from "@domains/plan/utils/formatPlanTimestamp";
@@ -6,9 +7,10 @@ import { useShotVersionReview } from "@domains/scriptProject/useShotVersionRevie
 import { buildCutDownloadName } from "@domains/scriptProject/utils/buildCutDownloadNames";
 import { hasCutShotVersionRenderFailed } from "@domains/scriptProject/utils/hasCutShotVersionRenderFailed";
 import { isCutShotVersionNew } from "@domains/scriptProject/utils/isCutShotVersionNew";
-import { isCutShotVersionRendering } from "@domains/scriptProject/utils/isCutShotVersionRendering";
+import { isCutShotVersionShownAsRendering } from "@domains/scriptProject/utils/isCutShotVersionShownAsRendering";
 import { CutShotVersionsInDisplayOrder } from "@domains/scriptProject/utils/orderCutShotVersionsForDisplay";
 import { ProjectOutputSize } from "@domains/scriptProject/utils/projectOutputSize";
+import { resolveCutShotVersionVideo } from "@domains/scriptProject/utils/resolveCutShotVersionVideo";
 import { CutShot, CutShotVersion } from "@schemas/scriptProject";
 import { cn } from "@utils";
 import { useTranslation } from "react-i18next";
@@ -53,20 +55,28 @@ export const ShotVersionStrip: React.FC<Props> = ({
   const { viewedVersionIds, markVersionsViewed } =
     useShotVersionReview(projectId);
   const {
-    versionsBelowShownVersion,
-    pinnedVersionAssetId,
+    versionsNewestFirst,
+    displayedPinnedVersionAssetId,
     versionNumberByAssetId
   } = versionsInDisplayOrder;
-  const visibleVersionsBelowShownVersion = versionsBelowShownVersion.slice(
-    0,
-    visibleVersionCount
+  const visibleVersions = versionsNewestFirst.filter(
+    (version, index) =>
+      visibleVersionCount === undefined ||
+      index < visibleVersionCount ||
+      version.asset_id === shot.pinned_asset_id
   );
-  if (!visibleVersionsBelowShownVersion.length) return null;
+  if (!visibleVersions.length) return null;
   return (
     <div className="contents">
-      {visibleVersionsBelowShownVersion.map((version) => {
-        const pinned = pinnedVersionAssetId === version.asset_id;
-        const isNew = !pinned && isCutShotVersionNew(version, viewedVersionIds);
+      {visibleVersions.map((version) => {
+        const pinned = displayedPinnedVersionAssetId === version.asset_id;
+        const isVersionShownAsRendering = isCutShotVersionShownAsRendering(
+          shot,
+          version
+        );
+        const isNew =
+          !isVersionShownAsRendering &&
+          isCutShotVersionNew(version, viewedVersionIds);
         // Current cut responses omit timestamps; project layers already expose creation time.
         const layer = project?.timelines
           ?.flatMap((timeline) => timeline.layers)
@@ -77,26 +87,38 @@ export const ShotVersionStrip: React.FC<Props> = ({
         const renderedAt = formatPlanTimestamp(
           version.created_at ?? layer?.created_at.toISOString()
         );
+        const versionVideo = resolveCutShotVersionVideo(shot, version);
         return (
           <div
             key={version.asset_id}
             className="flex w-full min-w-0 shrink-0 flex-col gap-1"
             data-testid={`shot-card-version-${version.asset_id}`}
           >
-            <Text
-              variant="2xs"
-              color="glyph-tertiary"
-              className="truncate"
-              data-testid={`shot-card-version-name-${version.asset_id}`}
-            >
-              {versionLabel}
-            </Text>
+            <div className="flex min-w-0 items-center gap-1">
+              <Text
+                variant="2xs"
+                color="glyph-tertiary"
+                className="truncate"
+                data-testid={`shot-card-version-name-${version.asset_id}`}
+              >
+                {versionLabel}
+              </Text>
+              {pinned && (
+                <Badge
+                  glyphColor="glyph-primary"
+                  className="h-auto min-w-0 bg-element-primary px-1 text-2xs"
+                  data-testid={`shot-card-version-pinned-${version.asset_id}`}
+                >
+                  {t("script_project.pinned_badge.label")}
+                </Badge>
+              )}
+            </div>
             <ShotVideoPreview
-              assetId={version.asset_id}
-              videoUrl={version.url}
-              posterUrl={version.poster_url}
+              assetId={versionVideo.videoAssetId}
+              videoUrl={versionVideo.videoUrl}
+              posterUrl={versionVideo.posterUrl}
               hasRender
-              isRendering={isCutShotVersionRendering(version)}
+              isRendering={isVersionShownAsRendering}
               hasRenderFailed={hasCutShotVersionRenderFailed(version)}
               renderFailedContent={
                 <CutShotVersionRenderError
@@ -117,7 +139,9 @@ export const ShotVersionStrip: React.FC<Props> = ({
                     <RenderMetricsBadge
                       assetId={version.asset_id}
                       kind="video"
-                      hasRenderFinished={version.ready}
+                      hasRenderFinished={
+                        version.ready && !isVersionShownAsRendering
+                      }
                       className="static h-auto gap-1 px-1 py-0 text-2xs"
                     />
                     {isNew && (
@@ -146,7 +170,7 @@ export const ShotVersionStrip: React.FC<Props> = ({
                       data-testid={`shot-card-version-actions-${version.asset_id}`}
                     >
                       <ShotVersionDownloadButton
-                        videoUrl={version.url}
+                        videoUrl={versionVideo.videoUrl}
                         downloadFileName={buildCutDownloadName(shot)}
                         testId={`shot-card-version-download-${version.asset_id}`}
                       />
@@ -182,7 +206,9 @@ export const ShotVersionStrip: React.FC<Props> = ({
                       className={
                         isPortraitOutput ? "w-full" : "ml-auto shrink-0"
                       }
-                      isDisabled={isBusy || !version.ready}
+                      isDisabled={
+                        isBusy || !version.ready || isVersionShownAsRendering
+                      }
                       onPress={() => {
                         if (!pinned) markVersionsViewed([version.asset_id]);
                         onPin(pinned ? null : version.asset_id);

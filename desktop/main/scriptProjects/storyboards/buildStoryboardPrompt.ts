@@ -3,7 +3,7 @@ import {
   KEEP_THE_GRID,
   NO_DRAWING_MEDIUM,
   STORY_PROGRESSION,
-  MOVEMENT_ARROWS,
+  NO_ARROWS,
   NO_OTHER_TEXT,
   CAST_HAS_ITS_OWN_REFERENCES,
   EMPTY_PANEL_DESCRIPTION
@@ -61,7 +61,7 @@ export const buildStoryboardPrompt = (
     template,
     NO_DRAWING_MEDIUM,
     ...(cuts.length > 1 ? [STORY_PROGRESSION] : []),
-    MOVEMENT_ARROWS,
+    NO_ARROWS,
     NO_OTHER_TEXT,
     ...(characters.length
       ? [

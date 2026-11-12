@@ -32,6 +32,10 @@ import {
 import { createQwenStructuredCall } from "./casting/qwenStructuredCall";
 import { CastingCallError, generateCasting } from "./casting/scriptCasting";
 import {
+  listCastCharacterTokens,
+  listUntaggedSpeakers
+} from "./casting/untaggedSpeakers";
+import {
   ComfyScriptProjectClient,
   LocalH3Model,
   LocalH3Steps,
@@ -556,8 +560,14 @@ export class LocalScriptProjectService {
     const visualStyle = await this.projectVisualStyle(projectId, state);
     if (visualStyle || "visual_style" in state)
       state.visual_style = visualStyle;
+    const castCharacterTokens = listCastCharacterTokens(state.keys);
     state.shots = records(state.shots).map((shot) => ({
       ...shot,
+      dialogue_untagged_speakers: listUntaggedSpeakers(
+        shot.dialogue,
+        shot.tags,
+        castCharacterTokens
+      ),
       storyboard: storyboardState(
         shot,
         records(state.keys),
@@ -1197,7 +1207,11 @@ export class LocalScriptProjectService {
           "Cast a script into this project before adding shots",
           SHOT_EDIT_STATUS.conflict
         );
-      validateAddedShot(input.payload, this.taggableTokens(state));
+      validateAddedShot(
+        input.payload,
+        this.taggableTokens(state),
+        listCastCharacterTokens(state.keys)
+      );
       const shotIndex =
         typeof input.payload.shot_index === "number"
           ? input.payload.shot_index
@@ -1242,6 +1256,7 @@ export class LocalScriptProjectService {
         validateShotEdit(fields, {
           shot,
           taggableTokens: this.taggableTokens(state),
+          castCharacterTokens: listCastCharacterTokens(state.keys),
           hasRenders:
             records(
               records(snapshot.cut?.shots).find(
@@ -1277,7 +1292,7 @@ export class LocalScriptProjectService {
         (candidate) => candidate.timeline_id === shot.timeline_id
       )!;
       return {
-        ...editedShotResponse(updated),
+        ...editedShotResponse(updated, listCastCharacterTokens(state.keys)),
         ...(order ? { shots: order } : {}),
         camera: updated.camera ?? null
       };
@@ -2251,13 +2266,13 @@ export class LocalScriptProjectService {
               },
               // "Already rendered with these inputs" reads this back.
               fingerprint: renderedSpec ? fingerprint(renderedSpec) : null,
+              render_spec: renderedSpec,
               ...(isStoryboard(target)
                 ? {
                     storyboard_plan_id: planId,
                     storyboard_scene_fingerprint:
                       target.storyboard_scene_fingerprint,
-                    panel_count: target.panel_count,
-                    render_spec: renderedSpec
+                    panel_count: target.panel_count
                   }
                 : {}),
               description: null,
@@ -3584,13 +3599,13 @@ export class LocalScriptProjectService {
           render_settings: { prompt, ...settings },
           cloud_asset_id: textValue(payload.cloudAssetId, "") || null,
           fingerprint: spec ? fingerprint(spec) : null,
+          render_spec: spec ?? null,
           ...(target && isStoryboard(target)
             ? {
                 storyboard_plan_id: planId,
                 storyboard_scene_fingerprint:
                   target.storyboard_scene_fingerprint,
-                panel_count: target.panel_count,
-                render_spec: spec
+                panel_count: target.panel_count
               }
             : {}),
           description: null,

@@ -15,17 +15,28 @@ export type LocalModelGroupsInstallInspection = Awaited<
 };
 
 export const inspectLocalModelGroupsForInstall = async (
-  settings: Parameters<typeof inspectLocalModelGroups>[0],
+  settings: Parameters<typeof inspectLocalModelGroups>[0] & {
+    getScriptTextVariantOverride?: () => Promise<string | null>;
+  },
   readVideoMemoryBytes: () => Promise<number | null>
 ): Promise<LocalModelGroupsInstallInspection> => {
   const savedModelGroupVariants =
     await settings.getSelectedModelGroupVariants();
-  const savedInspection = await inspectLocalModelGroups(settings);
+  const explicitTextVariant = await settings.getScriptTextVariantOverride?.();
+  if (explicitTextVariant)
+    savedModelGroupVariants["local-llm"] = explicitTextVariant;
+  const savedInspection = await inspectLocalModelGroups(
+    settings,
+    savedModelGroupVariants
+  );
   const notInstalledHardwareVariantGroups = savedInspection.groups
     .filter((group) => group.state === "not-installed")
     .map((group) => findLocalModelGroup(group.groupId))
     .filter((group) => group.hardwareVariants !== undefined);
-  if (notInstalledHardwareVariantGroups.length === 0)
+  const groupsToAutoSelect = notInstalledHardwareVariantGroups.filter(
+    (group) => group.id !== "local-llm" || !explicitTextVariant
+  );
+  if (groupsToAutoSelect.length === 0)
     return {
       ...savedInspection,
       selectedModelGroupVariantsForInstall: savedModelGroupVariants,
@@ -35,13 +46,13 @@ export const inspectLocalModelGroupsForInstall = async (
   const selectedModelGroupVariantsForInstall: SelectedModelGroupVariants = {
     ...savedModelGroupVariants
   };
-  for (const group of notInstalledHardwareVariantGroups)
+  for (const group of groupsToAutoSelect)
     selectedModelGroupVariantsForInstall[group.id] =
       pickHardwareVariantForVideoMemory(
         group.hardwareVariants ?? [],
         videoMemoryBytes
       );
-  const isSameAsSavedSelection = notInstalledHardwareVariantGroups.every(
+  const isSameAsSavedSelection = groupsToAutoSelect.every(
     (group) =>
       selectedModelGroupVariantsForInstall[group.id] ===
       savedModelGroupVariants[group.id]
@@ -55,7 +66,8 @@ export const inspectLocalModelGroupsForInstall = async (
   return {
     ...inspection,
     selectedModelGroupVariantsForInstall,
-    hardwareVariantGroupIdsPickedForInstall:
-      notInstalledHardwareVariantGroups.map((group) => group.id)
+    hardwareVariantGroupIdsPickedForInstall: groupsToAutoSelect.map(
+      (group) => group.id
+    )
   };
 };

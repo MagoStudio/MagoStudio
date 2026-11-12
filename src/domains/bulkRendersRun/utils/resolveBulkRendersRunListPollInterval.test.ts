@@ -1,7 +1,10 @@
 import { BulkRendersRun, BulkRendersRunStatus } from "@schemas/bulkRendersRun";
 import { describe, expect, it } from "vitest";
 
-import { BULK_RENDERS_RUN_POLL_INTERVAL_MS } from "../constants";
+import {
+  BULK_RENDERS_RUN_POLL_INTERVAL_MS,
+  FAILING_POLL_INTERVAL_MS
+} from "../constants";
 
 import {
   BULK_RENDERS_RUN_LIST_MAX_POLLED_ERRORS,
@@ -92,14 +95,14 @@ describe("resolveBulkRendersRunListPollInterval", () => {
     ).toBe(BULK_RENDERS_RUN_POLL_INTERVAL_MS);
   });
 
-  it("gives up once the errors are exhausted, so a dead endpoint is not polled forever", () => {
+  it("slows down once the errors are exhausted, so the list recovers without a reload", () => {
     expect(
       resolveBulkRendersRunListPollInterval({
         hasQueryErrored: true,
         consecutiveFailureCount: BULK_RENDERS_RUN_LIST_MAX_POLLED_ERRORS + 1,
         runs: undefined
       })
-    ).toBe(false);
+    ).toBe(FAILING_POLL_INTERVAL_MS);
   });
 
   it("keeps retrying an errored query even when the last good list was all terminal", () => {

@@ -1,13 +1,15 @@
 import { useIsReferenceImageUploading } from "@context/IsReferenceImageUploading";
 import { ImageAssetResponse } from "@domains/asset/api/interface";
 import { useQueryClient } from "@tanstack/react-query";
-import { getImageDimensions, resizeImageToFitWidth } from "@utils";
+import { getImageDimensions } from "@utils";
+import { resizeImageFromFile } from "@utils/image/resizeImage";
 import { useRef, useState } from "react";
 
 import { getLocalDesktopApi } from "@/platform/localDesktop";
 import { queryKeys } from "@/queryKeys";
 
-const THUMBNAIL_WIDTH = 158;
+const THUMBNAIL_MAX_SIDE_PX = 1024;
+const THUMBNAIL_JPEG_QUALITY = 0.85;
 const INITIAL_PROGRESS = 5;
 const COMPLETE_PROGRESS = 100;
 const PROGRESS_RESET_DELAY_MS = 300;
@@ -61,7 +63,13 @@ export const useUploadReferenceImage = () => {
       if (!sourcePath) {
         throw new Error("upload_button_file_access_error");
       }
-      const thumbnail = await resizeImageToFitWidth(file, THUMBNAIL_WIDTH);
+      const thumbnail = await resizeImageFromFile(file, {
+        maxWidth: THUMBNAIL_MAX_SIDE_PX,
+        maxHeight: THUMBNAIL_MAX_SIDE_PX,
+        imageFormat: "image/jpeg",
+        imageQuality: THUMBNAIL_JPEG_QUALITY,
+        showTransparencyAsCheckerboard: true
+      });
       const thumbnailDataUrl = await new Promise<string>((resolve, reject) => {
         const reader = new FileReader();
         reader.onerror = () =>

@@ -187,3 +187,16 @@ describe("BulkRendersRunSchema echoed pricing fields", () => {
     }
   });
 });
+
+describe("BulkRendersRunSchema scene list", () => {
+  it("keeps a run the backend started for one scene with no scene list", () => {
+    const result = BulkRendersRunSchema.safeParse({
+      id: "run",
+      status: "RUNNING",
+      input_settings: { timeline_ids: null }
+    });
+
+    expect(result.success).toBe(true);
+    expect(result.data?.input_settings?.timeline_ids).toEqual([]);
+  });
+});

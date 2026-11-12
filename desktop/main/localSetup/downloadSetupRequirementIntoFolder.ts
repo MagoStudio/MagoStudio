@@ -15,8 +15,14 @@ export const downloadSetupRequirementIntoFolder = async (
   folder: string,
   signal?: AbortSignal,
   {
-    replaceExistingNodePack = false
-  }: { replaceExistingNodePack?: boolean } = {}
+    replaceExistingNodePack = false,
+    onProgress,
+    onDestination
+  }: {
+    replaceExistingNodePack?: boolean;
+    onProgress?: (downloadedBytes: number, totalBytes: number | null) => void;
+    onDestination?: (destination: string) => void;
+  } = {}
 ): Promise<string> => {
   const filename =
     requirement.installKind === "node"
@@ -25,6 +31,7 @@ export const downloadSetupRequirementIntoFolder = async (
   if (path.basename(filename) !== filename)
     throw new Error("Invalid download filename");
   const destination = path.join(folder, filename);
+  onDestination?.(destination);
   signal?.throwIfAborted();
   const isNode = requirement.installKind === "node";
   const packDirectory = path.join(folder, filename.replace(/\.zip$/, ""));
@@ -47,7 +54,7 @@ export const downloadSetupRequirementIntoFolder = async (
       requirement.downloadUrl,
       destination,
       signal,
-      undefined,
+      onProgress,
       requirement.downloadSha256
     );
   signal?.throwIfAborted();

@@ -1,6 +1,8 @@
 import { Text } from "@components/Text";
 import { formatShotTitle } from "@domains/scriptProject/utils/formatShotTitle";
+import { isCutShotShownAsRendering } from "@domains/scriptProject/utils/isCutShotShownAsRendering";
 import { ProjectOutputSize } from "@domains/scriptProject/utils/projectOutputSize";
+import { resolveCutShotVideo } from "@domains/scriptProject/utils/resolveCutShotVideo";
 import { CutShot } from "@schemas/scriptProject";
 import { cn } from "@utils";
 import { Button as AriaButton } from "react-aria-components/Button";
@@ -24,6 +26,7 @@ export const CutShotTile: React.FC<Props> = ({
   onSelect
 }) => {
   const { t } = useTranslation();
+  const shotVideo = resolveCutShotVideo(shot);
 
   return (
     <AriaButton
@@ -38,11 +41,14 @@ export const CutShotTile: React.FC<Props> = ({
     >
       <div className="relative w-full">
         <ShotVideoPreview
-          assetId={shot.asset_id}
-          videoUrl={shot.url}
-          posterUrl={shot.poster_url}
+          assetId={shotVideo.videoAssetId}
+          videoUrl={shotVideo.videoUrl}
+          posterUrl={shotVideo.posterUrl}
           hasRender={!!shot.asset_id}
-          isRendering={isRendering}
+          isRendering={isCutShotShownAsRendering({
+            shot,
+            isShotRendering: isRendering
+          })}
           outputSize={outputSize}
           testId={`cut-shot-video-${shot.sequence_id}`}
         />

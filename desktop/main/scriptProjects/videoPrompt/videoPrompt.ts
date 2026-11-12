@@ -27,7 +27,10 @@ import {
   CONTINUATIONS,
   CROSS_SHOT_VIDEO_REF_ID
 } from "./videoPromptPayload";
-import { VIDEO_PROMPT_TEMPLATE } from "./videoPromptTemplate.generated";
+import {
+  SCENE_OVERVIEW_BRIEF,
+  VIDEO_PROMPT_TEMPLATE
+} from "./videoPromptTemplate.generated";
 
 /**
  * Shot data -> MiniMax H3 full-reference prompt document: the backend's composer, with Gemini replaced by the caller's model call.
@@ -113,6 +116,11 @@ const ENTRY_BOUNDARY_RE =
 const RUN_TOGETHER_RE = /(?<=[a-z0-9][.!?,])(?=[A-Z{<])/g;
 const DETAILED_DESCRIPTION_MIN_WORDS = 350;
 const DETAILED_DESCRIPTION_MAX_WORDS = 500;
+export const SCENE_OVERVIEW_MAX_WORDS = 80;
+const SHOT_MARKER_SOURCE = "\\[Shot (\\d+)\\]";
+const FIRST_SHOT_HEADING_RE = /(?:^|(?<=[.!?\n])|(?<=[.!?] ))\[Shot 1\]/;
+const DIALOGUE_TAG_RE = /<\s*\/?\s*d\s*>/i;
+const isSceneOverviewEnabled = true;
 const DEFAULT_ASPECT_RATIO = "16:9";
 export const MAX_CHARACTERS = 12;
 export const MAX_PROPS = 20;
@@ -138,6 +146,9 @@ const REFERENCE_TAG_FORMATS: Record<string, Record<string, string>> = {
   }
 };
 const CANONICAL_REFERENCE_TAG_ENGINE = "v9.1.0";
+/** Engines whose API takes a pinned opening frame as its first-frame input, not a numbered reference. */
+const FIRST_FRAME_INPUT_ENGINES = new Set(["minimax_h3_max"]);
+const FIRST_FRAME_LABEL = "First frame";
 const DURATION_BOUNDS: Record<string, [number, number]> = {
   seedance_2_5: [4, 15],
   minimax_h3_max: [5, 15],
@@ -200,6 +211,7 @@ const referenceTag = (engine: string, kind: string, index: number): string => {
 export interface CleanReference {
   panel_count?: number | null;
   voice_of?: null;
+  voice_role?: null;
   kind: string;
   asset_id: string;
   ref_id: string | null;
@@ -317,6 +329,7 @@ export const validateShotPayload = (payload: JsonRecord): CleanPayload => {
           ? (record.continuation as Continuation)
           : null,
       voice_of: null,
+      voice_role: null,
       panel_count: Number.isInteger(record.panel_count)
         ? Number(record.panel_count)
         : null
@@ -531,6 +544,21 @@ export interface Label {
   continuation?: Continuation | null;
 }
 
+const opensAsFirstFrame = (
+  entry: CleanReference,
+  engineVersion: string
+): boolean =>
+  (entry.kind || "image") === "image" &&
+  entry.continuation === "pin" &&
+  FIRST_FRAME_INPUT_ENGINES.has(engineVersion);
+
+/** The references the prompt's tags number, in order: all but a first-frame input. */
+const numberedReferences = (
+  references: CleanReference[],
+  engineVersion: string
+): CleanReference[] =>
+  references.filter((entry) => !opensAsFirstFrame(entry, engineVersion));
+
 /** Per-kind tags in list order, then a subject per character. */
 export const assignLabels = (
   clean: CleanPayload,
@@ -549,15 +577,20 @@ export const assignLabels = (
   for (const entry of references) {
     const kind = entry.kind || "image";
     const index = perKind.get(kind) ?? 0;
-    perKind.set(kind, index + 1);
+    const isFirstFrame = opensAsFirstFrame(entry, engineVersion);
     let label: string;
-    try {
-      label = referenceTag(engineVersion, kind, index + 1);
-    } catch {
-      label = referenceTag(CANONICAL_REFERENCE_TAG_ENGINE, kind, index + 1);
-      warnings.push(
-        `${engineVersion} takes no ${kind} references; kept ${label}`
-      );
+    if (isFirstFrame) {
+      label = FIRST_FRAME_LABEL;
+    } else {
+      perKind.set(kind, index + 1);
+      try {
+        label = referenceTag(engineVersion, kind, index + 1);
+      } catch {
+        label = referenceTag(CANONICAL_REFERENCE_TAG_ENGINE, kind, index + 1);
+        warnings.push(
+          `${engineVersion} takes no ${kind} references; kept ${label}`
+        );
+      }
     }
     labels.push({
       label,
@@ -565,7 +598,9 @@ export const assignLabels = (
       asset_id: entry.asset_id,
       ref_id: entry.ref_id,
       description: entry.description ?? "",
-      slot: `${slotByKind[kind] ?? "ref_image"}_${index}`,
+      slot: isFirstFrame
+        ? "first_frame"
+        : `${slotByKind[kind] ?? "ref_image"}_${index}`,
       character_sheet:
         kind === "image" &&
         !entry.members.length &&
@@ -918,13 +953,68 @@ const placeholderIndex = (labels: Label[]): Map<string, Label> => {
   return index;
 };
 
+const countWords = (text: string): number =>
+  text.split(/\s+/).filter(Boolean).length;
+
+/** Why this overview cannot head the shot list, or [] when it can. */
+export const sceneOverviewProblems = (
+  overview: string,
+  labels: Label[]
+): string[] => {
+  if (!overview) return ["no scene overview was written"];
+  const problems: string[] = [];
+  if (new RegExp(SHOT_MARKER_SOURCE).test(overview))
+    problems.push("it writes a [Shot n] heading");
+  if (new RegExp(NUMBERED_TAG_RE.source, "i").test(overview))
+    problems.push("it writes numbered reference tags");
+  if (
+    new RegExp(LINE_PLACEHOLDER_RE.source).test(overview) ||
+    DIALOGUE_TAG_RE.test(overview)
+  )
+    problems.push("it carries a spoken line");
+  if (SPEAKER_ID_RE.test(overview)) problems.push("it writes a speaker id");
+  const known = placeholderIndex(labels);
+  const unknown = [
+    ...new Set(
+      [...overview.matchAll(placeholderRe())]
+        .filter(
+          ([, kind, refId]) =>
+            kind !== "audio" && !known.has(`${kind}|${refId}`)
+        )
+        .map(([, kind, refId]) => `{{${kind}:${refId}}}`)
+    )
+  ].sort();
+  if (unknown.length)
+    problems.push(
+      `it names references that do not exist (${unknown.join(", ")})`
+    );
+  return problems;
+};
+
+/** Head the shot list with the overview, right before [Shot 1]; null when no [Shot 1] opens a sentence. */
+export const applySceneOverview = (
+  sections: Sections,
+  overview: string
+): Sections | null => {
+  const detailed = sections.detailed_description ?? "";
+  const heading = FIRST_SHOT_HEADING_RE.exec(detailed);
+  if (!heading) return null;
+  const before = detailed.slice(0, heading.index).trimEnd();
+  const joined = before ? `${before} ${overview} ` : `${overview} `;
+  return {
+    ...sections,
+    detailed_description: joined + detailed.slice(heading.index)
+  };
+};
+
 /** `[hard, soft]`. */
 export const validateDocument = (
   sections: Sections,
   labels: Label[],
   taskTypes: string[],
   retention: Record<string, string>,
-  turns: DialogueTurn[] = []
+  turns: DialogueTurn[] = [],
+  overviewWords = 0
 ): [string[], string[]] => {
   const hard: string[] = [...dialogueFailures(sections, turns, false)];
   const soft: string[] = [];
@@ -1003,11 +1093,11 @@ export const validateDocument = (
   if (!detailed.includes("[Shot 1]"))
     hard.push("detailed_description must contain a [Shot 1] marker");
   for (const [, number, tail] of detailed.matchAll(
-    /\[Shot (\d+)\]([^[]{0,40})/g
+    new RegExp(`${SHOT_MARKER_SOURCE}([^[]{0,40})`, "g")
   ))
     if (number !== "1" && !tail!.includes("At "))
       soft.push(`[Shot ${number}] has no 'At MM:SS.mmm' timestamp`);
-  const wordCount = detailed.split(/\s+/).filter(Boolean).length;
+  const wordCount = countWords(detailed) - overviewWords;
   if (
     wordCount < DETAILED_DESCRIPTION_MIN_WORDS ||
     wordCount > DETAILED_DESCRIPTION_MAX_WORDS
@@ -1224,8 +1314,15 @@ export const labelTable = (labels: Label[]): string =>
     .map((label) => {
       const ph = labelPlaceholder(label);
       const description = label.description ? `: ${label.description}` : "";
-      if (label.kind === "image" || label.kind === "video")
-        return `- ${ph} -> ${label.label} (${label.kind === "image" ? "image reference" : "reference video"}, slot ${label.slot})${description}`;
+      if (label.kind === "image" || label.kind === "video") {
+        const referenceKind =
+          label.slot === "first_frame"
+            ? "the video's first frame, given to the model as such, not a reference"
+            : label.kind === "image"
+              ? "image reference"
+              : "reference video";
+        return `- ${ph} -> ${label.label} (${referenceKind}, slot ${label.slot})${description}`;
+      }
       return `- ${ph} -> ${label.label} (subject, anchored to ${label.anchored_to || "no image reference"})${description}`;
     })
     .join("\n") || "- (no references for this shot)";
@@ -1282,6 +1379,7 @@ export const modelContents = (
   if (continuity) parts.push(continuity);
   const brief = dialogueBrief(turns, subjectLabelFor(labels));
   if (brief) parts.push(brief);
+  if (isSceneOverviewEnabled) parts.push(SCENE_OVERVIEW_BRIEF);
   if (hardFailures?.length)
     parts.push(
       "## Your previous answer was rejected. Fix exactly these problems:\n" +
@@ -1334,7 +1432,8 @@ export const prepareVideoPrompt = (
   if (references.some((entry) => entry.kind === "audio"))
     fail(`${engineVersion} takes no audio references`, UNPROCESSABLE);
   backfillReferenceDescriptions(clean, references, storedCaption);
-  checkReferences(references);
+  const numbered = numberedReferences(references, engineVersion);
+  checkReferences(numbered);
   const [labels, labelWarnings] = assignLabels(
     clean,
     references,
@@ -1352,7 +1451,7 @@ export const prepareVideoPrompt = (
   warnings.push(...dialogueWarnings);
   const [timing, timingWarnings] = resolveTiming(
     clean,
-    references,
+    numbered,
     engineVersion,
     turns
   );
@@ -1369,7 +1468,7 @@ export const prepareVideoPrompt = (
   );
   return {
     clean,
-    references,
+    references: numbered,
     labels,
     timing,
     taskTypes,
@@ -1397,6 +1496,19 @@ const toSections = (value: Record<string, unknown>): Record<string, string> => {
   return sections;
 };
 
+const sectionsWithOnlyDetailedDescription = (
+  detailedDescription: string
+): Sections =>
+  Object.fromEntries(
+    SECTION_ORDER.map((name) => [
+      name,
+      name === "detailed_description" ? detailedDescription : ""
+    ])
+  ) as Sections;
+
+const readSceneOverview = (answer: Record<string, unknown>): string =>
+  typeof answer.scene_overview === "string" ? answer.scene_overview : "";
+
 export interface ComposedVideoPrompt {
   prompt: string;
   prompt_template: string;
@@ -1411,6 +1523,7 @@ export interface ComposedVideoPrompt {
   engine_version: string;
   warnings: string[];
   fallback: boolean;
+  scene_overview: string | null;
 }
 
 /** Run the model over the prepared context. */
@@ -1422,14 +1535,16 @@ export const renderVideoPrompt = async (
   const warnings = [...context.warnings];
   let sections = skeleton;
   let fallback = true;
+  let sceneOverview: string | null = null;
   let hardFailures: string[] | null = null;
   let attempt = 0;
   for (; attempt < 2; attempt += 1) {
     let generated: Sections;
+    let answeredOverview: string;
     try {
-      generated = normalizeSections(
-        toSections(await callModel(modelContents(context, hardFailures)))
-      );
+      const answer = await callModel(modelContents(context, hardFailures));
+      generated = normalizeSections(toSections(answer));
+      answeredOverview = readSceneOverview(answer);
     } catch {
       warnings.push(
         "prompt generation failed; returning the deterministic skeleton"
@@ -1447,7 +1562,44 @@ export const renderVideoPrompt = async (
     if (!hard.length) {
       sections = generated;
       fallback = false;
-      warnings.push(...soft);
+      let shippedWarnings = soft;
+      if (isSceneOverviewEnabled) {
+        const overview = answeredOverview
+          .replace(RUN_TOGETHER_RE, " ")
+          .replace(/\s+/g, " ")
+          .trim();
+        const overviewWords = countWords(overview);
+        let problems = sceneOverviewProblems(overview, labels);
+        const headed = problems.length
+          ? null
+          : applySceneOverview(sections, overview);
+        if (!headed && !problems.length)
+          problems = ["no [Shot 1] heading opens the shot list"];
+        if (headed) {
+          const [headedHard, headedSoft] = validateDocument(
+            headed,
+            labels,
+            taskTypes,
+            retention,
+            turns,
+            overviewWords
+          );
+          problems = headedHard;
+          if (!problems.length) {
+            sections = headed;
+            shippedWarnings = headedSoft;
+            sceneOverview = overview;
+          }
+        }
+        if (problems.length)
+          warnings.push(`scene overview dropped: ${problems.join("; ")}`);
+        else if (overviewWords > SCENE_OVERVIEW_MAX_WORDS)
+          warnings.push(
+            `scene overview is ${overviewWords} words; ` +
+              `the guide asks for at most ${SCENE_OVERVIEW_MAX_WORDS}`
+          );
+      }
+      warnings.push(...shippedWarnings);
       break;
     }
   }
@@ -1510,7 +1662,14 @@ export const renderVideoPrompt = async (
     speakers,
     engine_version: context.engineVersion,
     warnings,
-    fallback
+    fallback,
+    scene_overview: sceneOverview
+      ? bindPlaceholders(
+          sectionsWithOnlyDetailedDescription(sceneOverview),
+          labels,
+          []
+        )[0].detailed_description!
+      : null
   };
 };
 

@@ -110,22 +110,30 @@ export const useExportCut = (
     }
   };
 
+  const isAnySceneInCutHiddenUntilDubLands = cutShots.some(
+    (cutShot) => cutShot.isSceneHiddenUntilDubLands
+  );
+
   /* A cut the dry run already refused is not asked to stitch: the answer is known, so the
    * button goes straight to the separate files rather than spending a request to be told no
    * and then opening a dialog about it. */
-  const downloadCut = () =>
-    expectedRefusal ? downloadCutAsZip() : exportCut();
+  const downloadCut = async () => {
+    if (isAnySceneInCutHiddenUntilDubLands) return;
+    await (expectedRefusal ? downloadCutAsZip() : exportCut());
+  };
 
   return {
     downloadCut,
     downloadOneShot,
     downloadCutAsZipAndDismiss: async () => {
+      if (isAnySceneInCutHiddenUntilDubLands) return;
       await downloadCutAsZip();
       setFailedExport(null);
     },
     isExportingCut: isExportingCut || isDownloadingCut,
     isDownloadingCut,
     downloadableShotCount,
+    isAnySceneInCutHiddenUntilDubLands,
     /** Known from the dry run, before the user presses anything. */
     expectedRefusal,
     failedExport,

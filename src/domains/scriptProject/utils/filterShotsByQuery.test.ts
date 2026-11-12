@@ -34,6 +34,7 @@ const shot = (
   tags: { characters, environments: [], props: [] },
   references: {},
   missing_references: [],
+  dialogue_untagged_speakers: [],
   dropped: false,
   hidden: false,
   manual: false

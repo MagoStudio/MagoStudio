@@ -19,6 +19,10 @@ import {
   buildLocalVideoSaveInputs,
   LOCAL_VIDEO_RENDER_CRF
 } from "../imageRenders/comfyVideoSave";
+import {
+  readConfiguredTextModelPath,
+  recordModelFailure
+} from "../modelSettings/modelRuntimeHooks";
 
 const RUN_TIMEOUT_MS = 3 * 60 * 60 * 1000;
 const SCRIPT_POLL_INTERVAL_MS = 2000;
@@ -511,9 +515,11 @@ export class ComfyScriptProjectClient {
     isCancelled?: () => boolean,
     mode: "subprocess" | "direct_clean" = "subprocess"
   ): Promise<string> {
-    const modelPath = await this.resolveTextEncoderPath(
-      LOCAL_SCRIPT_TEXT_MODEL_FILES[this.scriptTextModel]
-    );
+    const modelPath =
+      (await readConfiguredTextModelPath(this.endpoint)) ??
+      (await this.resolveTextEncoderPath(
+        LOCAL_SCRIPT_TEXT_MODEL_FILES[this.scriptTextModel]
+      ));
     const config = JSON.stringify({
       model_path: modelPath,
       system_prompt:
@@ -578,6 +584,7 @@ export class ComfyScriptProjectClient {
     const text = findString(output);
     if (!text) throw new Error("Qwen3.8 completed without text output");
     if (text.trimStart().startsWith("❌")) {
+      await recordModelFailure(this.endpoint, text.trim(), graph);
       throw new Error(text.trim());
     }
     return text;

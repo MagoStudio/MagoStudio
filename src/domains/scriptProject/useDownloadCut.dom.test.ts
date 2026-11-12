@@ -84,6 +84,38 @@ describe("useDownloadCut", () => {
       expect(triggerBlobDownload).not.toHaveBeenCalled();
       expect(toast.showErrorToast).not.toHaveBeenCalled();
     });
+
+    it("does not download a Shot whose scene is being dubbed", async () => {
+      const { result } = renderHook(() => useDownloadCut([]));
+
+      await act(() =>
+        result.current.downloadOneShot(
+          buildShot({ isSceneHiddenUntilDubLands: true })
+        )
+      );
+
+      expect(fetch).not.toHaveBeenCalled();
+      expect(triggerBlobDownload).not.toHaveBeenCalled();
+    });
+
+    it("downloads the dubbed scene, not the render it was made over", async () => {
+      vi.mocked(fetch).mockResolvedValue(mockOkResponse());
+      const { result } = renderHook(() => useDownloadCut([]));
+
+      await act(() =>
+        result.current.downloadOneShot(
+          buildShot({
+            mixed_asset_id: "dub",
+            url: "https://example.test/dubbed-scene.mp4"
+          })
+        )
+      );
+
+      expect(fetch).toHaveBeenCalledWith(
+        "https://example.test/dubbed-scene.mp4",
+        expect.anything()
+      );
+    });
   });
 
   describe("downloadCut", () => {

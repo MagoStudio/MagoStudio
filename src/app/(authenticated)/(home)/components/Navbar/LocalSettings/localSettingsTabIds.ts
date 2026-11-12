@@ -1,7 +1,8 @@
 export const LOCAL_SETTINGS_TAB_IDS = {
   account: "account",
+  general: "general",
   models: "models",
-  general: "general"
+  debug: "debug"
 } as const;
 
 export type LocalSettingsTabId =

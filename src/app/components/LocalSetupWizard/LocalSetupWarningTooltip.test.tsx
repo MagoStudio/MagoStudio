@@ -27,8 +27,7 @@ describe("LocalSetupWarningTooltip", () => {
     );
     const tooltip = screen.getByRole("tooltip");
     expect(tooltip).toHaveAttribute("data-react-aria-top-layer", "true");
-    expect(tooltip).toHaveClass("z-tooltip");
-    expect(tooltip).not.toHaveClass("z-help-button");
+    expect(tooltip).toHaveClass("data-[react-aria-top-layer=true]:z-tooltip");
     fireEvent.click(
       screen.getByRole("button", { name: "Set up local render" })
     );
@@ -56,6 +55,8 @@ describe("LocalSetupWarningTooltip", () => {
     expect(screen.getByRole("tooltip")).not.toHaveAttribute(
       "data-react-aria-top-layer"
     );
+    expect(screen.getByRole("tooltip")).toHaveClass("z-page-popover");
+    expect(screen.getByRole("tooltip")).not.toHaveClass("z-tooltip");
     expect(screen.getByRole("button", { name: "Generate" })).toBeDisabled();
     fireEvent.click(
       screen.getByRole("button", { name: "Update installation" })

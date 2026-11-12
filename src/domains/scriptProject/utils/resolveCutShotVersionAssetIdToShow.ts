@@ -1,5 +1,6 @@
 import { CutShot, CutShotVersion } from "@schemas/scriptProject";
 
+import { isCutShotVersionAwaitingDub } from "./isCutShotVersionAwaitingDub";
 import { isCutShotVersionRendering } from "./isCutShotVersionRendering";
 
 export const resolveCutShotVersionAssetIdToShow = (
@@ -8,7 +9,9 @@ export const resolveCutShotVersionAssetIdToShow = (
 ): string | null => {
   const [newestVersion] = versionsNewestFirst;
   const isNewestVersionStillRendering =
-    !!newestVersion && isCutShotVersionRendering(newestVersion);
+    !!newestVersion &&
+    (isCutShotVersionRendering(newestVersion) ||
+      isCutShotVersionAwaitingDub(newestVersion));
   return isNewestVersionStillRendering
     ? newestVersion.asset_id
     : (shot.pinned_asset_id ?? null);

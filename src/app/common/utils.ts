@@ -4,14 +4,10 @@ import { frameRangeOf } from "@domains/track/utils/frameCoordinates";
 import { getTrackAssetData } from "@domains/track/utils/getTrackAssetData";
 import { getTrackClip } from "@domains/track/utils/getTrackClip";
 import { Layer, LayerType } from "@schemas/layer";
-import {
-  getImageDimensions as getImageDimensionsUtil,
-  resizeImageFromFile
-} from "@utils/image/resizeImage";
+import { getImageDimensions as getImageDimensionsUtil } from "@utils/image/resizeImage";
 import { clsx, type ClassValue } from "clsx";
 import { extendTailwindMerge } from "tailwind-merge";
 
-const IMAGE_QUALITY_THRESHOLD = 0.9;
 const HTTP_STATUS_PRECONDITION_FAILED = 412;
 const HTTP_STATUS_UNPROCESSABLE_ENTITY = 422;
 const MOBILE_ASPECT_RATIO_MIN = 1.3;
@@ -25,6 +21,7 @@ const namedZIndexTokens = [
   "toast",
   "nested-modal",
   "modal",
+  "page-popover",
   "help-button",
   "menu"
 ];
@@ -45,28 +42,6 @@ export const getImageDimensions = getImageDimensionsUtil;
 
 export const getImageExtension = (file: File): string => {
   return file.name.split(".").pop()?.toLowerCase() || "";
-};
-
-export const resizeImageToFitWidth = async (
-  file: File,
-  maxWidth: number
-): Promise<File> => {
-  const { width } = await getImageDimensions(file);
-
-  if (width <= maxWidth) {
-    return file;
-  }
-
-  const extension = getImageExtension(file);
-  const imageFormat = (
-    extension === "jpg" ? "image/jpeg" : `image/${extension}`
-  ) as "image/jpeg" | "image/png" | "image/webp";
-
-  return resizeImageFromFile(file, {
-    maxWidth,
-    imageFormat,
-    imageQuality: IMAGE_QUALITY_THRESHOLD
-  });
 };
 
 const getLayersWithoutErrorOnes = (layers: Layer[] | undefined) => {

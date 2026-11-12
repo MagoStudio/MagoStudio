@@ -13,6 +13,8 @@ export const describeSceneStoryboardFromSheets = ({
     !shotStoryboard.latestFinishedStoryboardImageUrl;
   return {
     imageUrl: shotStoryboard.latestFinishedStoryboardImageUrl,
+    imageClipId: shotStoryboard.latestFinishedStoryboardClipId,
+    imageAssetId: shotStoryboard.latestFinishedStoryboardAssetId,
     isRendering: shotStoryboard.isStoryboardRendering,
     hasNoUsableVersion,
     failedRenderClipId: shotStoryboard.hasLatestStoryboardRenderFailed

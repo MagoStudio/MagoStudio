@@ -1,6 +1,8 @@
 import { CutShot } from "@schemas/scriptProject";
 
 import { doesShotContributeToCut } from "./countShotsContributingToCut";
+import { isCutShotVersionRendering } from "./isCutShotVersionRendering";
+import { resolveCutShotVideo } from "./resolveCutShotVideo";
 import { SHOT_FPS } from "./snapShotFrames";
 import { hasShotRenderFailed } from "./summariseShotRenderState";
 
@@ -12,8 +14,10 @@ export interface CutTimelineClip {
   posterUrl: string | null;
   videoUrl: string | null;
   assetId: string | null;
+  versionAssetId: string | null;
   isClipPlayable: boolean;
   doesClipHaveRender: boolean;
+  isClipRendering: boolean;
   hasClipRenderFailed: boolean;
   isClipDurationMeasured: boolean;
   durationFrames: number;
@@ -37,8 +41,9 @@ export const buildCutTimelineClips = (
 
   let startFrame = 0;
   const clips = orderedCutShots.map((cutShot) => {
-    const measuredSeconds = cutShot.asset_id
-      ? durationSecondsByAssetId[cutShot.asset_id]
+    const { videoUrl, videoAssetId, posterUrl } = resolveCutShotVideo(cutShot);
+    const measuredSeconds = videoAssetId
+      ? durationSecondsByAssetId[videoAssetId]
       : undefined;
     const isClipDurationMeasured =
       typeof measuredSeconds === "number" && measuredSeconds > 0;
@@ -51,11 +56,17 @@ export const buildCutTimelineClips = (
       sequenceId: cutShot.sequence_id,
       shotIndex: cutShot.shot_index,
       heading: cutShot.heading ?? null,
-      posterUrl: cutShot.poster_url,
-      videoUrl: cutShot.url,
-      assetId: cutShot.asset_id,
-      isClipPlayable: !!cutShot.url,
-      doesClipHaveRender: doesShotContributeToCut(cutShot),
+      posterUrl,
+      videoUrl,
+      assetId: videoAssetId,
+      versionAssetId: cutShot.asset_id,
+      isClipPlayable: !!videoUrl,
+      doesClipHaveRender:
+        doesShotContributeToCut(cutShot) && !cutShot.isSceneHiddenUntilDubLands,
+      isClipRendering:
+        !!cutShot.isSceneHiddenUntilDubLands ||
+        (!doesShotContributeToCut(cutShot) &&
+          cutShot.versions.some(isCutShotVersionRendering)),
       hasClipRenderFailed: hasShotRenderFailed(cutShot),
       isClipDurationMeasured,
       durationFrames,

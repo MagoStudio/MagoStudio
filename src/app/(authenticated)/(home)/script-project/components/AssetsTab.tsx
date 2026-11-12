@@ -42,11 +42,13 @@ import { ProjectState, SheetKind } from "@schemas/scriptProject";
 import { useState } from "react";
 import { useTranslation } from "react-i18next";
 
+import { AddEntityDialog } from "./AddEntityDialog";
 import { ConfirmPinDialog } from "./ConfirmPinDialog";
 import { ConfirmRemoveEntityDialog } from "./ConfirmRemoveEntityDialog";
-import { DraftSheetGroupCard } from "./DraftSheetGroupCard";
 import { EarlierScriptVersionToggle } from "./EarlierScriptVersionToggle";
 import { GenerateRunButton } from "./GenerateRunButton";
+import { NothingToGenerateReason } from "./NothingToGenerateReason";
+import { PendingSheetGroupCard } from "./PendingSheetGroupCard";
 import { ProjectVisualStyleField } from "./ProjectVisualStyleField";
 import { SheetGroupRow } from "./SheetGroupRow";
 import { SheetRenderModelDropdown } from "./SheetRenderModelDropdown";
@@ -103,9 +105,11 @@ export const AssetsTab: React.FC<Props> = ({
   const [collapsedSectionKinds, setCollapsedSectionKinds] = useState<string[]>(
     []
   );
-  const [sheetGroupDrafts, setSheetGroupDrafts] = useState<SheetGroupDraft[]>(
-    []
-  );
+  const [sheetGroupDraft, setSheetGroupDraft] =
+    useState<SheetGroupDraft | null>(null);
+  const [pendingNewSheetGroups, setPendingNewSheetGroups] = useState<
+    { token: string; name: string }[]
+  >([]);
   const [shouldScoreImages, setShouldScoreImages] = useState(false);
   const [expandedSectionKeys, setExpandedSectionKeys] = useState<string[]>([]);
   const [expandedDesignFamilyKeys, setExpandedDesignFamilyKeys] = useState<
@@ -142,8 +146,11 @@ export const AssetsTab: React.FC<Props> = ({
   } = useEditSheetGroup(projectId);
   const { mutate: renderSheetGroup, isPending: isRenderingSheetGroup } =
     useRenderSheetGroup(projectId);
-  const { uploadSheetGroupImage, isUploadingSheetGroupImage } =
-    useUploadSheetGroupImage(projectId);
+  const {
+    uploadSheetGroupImage,
+    isUploadingSheetGroupImage,
+    uploadingSheetGroupTokens
+  } = useUploadSheetGroupImage(projectId);
   const { mutate: describeSheetGroup, isPending: isDescribingSheetGroup } =
     useDescribeSheetGroup(projectId);
 
@@ -169,6 +176,22 @@ export const AssetsTab: React.FC<Props> = ({
     ) === true;
 
   const sheetsTimelineId = projectState.sheets_timeline_id;
+  const listedSheetGroupTokens = projectState.keys.map((group) => group.token);
+  const isAnyPendingNewSheetGroupListed = pendingNewSheetGroups.some(
+    (pending) => listedSheetGroupTokens.includes(pending.token)
+  );
+  if (isAnyPendingNewSheetGroupListed)
+    setPendingNewSheetGroups(
+      pendingNewSheetGroups.filter(
+        (pending) => !listedSheetGroupTokens.includes(pending.token)
+      )
+    );
+  const showPendingNewSheetGroup = (token: string, name: string) =>
+    setPendingNewSheetGroups((pending) => [...pending, { token, name }]);
+  const forgetPendingNewSheetGroup = (token: string) =>
+    setPendingNewSheetGroups((pending) =>
+      pending.filter((candidate) => candidate.token !== token)
+    );
   const creditsPerSheetImage = isSheetRenderModel(sheetRenderModel)
     ? estimateSheetImageCredits(sheetRenderModel, sheetOutputSize)
     : 0;
@@ -191,12 +214,13 @@ export const AssetsTab: React.FC<Props> = ({
   const pinnedUploadKeyCount = skippedAsPinnedUploadEntries.length;
   const unchangedKeyCount = otherSkippedEntries.length;
   const renderInProgressKeyCount = skippedAsRenderInProgressEntries.length;
-  const isBusy =
+  const isBusyWithAnythingButImageUploads =
     isPinningSheetImage ||
     isEditingSheetGroup ||
     isRenderingSheetGroup ||
-    isUploadingSheetGroupImage ||
     isDescribingSheetGroup;
+  const isBusy =
+    isBusyWithAnythingButImageUploads || isUploadingSheetGroupImage;
 
   const startSheetGeneration = () =>
     generateSheets(
@@ -261,26 +285,31 @@ export const AssetsTab: React.FC<Props> = ({
       : [])
   ];
 
-  const discardSheetGroupDraft = (draftId: string) =>
-    setSheetGroupDrafts((drafts) =>
-      drafts.filter((draft) => draft.draftId !== draftId)
-    );
-
   const createSheetGroupWithFirstRender = (entity: {
     token: string;
     name: string;
     kind: SheetKind;
     prompt: string;
+    referenceAssetIds: string[];
+    referenceInstruction: string;
   }) => {
     if (!sheetsTimelineId) return;
 
+    showPendingNewSheetGroup(entity.token, entity.name);
     renderSheetGroup(
       {
+        isNewSheetGroup: true,
         timelineId: sheetsTimelineId,
         token: entity.token,
         name: entity.name,
         kind: entity.kind,
         prompt: entity.prompt,
+        ...(entity.referenceAssetIds.length > 0
+          ? {
+              referenceAssetIds: entity.referenceAssetIds,
+              referenceInstruction: entity.referenceInstruction
+            }
+          : {}),
         renderModel: sheetRenderModel,
         renderMode: RenderMode.CREDITS,
         outputSize: sheetOutputSize
@@ -288,7 +317,8 @@ export const AssetsTab: React.FC<Props> = ({
       {
         onSuccess: (result) => {
           if (result?.plan_id) onRunStarted(result.plan_id, result.would_run);
-        }
+        },
+        onError: () => forgetPendingNewSheetGroup(entity.token)
       }
     );
   };
@@ -346,6 +376,8 @@ export const AssetsTab: React.FC<Props> = ({
   const renderSheetGroupRow = (group: ProjectState["keys"][number]) => (
     <SheetGroupRow
       key={`${group.token}:${(group.reference_asset_ids ?? []).join(",")}:${group.reference_instruction ?? ""}`}
+      projectId={projectId}
+      timelineId={sheetsTimelineId}
       group={group}
       imageUrlsByAssetId={imageUrlsByAssetId}
       changedPaths={dryRun?.changed?.[group.token]}
@@ -359,6 +391,8 @@ export const AssetsTab: React.FC<Props> = ({
       }
       onUploadReference={uploadSheetGroupReference}
       isBusy={isBusy}
+      isBusyWithAnythingButImageUploads={isBusyWithAnythingButImageUploads}
+      isUploadingImage={uploadingSheetGroupTokens.includes(group.token)}
       isRunActive={isRunActive}
       isRenderDisabled={!canRender}
       renderCost={
@@ -369,7 +403,7 @@ export const AssetsTab: React.FC<Props> = ({
             : { kind: "local" }
       }
       supportsImageReferences={isLocalProject || canRender}
-      shouldFetchImageInputs={!isLocalProject}
+      isCharacterVoiceAvailableForProject={!isLocalProject}
       onPin={(assetId) => {
         const staleShotCount = countShotsTaggingEntity(
           shotsInActiveScript,
@@ -453,11 +487,6 @@ export const AssetsTab: React.FC<Props> = ({
         isRunActive ||
         isLocalSheetRenderLocked
       }
-      nothingToGenerateReason={
-        isEveryEntityUpToDate
-          ? t("script_project.toolbar_nothing_to_generate.noChanges")
-          : undefined
-      }
       isPending={isGeneratingSheets || isRunActive}
       isPriceLoading={
         isDryRunFetching || isSavingSheetRenderModel || isSavingSheetResolution
@@ -529,15 +558,14 @@ export const AssetsTab: React.FC<Props> = ({
             colorScheme="secondary"
             isDisabled={!canRender || isBusy || isRunActive}
             onPress={() =>
-              setSheetGroupDrafts((drafts) => [
-                {
-                  draftId: crypto.randomUUID(),
-                  name: "",
-                  kind: "character",
-                  prompt: ""
-                },
-                ...drafts
-              ])
+              setSheetGroupDraft({
+                draftId: crypto.randomUUID(),
+                name: "",
+                kind: "character",
+                prompt: "",
+                referenceAssetIds: [],
+                referenceInstruction: ""
+              })
             }
             data-testid="script-project-add-entity"
           >
@@ -578,6 +606,20 @@ export const AssetsTab: React.FC<Props> = ({
             onChange={(event) => setShouldScoreImages(event.target.checked)}
             label={t("script_project.score_assets_toggle.label")}
           />
+          <NothingToGenerateReason
+            reason={
+              isEveryEntityUpToDate
+                ? t("script_project.toolbar_nothing_to_generate.noChanges")
+                : undefined
+            }
+            isPending={isGeneratingSheets || isRunActive}
+            isPriceLoading={
+              isDryRunFetching ||
+              isSavingSheetRenderModel ||
+              isSavingSheetResolution
+            }
+            testId="script-project-generate-sheets"
+          />
           {isLocalSheetRenderLocked ? (
             <SetupMagoStudioButton
               requiredLocalInstall={requiredLocalInstall}
@@ -609,43 +651,52 @@ export const AssetsTab: React.FC<Props> = ({
           inputId="script-project-toggle-disabled-entities"
           testId="script-project-toggle-disabled-entities"
         />
-        {sheetGroupDrafts.length > 0 && (
+        {sheetGroupDraft && (
+          <AddEntityDialog
+            draft={sheetGroupDraft}
+            existingTokens={[
+              ...listedSheetGroupTokens,
+              ...pendingNewSheetGroups.map((pending) => pending.token)
+            ]}
+            isBusy={isBusy || isRunActive}
+            isBusyWithAnythingButImageUploads={
+              isBusyWithAnythingButImageUploads || isRunActive
+            }
+            onChange={setSheetGroupDraft}
+            onRender={(newSheetGroup) => {
+              createSheetGroupWithFirstRender(newSheetGroup);
+              setSheetGroupDraft(null);
+            }}
+            onUploadImage={(newSheetGroup, file) => {
+              showPendingNewSheetGroup(newSheetGroup.token, newSheetGroup.name);
+              void uploadSheetGroupImage({
+                timelineId: sheetsTimelineId,
+                token: newSheetGroup.token,
+                file,
+                nameForNewSheetGroup: newSheetGroup.name,
+                kindForNewSheetGroup: newSheetGroup.kind
+              }).then((isImageFiled) => {
+                if (!isImageFiled)
+                  forgetPendingNewSheetGroup(newSheetGroup.token);
+              });
+              setSheetGroupDraft(null);
+            }}
+            onUploadReference={uploadSheetGroupReference}
+            onDiscard={() => setSheetGroupDraft(null)}
+          />
+        )}
+        {pendingNewSheetGroups.length > 0 && (
           <div className="grid grid-cols-2 items-start gap-3">
-            {sheetGroupDrafts.map((draft) => (
-              <DraftSheetGroupCard
-                key={draft.draftId}
-                draft={draft}
-                existingTokens={projectState.keys.map((group) => group.token)}
-                isBusy={isBusy || isRunActive}
-                onChange={(changedDraft) =>
-                  setSheetGroupDrafts((drafts) =>
-                    drafts.map((candidate) =>
-                      candidate.draftId === changedDraft.draftId
-                        ? changedDraft
-                        : candidate
-                    )
-                  )
-                }
-                onRender={(newSheetGroup) => {
-                  createSheetGroupWithFirstRender(newSheetGroup);
-                  discardSheetGroupDraft(draft.draftId);
-                }}
-                onUploadImage={(newSheetGroup, file) => {
-                  void uploadSheetGroupImage({
-                    timelineId: sheetsTimelineId,
-                    token: newSheetGroup.token,
-                    file,
-                    nameForNewSheetGroup: newSheetGroup.name,
-                    kindForNewSheetGroup: newSheetGroup.kind
-                  });
-                  discardSheetGroupDraft(draft.draftId);
-                }}
-                onDiscard={() => discardSheetGroupDraft(draft.draftId)}
+            {pendingNewSheetGroups.map((pending) => (
+              <PendingSheetGroupCard
+                key={pending.token}
+                name={pending.name}
+                token={pending.token}
               />
             ))}
           </div>
         )}
-        {sections.length === 0 && sheetGroupDrafts.length === 0 && (
+        {sections.length === 0 && pendingNewSheetGroups.length === 0 && (
           <Text variant="sm" color="glyph-tertiary">
             {isSearching
               ? t("script_project.no_search_results.label", {
@@ -663,6 +714,7 @@ export const AssetsTab: React.FC<Props> = ({
           return (
             <Accordion
               key={sectionKey}
+              panelIndent="flush"
               label={`${section.label} (${section.groups.length})`}
               isExpanded={isSearching || !isCollapsed}
               onExpandedChange={(isExpanded) => {

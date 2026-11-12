@@ -134,7 +134,7 @@ describe("i18n resources", () => {
   );
 
   it("defines the dynamically selected Script Project version-review labels", () => {
-    for (const field of ["good", "bad", "todo"]) {
+    for (const field of ["bad", "todo"]) {
       expect(i18n.exists(`script_project.version_review_${field}.label`)).toBe(
         true
       );

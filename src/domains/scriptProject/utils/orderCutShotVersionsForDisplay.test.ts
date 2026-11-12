@@ -30,7 +30,7 @@ const cutShot = (overrides: Partial<CutShot>): CutShot => ({
 });
 
 describe("orderCutShotVersionsForDisplay", () => {
-  it("shows the pinned version and lists the rest newest first below it", () => {
+  it("shows the pinned version and keeps every version in newest-first order", () => {
     const ordered = orderCutShotVersionsForDisplay(
       cutShot({
         pinned_asset_id: "middle",
@@ -44,18 +44,38 @@ describe("orderCutShotVersionsForDisplay", () => {
     );
 
     expect(ordered.shownVersion?.asset_id).toBe("middle");
-    expect(ordered.pinnedVersionAssetId).toBe("middle");
+    expect(ordered.displayedPinnedVersionAssetId).toBe("middle");
     expect(
-      ordered.versionsBelowShownVersion.map((version) => version.asset_id)
-    ).toEqual(["newest", "oldest"]);
+      ordered.versionsNewestFirst.map((version) => version.asset_id)
+    ).toEqual(["newest", "middle", "oldest"]);
     expect(ordered.versionNumberByAssetId.get("newest")).toBe(3);
+  });
+
+  it("shows the newest render as rendering while it waits for its dub, and keeps the pin", () => {
+    const ordered = orderCutShotVersionsForDisplay(
+      cutShot({
+        asset_id: "oldest",
+        pinned_asset_id: "oldest",
+        versions: [
+          cutShotVersion("oldest", "2026-10-01T00:00:00Z"),
+          {
+            ...cutShotVersion("newest", "2026-10-03T00:00:00Z"),
+            awaiting_dub: true
+          }
+        ]
+      }),
+      new Map()
+    );
+
+    expect(ordered.shownVersion?.asset_id).toBe("newest");
+    expect(ordered.displayedPinnedVersionAssetId).toBe("oldest");
   });
 
   it("has nothing to show for a scene with no cut", () => {
     expect(orderCutShotVersionsForDisplay(undefined, new Map())).toMatchObject({
       shownVersion: undefined,
       versionsNewestFirst: [],
-      pinnedVersionAssetId: null
+      displayedPinnedVersionAssetId: null
     });
   });
 });

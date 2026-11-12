@@ -2,7 +2,6 @@ import { LaunchComfyButton } from "@app/components/LaunchComfyButton";
 import { useComfyLaunchStatus } from "@app/components/LaunchComfyButton/hooks/useComfyLaunchStatus";
 import { COMFY_LAUNCH_MUTATION_KEY } from "@app/components/LaunchComfyButton/hooks/useLaunchComfy";
 import { Accordion } from "@components/Accordion";
-import { LinearProgress } from "@components/LinearProgress";
 import { MainButton } from "@components/MainButton";
 import { Modal } from "@components/Modal";
 import { Text } from "@components/Text";
@@ -15,8 +14,8 @@ import type { StarterInstallStatus } from "../../../../desktop/shared/contracts"
 
 import { LocalSetupComfyRestartPrompt } from "./LocalSetupComfyRestartPrompt";
 import { LocalSetupDownloadFileRow } from "./LocalSetupDownloadFileRow";
+import { LocalSetupDownloadProgressBar } from "./LocalSetupDownloadProgressBar";
 import { LocalSetupWizardCard } from "./LocalSetupWizardCard";
-const BYTES_PER_GIB = 1_073_741_824;
 export const LocalSetupDownloadStep = ({
   status,
   error,
@@ -88,17 +87,10 @@ export const LocalSetupDownloadStep = ({
                   ? "Download paused"
                   : "Downloading ComfyUI and models"}
       </Text>
-      <LinearProgress
-        size="lg"
-        value={received}
-        totalValue={Math.max(total, 1)}
-        color="element-additional-active"
-        className="min-w-0 flex-none rounded-full bg-element-tertiary"
+      <LocalSetupDownloadProgressBar
+        receivedBytes={received}
+        totalBytes={total}
       />
-      <Text variant="sm" color="glyph-secondary">
-        {(received / BYTES_PER_GIB).toFixed(1)} of{" "}
-        {(total / BYTES_PER_GIB).toFixed(1)} GB
-      </Text>
       {status?.phase === "extracting" && (
         <Text variant="xs" color="glyph-secondary" decoration="underline">
           Extracting into {status.directory}

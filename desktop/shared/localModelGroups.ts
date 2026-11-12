@@ -1,3 +1,4 @@
+import { LOCAL_MODEL_DEFINITIONS } from "./localModelDefinitions";
 import {
   LOCAL_MODEL_BUNDLES,
   type LocalModelBundle
@@ -77,13 +78,19 @@ const LOCAL_MODEL_GROUP_DEFINITIONS = [
       {
         id: "qwen38-27b-q3",
         label: "Q3",
-        bundleIds: ["local-llm-q3"],
+        bundleIds: LOCAL_MODEL_DEFINITIONS.find(
+          (model) => model.id === "text"
+        )!.variants.find((variant) => variant.id === "qwen38-27b-q3")!
+          .bundleIds,
         minimumVideoMemoryGigabytes: 0
       },
       {
         id: "qwen38-27b-q5",
         label: "Q5",
-        bundleIds: ["local-llm-q5"],
+        bundleIds: LOCAL_MODEL_DEFINITIONS.find(
+          (model) => model.id === "text"
+        )!.variants.find((variant) => variant.id === "qwen38-27b-q5")!
+          .bundleIds,
         minimumVideoMemoryGigabytes: 24
       }
     ],

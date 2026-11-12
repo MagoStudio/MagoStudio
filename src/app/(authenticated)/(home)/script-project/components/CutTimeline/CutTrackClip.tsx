@@ -1,6 +1,8 @@
+import { AnimatedGradient } from "@components/AnimatedGradient";
 import { Icon } from "@components/Icon";
 import { IconActionButton } from "@components/IconActionButton";
 import { Text } from "@components/Text";
+import { toDesktopCloudStorageUrl } from "@domains/asset/utils/toDesktopCloudStorageUrl";
 import { bucketFilmstripWidth } from "@domains/scriptProject/utils/bucketFilmstripWidth";
 import { CutTimelineClip } from "@domains/scriptProject/utils/buildCutTimelineClips";
 import { formatShotTitle } from "@domains/scriptProject/utils/formatShotTitle";
@@ -61,6 +63,7 @@ export const CutTrackClip: React.FC<Props> = ({
       title={clip.heading ?? undefined}
       data-testid={`cut-timeline-clip-${clip.sequenceId}`}
     >
+      {clip.isClipRendering && <AnimatedGradient />}
       {filmstripUrl && (
         <img
           alt={clip.heading ?? t("script_project.shot_filmstrip.alt")}
@@ -74,7 +77,7 @@ export const CutTrackClip: React.FC<Props> = ({
           aria-label={clip.heading ?? t("script_project.shot_filmstrip.alt")}
           className="absolute inset-0"
           style={{
-            backgroundImage: `url(${clip.posterUrl})`,
+            backgroundImage: `url(${clip.posterUrl ? toDesktopCloudStorageUrl(clip.posterUrl) : ""})`,
             backgroundRepeat: "repeat-x",
             backgroundSize: "auto 100%",
             backgroundPosition: "left center"

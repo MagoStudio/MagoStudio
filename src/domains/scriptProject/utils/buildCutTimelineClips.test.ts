@@ -56,6 +56,20 @@ describe("buildCutTimelineClips", () => {
     expect(clips[0]?.isClipPlayable).toBe(false);
   });
 
+  it("shows a scene being dubbed as not rendered yet", () => {
+    const { clips } = buildCutTimelineClips(
+      [buildCutShot({ isSceneHiddenUntilDubLands: true })],
+      {},
+      FALLBACK_FRAMES
+    );
+
+    expect(clips[0]?.doesClipHaveRender).toBe(false);
+    expect(clips[0]?.isClipPlayable).toBe(false);
+    expect(clips[0]?.videoUrl).toBeNull();
+    expect(clips[0]?.assetId).toBeNull();
+    expect(clips[0]?.posterUrl).toBeNull();
+  });
+
   it("lays each clip down where the one before it ended", () => {
     const { clips, totalDurationFrames } = buildCutTimelineClips(
       [
@@ -126,10 +140,84 @@ describe("buildCutTimelineClips", () => {
     expect(clips[0]?.hasClipRenderFailed).toBe(true);
   });
 
+  it("shows a scene whose first render waits for its dub as rendering, not as missing", () => {
+    const { clips } = buildCutTimelineClips(
+      [
+        buildCutShot({
+          asset_id: null,
+          url: "https://signed/raw.mp4",
+          isSceneHiddenUntilDubLands: true,
+          versions: [
+            {
+              layer_id: "layer-1",
+              asset_id: "asset-1",
+              ready: true,
+              status: "finished",
+              url: "https://signed/raw.mp4",
+              poster_url: null,
+              awaiting_dub: true
+            }
+          ]
+        })
+      ],
+      {},
+      FALLBACK_FRAMES
+    );
+
+    expect(clips[0]).toMatchObject({
+      isClipRendering: true,
+      isClipPlayable: false,
+      videoUrl: null,
+      doesClipHaveRender: false
+    });
+  });
+
+  it("shows a scene with a render still running and nothing in the cut as rendering", () => {
+    const { clips } = buildCutTimelineClips(
+      [
+        buildCutShot({
+          asset_id: null,
+          versions: [
+            {
+              layer_id: "layer-1",
+              asset_id: "asset-1",
+              ready: false,
+              status: "inprogress",
+              url: null,
+              poster_url: null
+            }
+          ]
+        })
+      ],
+      {},
+      FALLBACK_FRAMES
+    );
+
+    expect(clips[0]?.isClipRendering).toBe(true);
+  });
+
   it("has nothing to lay out for an empty cut", () => {
     expect(buildCutTimelineClips([], {}, FALLBACK_FRAMES)).toEqual({
       clips: [],
       totalDurationFrames: 0
     });
+  });
+
+  it("plays and measures a dubbed scene under the dub, never under its version", () => {
+    const { clips } = buildCutTimelineClips(
+      [
+        buildCutShot({
+          url: "https://example.com/shot-1-dubbed.mp4",
+          mixed_asset_id: "dub-1"
+        })
+      ],
+      { "asset-1": 1, "dub-1": 3 },
+      FALLBACK_FRAMES
+    );
+
+    expect(clips[0]?.assetId).toBe("dub-1");
+    expect(clips[0]?.versionAssetId).toBe("asset-1");
+    expect(clips[0]?.videoUrl).toBe("https://example.com/shot-1-dubbed.mp4");
+    expect(clips[0]?.durationFrames).toBe(72);
   });
 });

@@ -1,3 +1,4 @@
+import { execFileSync } from "node:child_process";
 import path from "node:path";
 
 import { app, BrowserWindow, dialog, session, shell } from "electron";
@@ -32,6 +33,7 @@ import { registerImageRenderHandlers } from "./ipc/registerImageRenderHandlers";
 import { registerLibraryHandlers } from "./ipc/registerLibraryHandlers";
 import { registerLocalSetupHandlers } from "./ipc/registerLocalSetupHandlers";
 import { registerMediaHandlers } from "./ipc/registerMediaHandlers";
+import { registerModelSettingsHandlers } from "./ipc/registerModelSettingsHandlers";
 import { registerProjectHandlers } from "./ipc/registerProjectHandlers";
 import { registerScriptProjectHandlers } from "./ipc/registerScriptProjectHandlers";
 import { registerVlmHandlers } from "./ipc/registerVlmHandlers";
@@ -39,6 +41,9 @@ import { TextModelBridge } from "./ipc/textModelBridge";
 import { runBackgroundTask } from "./libraryHealth";
 import { LibrarySettings } from "./librarySettings";
 import { VideoFrameService } from "./media/videoFrameService";
+import { configureModelRuntimeHooks } from "./modelSettings/modelRuntimeHooks";
+import { ModelSettingsService } from "./modelSettings/ModelSettingsService";
+import { ModelSettingsStore } from "./modelSettings/ModelSettingsStore";
 import { openStartupLibrary } from "./openStartupLibrary";
 import { installOfflineRenderer } from "./renderer/offlineRenderer";
 import {
@@ -359,6 +364,53 @@ void app
   .whenReady()
   .then(async () => {
     logStartup("Electron ready; registering services");
+    let modelCommit = process.env.NEXT_PUBLIC_COMMIT_HASH ?? "unknown";
+    if (!app.isPackaged)
+      try {
+        modelCommit = execFileSync("git", ["rev-parse", "HEAD"], {
+          cwd: app.getAppPath(),
+          windowsHide: true,
+          timeout: 2000,
+          encoding: "utf8"
+        }).trim();
+      } catch {}
+    const modelSettingsService = new ModelSettingsService(
+      new ModelSettingsStore(
+        path.join(app.getPath("userData"), "model-settings.json")
+      ),
+      librarySettings,
+      {
+        version: app.getVersion(),
+        commit: modelCommit,
+        development: !app.isPackaged
+      }
+    );
+    configureModelRuntimeHooks({
+      prepare: (endpoint, graph) =>
+        modelSettingsService.prepare(endpoint, graph),
+      observe: (endpoint, stats) =>
+        modelSettingsService.observe(endpoint, stats),
+      memoryPolicy: async (endpoint) =>
+        (await modelSettingsService.store.endpoint(endpoint)).settings
+          ?.memoryPolicy ?? "auto",
+      textModelPath: (endpoint) => modelSettingsService.textModelPath(endpoint),
+      allowsCpuTextInstall: async () => {
+        const endpoint = await librarySettings.getComfyEndpoint();
+        return (
+          (await modelSettingsService.store.endpoint(endpoint)).settings?.models
+            .text?.text.mode === "cpu"
+        );
+      },
+      failed: (endpoint, message, graph) =>
+        modelSettingsService.recordFailure(endpoint, message, graph)
+    });
+    registerModelSettingsHandlers(modelSettingsService);
+    void librarySettings
+      .getComfyEndpoint()
+      .then((endpoint) => modelSettingsService.refresh(endpoint))
+      .catch((error) =>
+        logStartup(`Model diagnostics unavailable: ${String(error)}`)
+      );
     registerMediaProtocol(projectRepository, scriptProjectSnapshotRepository);
     registerComfyHandlers(librarySettings);
     textModelBridge.register();
@@ -376,7 +428,11 @@ void app
     registerCloudStorageHandlers();
     registerVlmHandlers(vlmService, i2vPromptAdapter);
 
-    registerLocalSetupHandlers({ settings: librarySettings });
+    registerLocalSetupHandlers({
+      settings: librarySettings,
+      onSetupComplete: async () =>
+        modelSettingsService.refresh(await librarySettings.getComfyEndpoint())
+    });
 
     registerLibraryHandlers({
       settings: librarySettings,

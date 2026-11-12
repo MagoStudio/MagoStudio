@@ -16,6 +16,7 @@ import { useProjectScriptVersions } from "@domains/scriptProject/useProjectScrip
 import { useProjectState } from "@domains/scriptProject/useProjectState";
 import { useProjectTypeRedirect } from "@domains/scriptProject/useProjectTypeRedirect";
 import { useRecoverableCastingRun } from "@domains/scriptProject/useRecoverableCastingRun";
+import { useRefreshCutWhileShotsRender } from "@domains/scriptProject/useRefreshCutWhileShotsRender";
 import { useRefreshScriptProjectRunOutputs } from "@domains/scriptProject/useRefreshScriptProjectRunOutputs";
 import { useScriptProjectRenderAccess } from "@domains/scriptProject/useScriptProjectRenderAccess";
 import { useScriptProjectRun } from "@domains/scriptProject/useScriptProjectRun";
@@ -102,6 +103,7 @@ export default function ScriptProjectPage() {
     inProgressShotTimelineIds,
     failedShotTimelineIds
   });
+  useRefreshCutWhileShotsRender(projectId, renderingShotTimelineIds);
 
   if (!projectId) {
     return (

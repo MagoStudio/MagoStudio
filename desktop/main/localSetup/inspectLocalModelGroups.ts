@@ -71,7 +71,7 @@ export const inspectLocalModelGroups = async (
       const presentItems = new Set<ModelGroupItem>();
       if (runningAvailability)
         for (const item of items) {
-          if (runningAvailability(item)) presentItems.add(item);
+          if (runningAvailability(item, groupId)) presentItems.add(item);
         }
       else if (isGetStartedInstall)
         for (const item of items)

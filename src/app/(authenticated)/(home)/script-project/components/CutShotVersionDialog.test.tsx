@@ -47,6 +47,10 @@ vi.mock("@domains/scriptProject/useViewedShotVersionIds", () => ({
   })
 }));
 
+vi.mock("@domains/scriptProject/useRenderMetrics", () => ({
+  useRenderMetrics: () => ({ data: undefined })
+}));
+
 vi.mock("./RenderMetricsBadge", () => ({
   RenderMetricsBadge: () => null
 }));
@@ -105,7 +109,6 @@ describe("CutShotVersionDialog", () => {
   });
 
   it("seeks and plays every version from one shared timeline", () => {
-    const onReuseSettings = vi.fn();
     render(
       <CutShotVersionDialog
         projectId="project-1"
@@ -117,7 +120,7 @@ describe("CutShotVersionDialog", () => {
         isBusy={false}
         onOpenChange={vi.fn()}
         onPin={vi.fn()}
-        onReuseSettings={onReuseSettings}
+        onReuseSettings={vi.fn()}
       />
     );
 
@@ -142,9 +145,6 @@ describe("CutShotVersionDialog", () => {
     fireEvent.click(screen.getByRole("button", { name: "Play all versions" }));
 
     expect(HTMLMediaElement.prototype.play).toHaveBeenCalledTimes(2);
-
-    fireEvent.click(screen.getByTestId("cut-version-reuse-asset-1"));
-    expect(onReuseSettings).toHaveBeenCalledWith(shot.versions[0]);
 
     fireEvent.click(screen.getByTestId("cut-version-option-asset-2"));
     expect(mocks.markVersionsViewed).not.toHaveBeenCalled();

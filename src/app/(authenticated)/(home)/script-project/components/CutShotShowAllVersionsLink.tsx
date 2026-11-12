@@ -8,7 +8,7 @@ import { useTranslation } from "react-i18next";
 
 import { CutShotVersionDialog } from "./CutShotVersionDialog";
 
-const MINIMUM_VERSIONS_WORTH_LISTING = 3;
+const MINIMUM_VERSIONS_WORTH_LISTING = 2;
 
 type Props = {
   projectId?: string;

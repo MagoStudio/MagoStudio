@@ -9,6 +9,8 @@ export type ShotStoryboard = {
   isStoryboardRendering: boolean;
   hasLatestStoryboardRenderFailed: boolean;
   latestFinishedStoryboardImageUrl: string | undefined;
+  latestFinishedStoryboardClipId?: string;
+  latestFinishedStoryboardAssetId?: string;
 };
 
 const byNewestFirstWithJustSubmittedImagesFirst = (
@@ -36,6 +38,9 @@ export const findShotStoryboard = (
   const isStoryboardRendering = latestStoryboardImage
     ? isSheetImageRendering(latestStoryboardImage)
     : false;
+  const latestFinishedStoryboardImage = storyboardImagesNewestFirst.find(
+    (image) => !isSheetImageRendering(image) && image.url
+  );
 
   return {
     latestStoryboardImage,
@@ -45,8 +50,8 @@ export const findShotStoryboard = (
       !isStoryboardRendering &&
       !isSheetImageSuccessful(latestStoryboardImage),
     latestFinishedStoryboardImageUrl:
-      storyboardImagesNewestFirst.find(
-        (image) => !isSheetImageRendering(image) && image.url
-      )?.url ?? undefined
+      latestFinishedStoryboardImage?.url ?? undefined,
+    latestFinishedStoryboardClipId: latestFinishedStoryboardImage?.clip_id,
+    latestFinishedStoryboardAssetId: latestFinishedStoryboardImage?.asset_id
   };
 };

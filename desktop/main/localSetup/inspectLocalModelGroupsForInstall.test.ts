@@ -28,6 +28,21 @@ const localLlmMissingFileNames = (
     .join();
 
 describe("inspectLocalModelGroupsForInstall", () => {
+  it("preserves an explicit Q5 setting when a new setup scan recommends Q3", async () => {
+    const saved = settingsWith({
+      savedModelGroupVariants: { "local-llm": "qwen38-27b-q3" }
+    });
+    const hardware = vi.fn(async () => 8 * GIB);
+    const inspection = await inspectLocalModelGroupsForInstall(
+      { ...saved, getScriptTextVariantOverride: async () => "qwen38-27b-q5" },
+      hardware
+    );
+    expect(inspection.selectedModelGroupVariantsForInstall["local-llm"]).toBe(
+      "qwen38-27b-q5"
+    );
+    expect(localLlmMissingFileNames(inspection)).toContain("Q5");
+    expect(hardware).not.toHaveBeenCalled();
+  });
   it("measures a not-installed Local LLM at the variant this machine will get", async () => {
     const settings = settingsWith({
       savedModelGroupVariants: { "local-llm": "qwen38-27b-q5" }

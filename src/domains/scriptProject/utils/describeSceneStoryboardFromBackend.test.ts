@@ -16,12 +16,14 @@ describe("describeSceneStoryboardFromBackend", () => {
       summaryOf({
         status: "ready",
         image_url: "https://cdn.example/v1.png",
+        effective_asset_id: "storyboard-v1",
         last_attempt_failed: true,
         version_count: 2
       })
     );
     expect(view).toMatchObject({
       imageUrl: "https://cdn.example/v1.png",
+      imageAssetId: "storyboard-v1",
       hasNoUsableVersion: false,
       hasLastAttemptFailed: true,
       versionCount: 2

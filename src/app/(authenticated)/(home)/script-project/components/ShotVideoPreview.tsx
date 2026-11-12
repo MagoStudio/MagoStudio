@@ -11,6 +11,7 @@ import {
 } from "@domains/asset/useAssetDownloadPriority";
 import { useCachedVideoPreview } from "@domains/asset/useCachedVideoPreview";
 import { isLocalVideoUrl } from "@domains/asset/utils/isLocalVideoUrl";
+import { toDesktopCloudStorageUrl } from "@domains/asset/utils/toDesktopCloudStorageUrl";
 import { buildAspectFitStyle } from "@domains/scriptProject/utils/buildAspectFitStyle";
 import { ProjectOutputSize } from "@domains/scriptProject/utils/projectOutputSize";
 import { SHOT_FPS } from "@domains/scriptProject/utils/snapShotFrames";
@@ -59,7 +60,13 @@ export const ShotVideoPreview: React.FC<Props> = ({
   const { t } = useTranslation();
   const videoRef = useRef<HTMLVideoElement>(null);
   const [isVideoPlaying, setIsVideoPlaying] = useState(false);
-  const [startedVideoUrl, setStartedVideoUrl] = useState<string | null>(null);
+  const [startedPlaybackSourceKey, setStartedPlaybackSourceKey] = useState<
+    string | null
+  >(null);
+  const [pinnedPlayback, setPinnedPlayback] = useState<{
+    sourceKey: string;
+    playedUrl: string;
+  } | null>(null);
   const { ref: visibilityRef, isIntersecting } = useIntersectionObserver({
     rootMargin: "160px"
   });
@@ -70,7 +77,9 @@ export const ShotVideoPreview: React.FC<Props> = ({
   const isDownloading =
     !isVideoAvailableLocally &&
     (downloadState === "queued" || downloadState === "downloading");
-  const hasRequestedPlayback = !!videoUrl && startedVideoUrl === videoUrl;
+  const playbackSourceKey = assetId ?? videoUrl;
+  const hasRequestedPlayback =
+    !!videoUrl && startedPlaybackSourceKey === playbackSourceKey;
   const {
     videoFirstFrameUrl,
     playableVideoUrl,
@@ -90,8 +99,21 @@ export const ShotVideoPreview: React.FC<Props> = ({
       : DOWNLOAD_PRIORITY.visible
   });
 
+  const resolvedPlayableUrl =
+    playableVideoUrl ?? (isVideoAvailableLocally ? videoUrl : null);
+  const pinnedPlayedUrl =
+    pinnedPlayback && pinnedPlayback.sourceKey === playbackSourceKey
+      ? pinnedPlayback.playedUrl
+      : null;
+  const isPlayedUrlAwaitingPin =
+    hasRequestedPlayback && !!resolvedPlayableUrl && !pinnedPlayedUrl;
+  if (isPlayedUrlAwaitingPin && playbackSourceKey && resolvedPlayableUrl)
+    setPinnedPlayback({
+      sourceKey: playbackSourceKey,
+      playedUrl: resolvedPlayableUrl
+    });
   const activeVideoUrl = hasRequestedPlayback
-    ? (playableVideoUrl ?? (isVideoAvailableLocally ? videoUrl : null))
+    ? (pinnedPlayedUrl ?? resolvedPlayableUrl)
     : null;
   useAssetDownloadPriority(
     assetId,
@@ -99,15 +121,16 @@ export const ShotVideoPreview: React.FC<Props> = ({
     DOWNLOAD_PRIORITY.playback
   );
   const previewImageUrl = isIntersecting
-    ? (videoFirstFrameUrl ?? posterUrl ?? undefined)
+    ? (videoFirstFrameUrl ??
+      (posterUrl ? toDesktopCloudStorageUrl(posterUrl) : undefined))
     : undefined;
 
   const handleTogglePlayback = () => {
     const video = videoRef.current;
 
     if (!video) {
-      if (!videoUrl) return;
-      setStartedVideoUrl(videoUrl);
+      if (!videoUrl || !playbackSourceKey) return;
+      setStartedPlaybackSourceKey(playbackSourceKey);
       return;
     }
 

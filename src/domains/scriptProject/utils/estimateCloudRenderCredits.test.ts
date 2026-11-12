@@ -81,7 +81,7 @@ describe("estimateCloudRenderCredits", () => {
           shotEngine: UNRECORDED_RENDER_SHOT_RENDER_ENGINE,
           outputSize: [1280, 720],
           shotFrames: snapShotSecondsToFrames(5),
-          referenceImageCount: 0
+          referenceImageSizes: []
         })
     );
   });

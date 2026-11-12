@@ -43,7 +43,22 @@ export default defineConfig({
           name: "node",
           environment: "node",
           include: ["**/*.test.ts"],
-          exclude: [...configDefaults.exclude, "**/*.dom.test.ts"]
+          exclude: [
+            ...configDefaults.exclude,
+            "**/*.dom.test.ts",
+            "oxlint-rules/**"
+          ]
+        }
+      },
+      {
+        extends: true,
+        test: {
+          name: "oxlint-rules",
+          environment: "node",
+          include: ["oxlint-rules/**/*.test.ts"],
+          fileParallelism: false,
+          isolate: false,
+          sequence: { groupOrder: 1 }
         }
       },
       {

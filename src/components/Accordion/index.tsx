@@ -14,13 +14,15 @@ type Props = {
   isExpanded: boolean;
   onExpandedChange: (isExpanded: boolean) => void;
   children: React.ReactNode;
+  panelIndent?: "indented" | "flush";
 };
 
 export const Accordion: React.FC<Props> = ({
   label,
   isExpanded,
   onExpandedChange,
-  children
+  children,
+  panelIndent = "indented"
 }) => {
   const [hasEverExpanded, setHasEverExpanded] = useState(isExpanded);
   const isExpandingForTheFirstTime = isExpanded && !hasEverExpanded;
@@ -54,7 +56,12 @@ export const Accordion: React.FC<Props> = ({
           </Text>
         </Button>
       </Heading>
-      <DisclosurePanel className="flex flex-col gap-3 pt-3 pb-1 pl-8 [&[hidden]]:hidden">
+      <DisclosurePanel
+        className={cn(
+          "flex flex-col gap-3 pt-3 pb-1 [&[hidden]]:hidden",
+          panelIndent === "indented" && "pl-8"
+        )}
+      >
         {hasEverExpanded ? children : null}
       </DisclosurePanel>
     </Disclosure>

@@ -6,8 +6,8 @@ export const NO_DRAWING_MEDIUM =
   "It is a flat digital page, not a photograph: never a hand, pen, marker, pencil, desk, table, paper edge or shadow.";
 export const STORY_PROGRESSION =
   "Each panel is a different moment and a different camera set-up: the characters move through the place and the framing changes, so the panels read as a story, never the same picture repeated.";
-export const MOVEMENT_ARROWS =
-  "Add simple arrows for movement: a solid arrow for the direction a character or object moves, a dashed arrow for the camera move. When nothing moves, draw no arrows.";
+export const NO_ARROWS =
+  "Draw no arrows, motion lines or other symbols anywhere: show movement only by where things are in each panel.";
 export const CAST_HAS_ITS_OWN_REFERENCES =
   "Every character, place and prop named here has its own reference image elsewhere, so this storyboard must not describe how it looks: draw only its outline, size and position, never its markings, surface details, contents or writing.";
 export const NO_OTHER_TEXT =

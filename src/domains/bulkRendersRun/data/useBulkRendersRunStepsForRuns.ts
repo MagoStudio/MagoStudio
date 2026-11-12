@@ -4,6 +4,7 @@ import { Query, useQueries } from "@tanstack/react-query";
 import { queryKeys } from "@/queryKeys";
 
 import { fetchBulkRendersRunSteps } from "../api/fetchBulkRendersRunSteps";
+import { FAILING_POLL_INTERVAL_MS } from "../constants";
 import { areBulkRendersRunStepsSettled } from "../utils/areBulkRendersRunStepsSettled";
 
 export interface BulkRendersRunStepsRequest {
@@ -34,7 +35,7 @@ export const useBulkRendersRunStepsForRuns = (
       ),
       queryFn: () => fetchBulkRendersRunSteps(bulkRunId),
       refetchInterval: (query: Query<BulkRendersRunStep[]>) => {
-        if (query.state.status === "error") return false;
+        if (query.state.status === "error") return FAILING_POLL_INTERVAL_MS;
         return areBulkRendersRunStepsSettled(query.state.data)
           ? false
           : pollIntervalMs;

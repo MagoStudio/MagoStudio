@@ -2,11 +2,13 @@ import { Icon } from "@components/Icon";
 import { IconActionButton } from "@components/IconActionButton";
 import { ImageThumbnail } from "@components/ImageThumbnail";
 import { Text } from "@components/Text";
+import { useCachedOrProxiedImageUrl } from "@domains/asset/useCachedOrProxiedImageUrl";
 import { Button as AriaButton } from "react-aria-components/Button";
 import { useTranslation } from "react-i18next";
 
 type Props = {
   storyboardImageUrl: string;
+  storyboardImageAssetId: string | undefined;
   isBusy: boolean;
   onRemove: () => void;
   testId: string;
@@ -14,12 +16,17 @@ type Props = {
 
 export const ShotStoryboardReferenceTile: React.FC<Props> = ({
   storyboardImageUrl,
+  storyboardImageAssetId,
   isBusy,
   onRemove,
   testId
 }) => {
   const { t } = useTranslation();
   const storyboardLabel = t("script_project.storyboard_version_badge.label");
+  const readableStoryboardImageUrl = useCachedOrProxiedImageUrl(
+    storyboardImageUrl,
+    storyboardImageAssetId
+  );
 
   return (
     <div
@@ -27,8 +34,8 @@ export const ShotStoryboardReferenceTile: React.FC<Props> = ({
       className="group relative h-[50px] w-full overflow-hidden rounded bg-element-primary"
     >
       <ImageThumbnail
-        src={storyboardImageUrl}
-        srcThumbnail={storyboardImageUrl}
+        src={readableStoryboardImageUrl}
+        srcThumbnail={readableStoryboardImageUrl}
         name={storyboardLabel}
         alt={storyboardLabel}
         classNames={{

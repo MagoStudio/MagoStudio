@@ -15,6 +15,49 @@ vi.mock("../projectOrigin", () => ({
 }));
 beforeEach(() => vi.clearAllMocks());
 describe("script project API contracts", () => {
+  it("creates a new entity with references before saving its reference fields", async () => {
+    vi.mocked(backendApiClient.post).mockResolvedValue({ data: {} });
+    vi.mocked(backendApiClient.patch).mockImplementationOnce(async () => {
+      expect(backendApiClient.post).toHaveBeenCalledWith(
+        "/assets/img2img/render",
+        expect.objectContaining({
+          sheet_token: "hero",
+          sheet_name: "Hero",
+          render_model: "gpt_image_2",
+          settings: expect.objectContaining({
+            input_image_id: "face",
+            reference_images: ["outfit"],
+            prompt:
+              "Hero portrait\n\nUse the supplied reference images as follows: Keep the face"
+          })
+        })
+      );
+      return {
+        data: { token: "hero", name: "Hero", layer_id: "layer", images: [] }
+      };
+    });
+    await postSheetGroupRender({
+      isNewSheetGroup: true,
+      timelineId: "sheets",
+      token: "hero",
+      name: "Hero",
+      kind: "character",
+      prompt: "Hero portrait",
+      referenceAssetIds: ["face", "outfit"],
+      referenceInstruction: "Keep the face",
+      renderModel: "gpt_image_2_t2i",
+      renderMode: RenderMode.CREDITS,
+      outputSize: [1024, 1024]
+    });
+    expect(backendApiClient.patch).toHaveBeenCalledWith(
+      "/timelines/sheets/sheets/hero/edit",
+      {
+        prompt: "Hero portrait",
+        reference_asset_ids: ["face", "outfit"],
+        reference_instruction: "Keep the face"
+      }
+    );
+  });
   it("sends structured dialogue and accepts the backend's nullable edit fields", async () => {
     const dialogue = [
       { speaker: "HERO", speaker_token: "hero", line: "Hello", language: null }
@@ -50,6 +93,37 @@ describe("script project API contracts", () => {
     expect(backendApiClient.patch).toHaveBeenCalledWith(
       "/timelines/sheets/sheets/hero/edit",
       { reference_asset_ids: [], reference_instruction: null }
+    );
+  });
+  it("saves a character's chosen voice as its voice signature, and null detaches it", async () => {
+    vi.mocked(backendApiClient.patch).mockResolvedValue({
+      data: { token: "hero", name: "Hero", layer_id: "layer", images: [] }
+    });
+    const voiceSignature = {
+      provider: "elevenlabs",
+      voice_id: "CwhRBWXzGAHq8TQ4Fs17",
+      name: "Roger",
+      preview_url: "https://example.com/roger.mp3"
+    };
+    await patchSheetGroup({
+      timelineId: "sheets",
+      token: "hero",
+      voiceSignature
+    });
+    await patchSheetGroup({
+      timelineId: "sheets",
+      token: "hero",
+      voiceSignature: null
+    });
+    expect(backendApiClient.patch).toHaveBeenNthCalledWith(
+      1,
+      "/timelines/sheets/sheets/hero/edit",
+      { voice_signature: voiceSignature }
+    );
+    expect(backendApiClient.patch).toHaveBeenNthCalledWith(
+      2,
+      "/timelines/sheets/sheets/hero/edit",
+      { voice_signature: null }
     );
   });
   it.each([

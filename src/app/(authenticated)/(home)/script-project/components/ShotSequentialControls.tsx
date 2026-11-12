@@ -3,13 +3,15 @@ import { Textarea } from "@components/Textarea";
 import {
   MAX_SEQUENTIAL_KEY_FRAMES,
   MIN_SEQUENTIAL_KEY_FRAMES,
-  SEQUENTIAL_CONTINUATION_OFF
+  SEQUENTIAL_CONTINUATION_OFF,
+  ShotRenderEngine
 } from "@domains/scriptProject/constants";
 import { formatShotTitle } from "@domains/scriptProject/utils/formatShotTitle";
 import { resolveDefaultSequentialPrompt } from "@domains/scriptProject/utils/resolveDefaultSequentialPrompt";
 import { ResolvedSequentialShotConfig } from "@domains/scriptProject/utils/resolveSequentialShotConfig";
 import { resolveShotChainPositionLabelKey } from "@domains/scriptProject/utils/resolveShotChainPositionLabelKey";
 import { withSequentialContinuation } from "@domains/scriptProject/utils/withSequentialContinuation";
+import { VideoEngine } from "@models/video/types";
 import { SequentialPromptDefaults, ShotState } from "@schemas/scriptProject";
 import { useState } from "react";
 import { Button } from "react-aria-components/Button";
@@ -23,6 +25,7 @@ type Props = {
   sequential: ResolvedSequentialShotConfig;
   sequentialPromptDefaults: SequentialPromptDefaults | null;
   predecessorShot: ShotState;
+  shotEngine: ShotRenderEngine;
   isDisabled: boolean;
   onChange: (sequential: ResolvedSequentialShotConfig) => void;
   testIdSuffix: string | number;
@@ -32,6 +35,7 @@ export const ShotSequentialControls: React.FC<Props> = ({
   sequential,
   sequentialPromptDefaults,
   predecessorShot,
+  shotEngine,
   isDisabled,
   onChange,
   testIdSuffix
@@ -78,6 +82,10 @@ export const ShotSequentialControls: React.FC<Props> = ({
     sequential.enabled && sequential.mode === "key_frames";
   const showsOpeningFrame =
     sequential.enabled && sequential.mode === "last_frame";
+  const showsPromptOnlyOpeningFrameHint =
+    showsOpeningFrame &&
+    sequential.opening_frame === "pin" &&
+    shotEngine === VideoEngine.seedance_2_5;
 
   return (
     <div
@@ -127,6 +135,18 @@ export const ShotSequentialControls: React.FC<Props> = ({
               }
               testId={`shot-sequential-opening-frame-${testIdSuffix}`}
             />
+          )}
+
+          {showsPromptOnlyOpeningFrameHint && (
+            <Text
+              variant="xs"
+              color="glyph-tertiary"
+              data-testid={`shot-sequential-opening-frame-prompt-only-hint-${testIdSuffix}`}
+            >
+              {t(
+                "script_project.sequential_opening_frame_pin_prompt_only_hint.label"
+              )}
+            </Text>
           )}
 
           <label className="flex flex-col gap-1">

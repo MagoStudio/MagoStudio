@@ -184,6 +184,50 @@ describe("ProjectStateSchema", () => {
 
     expect(parsed.shots[0]?.sequential?.mode).toBe("last_frame");
   });
+
+  it.each([
+    ["missing", undefined],
+    ["null", null],
+    ["not a list", "alex"]
+  ])(
+    "keeps a Shot whose untagged speakers are %s, reading them as none",
+    (_case, dialogueUntaggedSpeakers) => {
+      const parsed = ProjectStateSchema.parse({
+        project_id: "project-1",
+        keys: [],
+        shots: [
+          {
+            timeline_id: "timeline-8",
+            shot_index: 0,
+            sequence_id: 8,
+            dialogue_untagged_speakers: dialogueUntaggedSpeakers
+          }
+        ]
+      });
+
+      expect(parsed.shots[0]?.dialogue_untagged_speakers).toEqual([]);
+    }
+  );
+
+  it("reads the speakers a Shot's dialogue has but its tags lack", () => {
+    const parsed = ProjectStateSchema.parse({
+      project_id: "project-1",
+      keys: [],
+      shots: [
+        {
+          timeline_id: "timeline-8",
+          shot_index: 0,
+          sequence_id: 8,
+          dialogue_untagged_speakers: ["alex", "mara"]
+        }
+      ]
+    });
+
+    expect(parsed.shots[0]?.dialogue_untagged_speakers).toEqual([
+      "alex",
+      "mara"
+    ]);
+  });
 });
 
 describe("GetScriptChatMessagesResponseSchema", () => {

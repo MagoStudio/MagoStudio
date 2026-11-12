@@ -1,12 +1,18 @@
 import { spawn } from "node:child_process";
-import { stat } from "node:fs/promises";
+import { readFile, stat } from "node:fs/promises";
 import path from "node:path";
+
+import { allowsCpuTextInstall } from "../modelSettings/modelRuntimeHooks";
+import { repairLlamaRuntime } from "../modelSettings/repairLlamaRuntime";
+import { runModelProbe } from "../modelSettings/runModelProbe";
 
 export type PythonProcessRunner = (
   python: string,
   args: string[],
   signal?: AbortSignal
 ) => Promise<{ exitCode: number | null; output: string }>;
+
+const LLAMA_PROBE_TIMEOUT_MS = 60_000;
 
 const PIP_ERROR_TAIL_LINES = 6;
 
@@ -53,7 +59,42 @@ export const installNodePackRequirements = async ({
     signal
   );
   log(`pip install for ${path.basename(nodePackDirectory)}:\n${output}`);
-  if (exitCode === 0) return "installed";
+  if (exitCode === 0) {
+    if (
+      /llama[-_]cpp[-_]python/i.test(await readFile(requirementsFile, "utf8"))
+    ) {
+      const probe = await runModelProbe(
+        python,
+        { action: "runtime" },
+        LLAMA_PROBE_TIMEOUT_MS,
+        signal
+      );
+      const gpuExpected =
+        Number(probe.details?.cudaDriverVersion) > 0 ||
+        probe.details?.metal === true;
+      if (
+        gpuExpected &&
+        probe.details?.llamaGpu !== true &&
+        !(await allowsCpuTextInstall())
+      ) {
+        signal?.throwIfAborted();
+        const repaired = await repairLlamaRuntime(python, signal);
+        log(`llama.cpp GPU verification: ${JSON.stringify(repaired)}`);
+        if (repaired.status !== "success")
+          throw new Error(
+            `llama.cpp GPU runtime is unavailable: ${repaired.message}`
+          );
+      } else if (
+        probe.status !== "success" ||
+        typeof probe.details?.llamaGpu !== "boolean" ||
+        probe.details?.llamaError
+      )
+        throw new Error(
+          `llama.cpp could not initialize in ComfyUI's Python: ${JSON.stringify(probe.details ?? probe)}`
+        );
+    }
+    return "installed";
+  }
   const lastLines = output
     .trim()
     .split(/\r?\n/)

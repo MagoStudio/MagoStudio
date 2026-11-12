@@ -34,6 +34,7 @@ import {
   scriptChatMessages,
   sheetImageInputs
 } from "./scriptProject";
+import { voiceLibrary, voicePreviewUrl } from "./voiceLibrary";
 
 export const queryKeys = {
   project,
@@ -69,5 +70,7 @@ export const queryKeys = {
   img2imgStatus,
   autoPrompt,
   magoState,
-  version
+  version,
+  voiceLibrary,
+  voicePreviewUrl
 } as const;

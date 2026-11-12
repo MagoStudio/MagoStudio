@@ -15,6 +15,7 @@ const shot = (
   tags: { characters: [], environments: [], props: [], ...tags },
   references: {},
   missing_references: [],
+  dialogue_untagged_speakers: [],
   dropped: false,
   hidden: false,
   manual: false

@@ -17,6 +17,7 @@ const EXPECTED_APP_LEVEL_Z_INDEX_TOKEN_NAMES = [
   "toast",
   "nested-modal",
   "modal",
+  "page-popover",
   "help-button",
   "menu"
 ];
@@ -105,7 +106,7 @@ describe("every z-index token declared in tailwind-theme.css has a consumer", ()
     );
   });
 
-  it("declares exactly the seven expected app-level tokens, each at or above the escalation floor", () => {
+  it("declares exactly the eight expected app-level tokens, each at or above the escalation floor", () => {
     const cssContent = readFileSync(THEME_CSS_PATH, "utf8");
     const tokenEntries = extractZIndexTokenEntries(cssContent);
 

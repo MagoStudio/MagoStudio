@@ -66,13 +66,7 @@ export const SheetGroupReferences: React.FC<Props> = ({
   const { t } = useTranslation();
   const [isUploading, setIsUploading] = useState(false);
   return (
-    <div className="flex flex-col gap-2 rounded-lg bg-surface-primary p-3">
-      <Text variant="xs" weight="semibold">
-        {t("script_project.asset_references.label")}
-      </Text>
-      <Text variant="2xs" color="glyph-tertiary">
-        {t("script_project.asset_references.hint", { count: limit })}
-      </Text>
+    <div className="flex flex-col gap-2">
       <div className="flex flex-wrap items-center gap-2">
         {assetIds.map((assetId) => (
           <ReferencePreview

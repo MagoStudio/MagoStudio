@@ -2,6 +2,7 @@ import { AnimatedGradient } from "@components/AnimatedGradient";
 import { ImageThumbnail } from "@components/ImageThumbnail";
 import { Text } from "@components/Text";
 import { useCachedImageUrl } from "@domains/asset/useCachedImageUrl";
+import { toDesktopCloudStorageUrl } from "@domains/asset/utils/toDesktopCloudStorageUrl";
 import { SheetImageUrls } from "@domains/scriptProject/utils/buildSheetImageUrlIndex";
 import { isSheetImageSuccessful } from "@domains/scriptProject/utils/findNewestSuccessfulSheetImage";
 import { isSheetImageRendering } from "@domains/scriptProject/utils/isSheetImageRendering";
@@ -18,8 +19,7 @@ type Props = {
   imageUrls: SheetImageUrls | undefined;
   isPinned: boolean;
   isEffective: boolean;
-  isSelected: boolean;
-  onSelect: () => void;
+  versionInputsButton: React.ReactNode;
   onPin: () => void;
 };
 
@@ -28,8 +28,7 @@ export const SheetImageCard: React.FC<Props> = ({
   imageUrls,
   isPinned,
   isEffective,
-  isSelected,
-  onSelect,
+  versionInputsButton,
   onPin
 }) => {
   const { t } = useTranslation();
@@ -51,26 +50,29 @@ export const SheetImageCard: React.FC<Props> = ({
     <div
       ref={visibilityRef}
       data-testid={`sheet-image-${image.asset_id}`}
-      className={cn(
-        "flex w-48 flex-col gap-1.5 rounded-xl border p-1.5",
-        isSelected && "border-glyph-secondary",
-        !isSelected && isPinned && "border-glyph-action-main",
-        !isSelected && !isPinned && "border-element-primary"
-      )}
+      className="flex w-full min-w-0 flex-col gap-1.5 rounded-xl bg-surface-primary p-1.5"
     >
-      <div className="relative" onClick={onSelect} role="presentation">
+      <div className="relative">
         <ImageThumbnail
           assetId={image.asset_id}
-          src={isIntersecting ? imageUrls?.url : undefined}
+          src={
+            isIntersecting && imageUrls?.url
+              ? toDesktopCloudStorageUrl(imageUrls.url)
+              : undefined
+          }
           srcThumbnail={
             isIntersecting
-              ? (cachedDisplayedImageUrl ?? displayedImageUrl)
+              ? (cachedDisplayedImageUrl ??
+                (displayedImageUrl &&
+                  toDesktopCloudStorageUrl(displayedImageUrl)))
               : undefined
           }
           name={versionName}
           alt={versionName}
           isLoading={isRenderInProgress}
-          classNames={{ root: "aspect-square rounded-lg" }}
+          classNames={{
+            root: "aspect-square rounded-lg bg-transparent hover:border-transparent"
+          }}
         />
         {isRenderInProgress && (
           <div className="pointer-events-none absolute inset-0 overflow-hidden rounded-lg bg-surface-primary">
@@ -118,33 +120,32 @@ export const SheetImageCard: React.FC<Props> = ({
         )}
       </div>
       <div className="flex min-w-0 items-center justify-between gap-1 px-1 pb-0.5">
-        <Text variant="2xs" color="glyph-secondary" className="truncate">
-          {versionName}
-        </Text>
+        <div className="flex min-w-0 items-center gap-1">
+          <Text variant="2xs" color="glyph-tertiary" className="truncate">
+            {versionName}
+          </Text>
+          {versionInputsButton}
+        </div>
         {isRenderInProgress && (
           <Text variant="2xs" color="glyph-tertiary">
             {t("script_project.version_not_ready.label")}
           </Text>
         )}
       </div>
-      <button
-        type="button"
-        disabled={!hasRenderSucceeded}
-        onClick={onPin}
-        aria-pressed={isPinned}
-        data-testid={`sheet-image-pin-${image.asset_id}`}
-        className={cn(
-          "rounded px-1.5 py-0.5 text-2xs font-lato transition-colors",
-          isPinned
-            ? "bg-element-additional-active text-glyph-primary-on-pic"
-            : "bg-element-primary text-glyph-secondary hover:bg-element-primary-active hover:text-glyph-primary",
-          !hasRenderSucceeded && "cursor-default opacity-50"
-        )}
-      >
-        {isPinned
-          ? t("script_project.unpin_button.label")
-          : t("script_project.pin_button.label")}
-      </button>
+      {!isPinned && (
+        <button
+          type="button"
+          disabled={!hasRenderSucceeded}
+          onClick={onPin}
+          data-testid={`sheet-image-pin-${image.asset_id}`}
+          className={cn(
+            "rounded bg-element-primary px-1.5 py-0.5 text-2xs font-lato text-glyph-secondary transition-colors hover:bg-element-primary-active hover:text-glyph-primary",
+            !hasRenderSucceeded && "cursor-default opacity-50"
+          )}
+        >
+          {t("script_project.pin_button.label")}
+        </button>
+      )}
     </div>
   );
 };

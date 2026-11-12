@@ -2,6 +2,8 @@ export const MAX_SCENE_STORYBOARD_SHOT_COUNT = 15;
 
 export type SceneStoryboardView = {
   imageUrl: string | undefined;
+  imageClipId?: string;
+  imageAssetId?: string;
   isRendering: boolean;
   hasNoUsableVersion: boolean;
   failedRenderClipId: string | undefined;

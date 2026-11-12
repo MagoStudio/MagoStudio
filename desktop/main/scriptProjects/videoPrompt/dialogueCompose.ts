@@ -57,10 +57,10 @@ const speakerKey = (
 /** `[turns, warnings]`. */
 export const normalizeDialogue = (
   turns: unknown,
-  characterIds: readonly string[] = []
+  characterIds: readonly string[] | null = null
 ): [DialogueTurn[], string[]] => {
   const warnings: string[] = [];
-  const known = new Set(characterIds);
+  const known = new Set(characterIds ?? []);
   const staged: Array<
     Omit<DialogueTurn, "index" | "speaker_id"> & { key: string }
   > = [];
@@ -83,7 +83,7 @@ export const normalizeDialogue = (
 
     let speakerRefId: string | null =
       collapse(entry.speaker_ref_id || "") || null;
-    if (speakerRefId && known.size && !known.has(speakerRefId)) {
+    if (speakerRefId && characterIds !== null && !known.has(speakerRefId)) {
       warnings.push(
         `dialogue turn ${position + 1} names speaker_ref_id "${speakerRefId}", ` +
           "which is not a character in this shot; the speaker is described instead"

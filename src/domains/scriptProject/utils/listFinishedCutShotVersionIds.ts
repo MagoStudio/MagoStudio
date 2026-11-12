@@ -5,5 +5,5 @@ export const listFinishedCutShotVersionIds = (
 ): string[] =>
   [...cut.shots, ...cut.hidden_shots]
     .flatMap((cutShot) => cutShot.versions)
-    .filter((version) => version.ready)
+    .filter((version) => version.ready && !version.awaiting_dub)
     .map((version) => version.asset_id);

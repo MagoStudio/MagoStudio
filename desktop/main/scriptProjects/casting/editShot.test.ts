@@ -24,6 +24,7 @@ const context = (
 ) => ({
   shot: shot(),
   taggableTokens: new Set(["john", "mary", "field", "lantern"]),
+  castCharacterTokens: new Set(["john", "mary"]),
   hasRenders: false,
   ...overrides
 });
@@ -63,10 +64,10 @@ describe("validateShotEdit (ProjectShotEdit.patch)", () => {
       "A shot with no renders cannot be locked"
     ]);
     expect(
-      refusal({ dialogue: [{ speaker_token: "mary", line: "Hi." }] })
+      refusal({ dialogue: [{ speaker_token: "ghost", line: "Hi." }] })
     ).toEqual([
       400,
-      "dialogue[0].speaker_token 'mary' is not a character tagged in this shot"
+      "dialogue[0].speaker_token 'ghost' is not a character in this project's cast"
     ]);
     expect(
       refusal({ dialogue: Array.from({ length: 21 }, () => ({ line: "x" })) })
@@ -82,6 +83,12 @@ describe("validateShotEdit (ProjectShotEdit.patch)", () => {
       422,
       "a shot can feature at most 20 props, and every environment after the first counts as one; this one tags 21"
     ]);
+  });
+
+  it("saves dialogue by a cast character who is not tagged in the shot", () => {
+    expect(
+      refusal({ dialogue: [{ speaker_token: "mary", line: "Hi." }] })
+    ).toBeNull();
   });
 
   it("accepts a speaker tagged in the same edit, and a lock once there are renders", () => {
@@ -135,7 +142,8 @@ describe("applyShotEdit (edit_shot)", () => {
     expect(edited).toEqual(expect.objectContaining({ locked: true }));
     expect("edited" in edited).toBe(false);
     expect(
-      editedShotResponse(applyShotEdit(edited, { locked: false })).locked
+      editedShotResponse(applyShotEdit(edited, { locked: false }), new Set())
+        .locked
     ).toBe(false);
   });
 

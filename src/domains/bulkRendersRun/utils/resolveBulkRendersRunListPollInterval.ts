@@ -1,6 +1,9 @@
 import { BulkRendersRun } from "@schemas/bulkRendersRun";
 
-import { BULK_RENDERS_RUN_POLL_INTERVAL_MS } from "../constants";
+import {
+  BULK_RENDERS_RUN_POLL_INTERVAL_MS,
+  FAILING_POLL_INTERVAL_MS
+} from "../constants";
 
 import { isBulkRendersRunStatusTerminal } from "./isBulkRendersRunStatusTerminal";
 
@@ -18,7 +21,9 @@ export const resolveBulkRendersRunListPollInterval = ({
   if (hasQueryErrored) {
     const hasExhaustedPolledErrors =
       consecutiveFailureCount > BULK_RENDERS_RUN_LIST_MAX_POLLED_ERRORS;
-    return hasExhaustedPolledErrors ? false : BULK_RENDERS_RUN_POLL_INTERVAL_MS;
+    return hasExhaustedPolledErrors
+      ? FAILING_POLL_INTERVAL_MS
+      : BULK_RENDERS_RUN_POLL_INTERVAL_MS;
   }
 
   const hasRunThatCanAdvance = (runs ?? []).some(

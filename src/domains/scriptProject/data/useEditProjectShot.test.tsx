@@ -30,7 +30,8 @@ const PROJECT_STATE: ProjectState = {
       manual: false,
       tags: { characters: [], environments: [], props: [] },
       references: {},
-      missing_references: []
+      missing_references: [],
+      dialogue_untagged_speakers: []
     }
   ]
 };

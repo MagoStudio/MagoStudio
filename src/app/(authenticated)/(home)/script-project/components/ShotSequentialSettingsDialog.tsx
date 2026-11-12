@@ -1,6 +1,7 @@
 import { CloseButton } from "@components/CloseButton";
 import { OverlayDialog } from "@components/OverlayDialog";
 import { Text } from "@components/Text";
+import { ShotRenderEngine } from "@domains/scriptProject/constants";
 import { resolveSequentialShotConfig } from "@domains/scriptProject/utils/resolveSequentialShotConfig";
 import {
   SequentialPromptDefaults,
@@ -17,6 +18,7 @@ const DIALOG_MAX_WIDTH_PX = 480;
 type Props = {
   shot: ShotState;
   predecessorShot: ShotState;
+  shotEngine: ShotRenderEngine;
   sequentialPromptDefaults: SequentialPromptDefaults | null;
   isDisabled: boolean;
   onSaveSequential: (sequential: SequentialShotConfig) => void;
@@ -27,6 +29,7 @@ type Props = {
 export const ShotSequentialSettingsDialog: React.FC<Props> = ({
   shot,
   predecessorShot,
+  shotEngine,
   sequentialPromptDefaults,
   isDisabled,
   onSaveSequential,
@@ -70,6 +73,7 @@ export const ShotSequentialSettingsDialog: React.FC<Props> = ({
           sequential={draftSequential}
           sequentialPromptDefaults={sequentialPromptDefaults}
           predecessorShot={predecessorShot}
+          shotEngine={shotEngine}
           isDisabled={isDisabled}
           onChange={setDraftSequential}
           testIdSuffix={testIdSuffix}

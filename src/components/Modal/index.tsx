@@ -4,6 +4,9 @@ import { Text } from "@components/Text";
 import { Dialog, DialogPanel } from "@headlessui/react";
 import { Shadows } from "@styles/types";
 import { cn } from "@utils";
+import { useState } from "react";
+
+import { ModalPortalContext } from "./ModalPortalContext";
 
 type Props = {
   alertIcon?: React.ReactNode;
@@ -53,6 +56,9 @@ export const Modal: React.FC<Props> = ({
   width = "md",
   widthClassName
 }) => {
+  const [portalContainer, setPortalContainer] = useState<HTMLElement | null>(
+    null
+  );
   const handleModalClose = () => {
     if (preventOutsideClick) {
       return;
@@ -74,60 +80,67 @@ export const Modal: React.FC<Props> = ({
           widthClassName ?? widthClasses[width]
         )}
       >
-        <DialogPanel className="h-full w-full">
-          <div
-            className={cn(
-              "relative h-full w-full text-glyph-primary backdrop-blur-xl rounded-3xl bg-surface-secondary",
-              `shadow-${elevation}`, // eslint-disable-line better-tailwindcss/no-unknown-classes
-              enterAnimation && "animate-fade-slide-in",
-              surfaceClassName
-            )}
-          >
-            <div className={cn("relative p-4 h-full w-full", contentClassName)}>
+        <DialogPanel ref={setPortalContainer} className="h-full w-full">
+          <ModalPortalContext.Provider value={portalContainer ?? undefined}>
+            <div
+              className={cn(
+                "relative h-full w-full text-glyph-primary backdrop-blur-xl rounded-3xl bg-surface-secondary",
+                `shadow-${elevation}`, // eslint-disable-line better-tailwindcss/no-unknown-classes
+                enterAnimation && "animate-fade-slide-in",
+                surfaceClassName
+              )}
+            >
               <div
-                className={cn("flex flex-col", fullHeight && "h-full min-h-0")}
+                className={cn("relative p-4 h-full w-full", contentClassName)}
               >
                 <div
                   className={cn(
-                    "relative flex flex-nowrap items-center justify-between min-h-8 w-full",
-                    (title || titleContent) && "h-[34px] mb-5",
-                    unlimitedTitleHeight && "h-auto items-start"
+                    "flex flex-col",
+                    fullHeight && "h-full min-h-0"
                   )}
                 >
-                  <div className="flex-1 overflow-hidden">
-                    {alertIcon && (
-                      <div className="flex items-center justify-center mt-2 select-none">
-                        {alertIcon}
+                  <div
+                    className={cn(
+                      "relative flex flex-nowrap items-center justify-between min-h-8 w-full",
+                      (title || titleContent) && "h-[34px] mb-5",
+                      unlimitedTitleHeight && "h-auto items-start"
+                    )}
+                  >
+                    <div className="flex-1 overflow-hidden">
+                      {alertIcon && (
+                        <div className="flex items-center justify-center mt-2 select-none">
+                          {alertIcon}
+                        </div>
+                      )}
+                      {titleContent
+                        ? titleContent
+                        : title && (
+                            <Text
+                              align={centeredTitle ? "center" : "left"}
+                              color="glyph-primary"
+                              select="none"
+                              variant="md"
+                              overflow="hidden"
+                              textOverflow="ellipsis"
+                              whiteSpace="nowrap"
+                            >
+                              {title}
+                            </Text>
+                          )}
+                    </div>
+
+                    {showCloseButton && (
+                      <div className="flex justify-end z-10">
+                        <CloseButton onClick={handleModalClose} />
                       </div>
                     )}
-                    {titleContent
-                      ? titleContent
-                      : title && (
-                          <Text
-                            align={centeredTitle ? "center" : "left"}
-                            color="glyph-primary"
-                            select="none"
-                            variant="md"
-                            overflow="hidden"
-                            textOverflow="ellipsis"
-                            whiteSpace="nowrap"
-                          >
-                            {title}
-                          </Text>
-                        )}
                   </div>
 
-                  {showCloseButton && (
-                    <div className="flex justify-end z-10">
-                      <CloseButton onClick={handleModalClose} />
-                    </div>
-                  )}
+                  {children}
                 </div>
-
-                {children}
               </div>
             </div>
-          </div>
+          </ModalPortalContext.Provider>
         </DialogPanel>
       </div>
     </Dialog>

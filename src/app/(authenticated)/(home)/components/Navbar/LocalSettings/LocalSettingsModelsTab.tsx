@@ -3,8 +3,11 @@ import { Input } from "@components/Input";
 import { Text } from "@components/Text";
 import { useTranslation } from "react-i18next";
 
-import type { LocalScriptTextModel } from "../../../../../../../desktop/shared/contracts";
+import type { LocalTextModelProvider } from "../../../../../../../desktop/shared/contracts";
 
+import { ComfyVersionStatus } from "./ComfyVersionStatus";
+import { LocalModelSettingsPanel } from "./LocalModelSettingsPanel";
+import { LocalTextProviderRadios } from "./LocalTextProviderRadios";
 import { SettingsStatusMark } from "./SettingsStatusMark";
 
 type Props = {
@@ -17,9 +20,10 @@ type Props = {
   isSavedComfyEndpointUnavailable: boolean;
   onSetupMagoStudio: () => void;
   onBeforeOpenComfyLaunch: () => Promise<boolean>;
-  selectedTextModel: "cloud" | LocalScriptTextModel;
+  textModelProvider: LocalTextModelProvider;
   isCloudTextModelDisabled: boolean;
-  onTextModelChange: (textModel: "cloud" | LocalScriptTextModel) => void;
+  onTextModelChange: (provider: LocalTextModelProvider) => void;
+  onModelSettingsSaved?: () => Promise<void>;
   textModelReady: boolean | null;
   textModelHint: string;
 };
@@ -34,13 +38,15 @@ export const LocalSettingsModelsTab = ({
   isSavedComfyEndpointUnavailable,
   onSetupMagoStudio,
   onBeforeOpenComfyLaunch,
-  selectedTextModel,
+  textModelProvider,
   isCloudTextModelDisabled,
   onTextModelChange,
   textModelReady,
-  textModelHint
+  textModelHint,
+  onModelSettingsSaved
 }: Props) => {
   const { t } = useTranslation();
+  const isComfyConnected = comfyConnectionReady === true;
 
   return (
     <div className="flex flex-col gap-3">
@@ -80,13 +86,14 @@ export const LocalSettingsModelsTab = ({
           </Text>
         )}
       </label>
+      <ComfyVersionStatus endpoint={comfyEndpoint} />
       {isSavedComfyEndpointUnavailable && (
         <LaunchComfyOrSetupMagoStudioButton
           onSetup={onSetupMagoStudio}
           onBeforeOpenComfyLaunch={onBeforeOpenComfyLaunch}
         />
       )}
-      <label className="flex flex-col gap-1">
+      <div className="flex flex-col gap-1">
         <span className="flex items-center gap-2">
           <SettingsStatusMark
             ready={textModelReady}
@@ -96,32 +103,25 @@ export const LocalSettingsModelsTab = ({
             {t("localSettings.models.textModelLabel")}
           </Text>
         </span>
-        <select
-          aria-label={t("localSettings.models.textModelLabel")}
-          className="h-8 rounded border border-element-primary bg-element-primary px-2 text-sm text-glyph-secondary outline-hidden focus-visible:outline-1 focus-visible:outline-glyph-action-main"
-          value={selectedTextModel}
-          onChange={(event) =>
-            onTextModelChange(
-              event.target.value as "cloud" | LocalScriptTextModel
-            )
-          }
-        >
-          <option value="cloud" disabled={isCloudTextModelDisabled}>
-            {t("localSettings.models.textModelCloud")}
-          </option>
-          <option value="qwen38-27b-q3">
-            {t("localSettings.models.textModelQwenQ3")}
-          </option>
-          <option value="qwen38-27b-q5">
-            {t("localSettings.models.textModelQwenQ5")}
-          </option>
-        </select>
+        <LocalTextProviderRadios
+          value={textModelProvider}
+          onChange={onTextModelChange}
+          cloudDisabled={isCloudTextModelDisabled}
+        />
         {textModelReady === false && (
           <Text variant="xs" color="glyph-error">
             {textModelHint}
           </Text>
         )}
-      </label>
+      </div>
+      {isComfyConnected && (
+        <LocalModelSettingsPanel
+          key={comfyEndpoint}
+          endpoint={comfyEndpoint}
+          onSaved={onModelSettingsSaved}
+          onSetup={onSetupMagoStudio}
+        />
+      )}
     </div>
   );
 };

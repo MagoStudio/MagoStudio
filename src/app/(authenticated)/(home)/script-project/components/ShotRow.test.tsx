@@ -2,6 +2,7 @@ import { buildStoryboardSheetToken } from "@domains/scriptProject/utils/buildSto
 import { describeSceneStoryboardFromBackend } from "@domains/scriptProject/utils/describeSceneStoryboardFromBackend";
 import { describeSceneStoryboardFromSheets } from "@domains/scriptProject/utils/describeSceneStoryboardFromSheets";
 import { ShotStoryboard } from "@domains/scriptProject/utils/findShotStoryboard";
+import { UntaggedSpeaker } from "@domains/scriptProject/utils/listUntaggedSpeakers";
 import { SceneStoryboardView } from "@domains/scriptProject/utils/sceneStoryboardView";
 import {
   CutShot,
@@ -75,7 +76,8 @@ const setup = ({
   sceneStoryboard,
   cutShotUnderTest,
   hasShotChangedSinceRender = true,
-  changedPaths
+  changedPaths,
+  untaggedSpeakers = []
 }: {
   heading?: string | null;
   isBusy?: boolean;
@@ -89,6 +91,7 @@ const setup = ({
   cutShotUnderTest?: CutShot;
   hasShotChangedSinceRender?: boolean;
   changedPaths?: string[];
+  untaggedSpeakers?: UntaggedSpeaker[];
 } = {}) => {
   const onSaveSceneShots = vi.fn(),
     onSaveHeading = vi.fn(),
@@ -127,6 +130,9 @@ const setup = ({
       onRetryRender={onRetryRender}
       onReuseVersionSettings={vi.fn()}
       onSaveTags={vi.fn()}
+      voicedCharacterTokens={new Set()}
+      characterNamesWithoutVoice={[]}
+      untaggedSpeakers={untaggedSpeakers}
       storyboard={storyboardView}
       scenesView={scenesView}
       scenesLayout="cards"
@@ -286,6 +292,35 @@ describe("scene storyboard from the backend", () => {
         ]
       }).shots[0]!.storyboard!
     );
+
+  it("loads a cloud storyboard stored on S3 through the desktop media proxy", () => {
+    const storyboardObjectUrl =
+      "https://mago-assets.s3.us-east-1.amazonaws.com/storyboard.png?X-Amz-Signature=abc";
+    const proxiedStoryboardUrl = `mago-media://cloud-storage/?url=${encodeURIComponent(storyboardObjectUrl)}`;
+    const sceneStoryboard = backendStoryboard({
+      status: "ready",
+      image_url: storyboardObjectUrl,
+      version_count: 1
+    });
+    const storyboardScreen = setup({
+      scenesView: "storyboard",
+      sceneStoryboard
+    });
+    expect(
+      storyboardScreen
+        .getByTestId("shot-storyboard-version-1-image")
+        .getAttribute("src")
+    ).toBe(proxiedStoryboardUrl);
+    storyboardScreen.unmount();
+
+    const videoScreen = setup({ sceneStoryboard });
+    const referenceTileImageSources = [
+      ...videoScreen
+        .getByTestId("shot-storyboard-reference-1")
+        .querySelectorAll("img")
+    ].map((image) => image.getAttribute("src"));
+    expect(referenceTileImageSources).toEqual([proxiedStoryboardUrl]);
+  });
 
   it("says a stale storyboard is out of date and that the video renders without it", () => {
     const sceneStoryboard = backendStoryboard({
@@ -538,6 +573,44 @@ describe("scene length on Generate", () => {
     );
   });
 });
+describe("speaker not tagged in the scene", () => {
+  const alex = { token: "alex", name: "ALEX" };
+  const mara = { token: "mara", name: "MARA" };
+  it("names each untagged speaker in a warning, in the backend's order", () => {
+    const screen = setup({ untaggedSpeakers: [mara, alex] });
+    const notes = screen.getAllByTestId(/^shot-untagged-speaker-1-/);
+    expect(notes.map((note) => note.textContent)).toEqual([
+      "MARA speaks but isn't in this shot. Their line will be heard off-screen.",
+      "ALEX speaks but isn't in this shot. Their line will be heard off-screen."
+    ]);
+  });
+  it("shows both speakers when they share a name", () => {
+    const screen = setup({
+      untaggedSpeakers: [alex, { token: "alex_2", name: "ALEX" }]
+    });
+    expect(screen.getByTestId("shot-untagged-speaker-1-alex")).toBeTruthy();
+    expect(screen.getByTestId("shot-untagged-speaker-1-alex_2")).toBeTruthy();
+  });
+  it("shows no warning when every speaker is tagged", () => {
+    const screen = setup();
+    expect(screen.queryAllByTestId(/^shot-untagged-speaker-1-/)).toEqual([]);
+  });
+  it("shows no warning on a locked scene", () => {
+    const screen = setup({
+      shotUnderTest: { ...shot, locked: true },
+      untaggedSpeakers: [alex]
+    });
+    expect(screen.queryByTestId("shot-untagged-speaker-1-alex")).toBeNull();
+  });
+  it("keeps Generate available while the warning shows", () => {
+    const screen = setup({ untaggedSpeakers: [alex] });
+    expect(screen.getByTestId("shot-untagged-speaker-1-alex")).toBeTruthy();
+    const generateButton = screen.getByTestId("shot-rerender-1");
+    expect(generateButton).not.toBeDisabled();
+    fireEvent.click(generateButton);
+    expect(screen.onRetryRender).toHaveBeenCalled();
+  });
+});
 describe("locked scene", () => {
   const cutShotWithTwoVersions = ProjectCutSchema.parse({
     project_id: "project",
@@ -568,10 +641,21 @@ describe("locked scene", () => {
   }).shots[0]!;
   const lockedShot = { ...shot, locked: true };
 
-  it("drops the version column when the pinned video is the only version", () => {
+  it("keeps the pinned video in the version column when it is the only version", () => {
     const screen = setup({
       cutShotUnderTest: {
         ...cutShotWithTwoVersions,
+        versions: cutShotWithTwoVersions.versions.slice(0, 1)
+      }
+    });
+    expect(screen.getByTestId("version-strip")).toBeInTheDocument();
+  });
+
+  it("keeps the version column hidden for a sole unpinned video", () => {
+    const screen = setup({
+      cutShotUnderTest: {
+        ...cutShotWithTwoVersions,
+        pinned_asset_id: null,
         versions: cutShotWithTwoVersions.versions.slice(0, 1)
       }
     });

@@ -16,6 +16,8 @@ describe("cut playback during synchronization", () => {
     const register = vi.fn();
     const clip: CutTimelineClip = {
       assetId: "cold-video",
+      versionAssetId: "cold-video",
+      isClipRendering: false,
       videoUrl: "https://cdn.example/cold.mp4",
       isClipPlayable: true,
       sequenceId: 1,
@@ -32,6 +34,8 @@ describe("cut playback during synchronization", () => {
     const props = {
       clip,
       isActive: true,
+      isClipPlaying: false,
+      onPlay: vi.fn(),
       onEnded: vi.fn(),
       onError: vi.fn(),
       registerElement: register

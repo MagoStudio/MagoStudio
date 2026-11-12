@@ -16,18 +16,21 @@ interface PopoverProps {
   onOpenChange?: (isOpen: boolean) => void;
   onMouseEnter?: React.MouseEventHandler;
   onMouseLeave?: React.MouseEventHandler;
-  variant?: "default" | "warning";
+  variant?: "default" | "warning" | "neutral";
   isNonModal?: boolean;
+  portalContainer?: HTMLElement;
 }
 
 const bubbleVariants = {
   default: "bg-surface-bg-100 text-glyph-primary-on-pic",
-  warning: "bg-element-warning text-glyph-invert-main"
+  warning: "bg-element-warning text-glyph-invert-main",
+  neutral: "bg-element-tertiary text-glyph-primary"
 };
 
 const arrowVariants = {
   default: "fill-surface-bg-100",
-  warning: "fill-element-warning"
+  warning: "fill-element-warning",
+  neutral: "fill-element-tertiary"
 };
 
 export function Popover({
@@ -41,7 +44,8 @@ export function Popover({
   onMouseEnter,
   onMouseLeave,
   variant = "default",
-  isNonModal = true
+  isNonModal = true,
+  portalContainer
 }: PopoverProps) {
   return (
     <AriaPopover
@@ -51,8 +55,9 @@ export function Popover({
       placement={placement}
       offset={offsetPx}
       isNonModal={isNonModal}
+      UNSTABLE_portalContainer={portalContainer}
       className={cn(
-        "z-popover max-w-120 rounded backdrop-blur-md shadow-popover",
+        "z-popover flex max-w-120 flex-col rounded backdrop-blur-md shadow-popover",
         bubbleVariants[variant],
         className
       )}
@@ -72,7 +77,7 @@ export function Popover({
           <path d="M0 0L4.93934 4.93934C5.52513 5.52513 6.47487 5.52513 7.06066 4.93934L12 0" />
         </svg>
       </OverlayArrow>
-      <Dialog className="max-h-[calc(100vh-2rem)] overflow-x-hidden overflow-y-auto scrollbar-custom p-3 text-sm leading-5 outline-none whitespace-pre-line">
+      <Dialog className="min-h-0 max-h-[calc(100vh-2rem)] overflow-x-hidden overflow-y-auto scrollbar-custom p-3 text-sm leading-5 outline-none whitespace-pre-line">
         {children}
       </Dialog>
     </AriaPopover>

@@ -34,32 +34,46 @@ const estimateV9ShotRenderCredits = ({
   );
 };
 
-const MINIMAX_CREDITS_PER_SECOND_BY_TIER: Record<
+const MINIMAX_H3_MAX_FAL_USD_PER_OUTPUT_SECOND_BY_TIER: Record<
   MinimaxResolutionTier,
   number
 > = {
-  "480P": 102,
-  "768P": 164,
-  "1080P": 327
+  "480P": 0.05,
+  "768P": 0.08,
+  "1080P": 0.16
 };
+const MINIMAX_H3_MAX_FAL_FREE_REFERENCE_TOKENS = 4096;
+const MINIMAX_H3_MAX_FAL_USD_PER_THOUSAND_REFERENCE_TOKENS = 0.02;
+const MINIMAX_H3_MAX_FAL_TOKENS_PER_SQUARE_IMAGE = 1024;
+const MINIMAX_H3_MAX_FAL_IMAGE_TOKEN_STEP = 32;
+const SEEDANCE_2_CREDITS_PER_SECOND = 370;
+const SEEDANCE_2_FAL_USD_PER_SECOND = 0.18144;
+const FAL_CREDITS_PER_USD =
+  SEEDANCE_2_CREDITS_PER_SECOND / SEEDANCE_2_FAL_USD_PER_SECOND;
+const IMAGE_TOKEN_ROUNDING_TOLERANCE = 1e-9;
 
-const MINIMAX_FREE_REFERENCE_PIXELS = 4096;
-const MINIMAX_PIXELS_PER_REFERENCE_IMAGE = 1024;
-const MINIMAX_EXTRA_PIXEL_USD_PER_KILOPIXEL = 0.02;
-const MINIMAX_USD_PER_CREDIT_BATCH = 0.18144;
-const MINIMAX_CREDITS_PER_USD_BATCH = 370;
-const MINIMAX_EXTRA_REFERENCE_CREDIT_RATE =
-  (MINIMAX_EXTRA_PIXEL_USD_PER_KILOPIXEL / 1000) *
-  (MINIMAX_CREDITS_PER_USD_BATCH / MINIMAX_USD_PER_CREDIT_BATCH);
+const countMinimaxH3MaxReferenceImageTokens = (
+  imageSize: [number, number] | null
+): number => {
+  if (!imageSize) return MINIMAX_H3_MAX_FAL_TOKENS_PER_SQUARE_IMAGE;
+  const aspectRatio = Math.max(...imageSize) / Math.min(...imageSize);
+  return (
+    Math.ceil(
+      (MINIMAX_H3_MAX_FAL_TOKENS_PER_SQUARE_IMAGE * aspectRatio) /
+        MINIMAX_H3_MAX_FAL_IMAGE_TOKEN_STEP -
+        IMAGE_TOKEN_ROUNDING_TOLERANCE
+    ) * MINIMAX_H3_MAX_FAL_IMAGE_TOKEN_STEP
+  );
+};
 
 const estimateMinimaxShotRenderCredits = ({
   outputSize,
   shotFrames,
-  referenceImageCount
+  referenceImageSizes
 }: {
   outputSize: [number, number];
   shotFrames: number;
-  referenceImageCount: number;
+  referenceImageSizes: ([number, number] | null)[];
 }): number => {
   const shortEdgePx = Math.min(outputSize[0], outputSize[1]);
 
@@ -67,17 +81,22 @@ const estimateMinimaxShotRenderCredits = ({
 
   const billedSeconds = roundHalfToEven(shotFrames / SHOT_FPS);
   const tier = findNearestMinimaxResolutionTier(shortEdgePx);
-  const extraReferencePixels = Math.max(
-    0,
-    referenceImageCount * MINIMAX_PIXELS_PER_REFERENCE_IMAGE -
-      MINIMAX_FREE_REFERENCE_PIXELS
+  const imageTokens = referenceImageSizes.reduce(
+    (totalTokens, imageSize) =>
+      totalTokens + countMinimaxH3MaxReferenceImageTokens(imageSize),
+    0
   );
+  const billedReferenceTokens = Math.max(
+    0,
+    imageTokens - MINIMAX_H3_MAX_FAL_FREE_REFERENCE_TOKENS
+  );
+  const falUsd =
+    billedSeconds * MINIMAX_H3_MAX_FAL_USD_PER_OUTPUT_SECOND_BY_TIER[tier] +
+    (billedReferenceTokens *
+      MINIMAX_H3_MAX_FAL_USD_PER_THOUSAND_REFERENCE_TOKENS) /
+      1000;
 
-  const credits =
-    billedSeconds * MINIMAX_CREDITS_PER_SECOND_BY_TIER[tier] +
-    extraReferencePixels * MINIMAX_EXTRA_REFERENCE_CREDIT_RATE;
-
-  return Math.ceil(credits);
+  return Math.ceil(falUsd * FAL_CREDITS_PER_USD);
 };
 
 const estimateSeedanceShotRenderCredits = (
@@ -103,12 +122,12 @@ export const estimateShotRenderCredits = ({
   shotEngine,
   outputSize,
   shotFrames,
-  referenceImageCount
+  referenceImageSizes
 }: {
   shotEngine: ShotRenderEngine;
   outputSize: [number, number];
   shotFrames: number;
-  referenceImageCount: number;
+  referenceImageSizes: ([number, number] | null)[];
 }): number =>
   shotEngine === VideoEngine.seedance_2_5
     ? estimateSeedanceShotRenderCredits(outputSize, shotFrames)
@@ -116,6 +135,6 @@ export const estimateShotRenderCredits = ({
       ? estimateMinimaxShotRenderCredits({
           outputSize,
           shotFrames,
-          referenceImageCount
+          referenceImageSizes
         })
       : estimateV9ShotRenderCredits({ outputSize, shotFrames });

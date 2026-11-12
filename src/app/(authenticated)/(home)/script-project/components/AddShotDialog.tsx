@@ -115,6 +115,7 @@ export const AddShotDialog: React.FC<Props> = ({
           </Text>
           <div className="grid grid-cols-3 gap-2">
             <ShotReferenceList
+              voicedCharacterTokens={new Set()}
               chips={chips}
               imageUrlsByAssetId={imageUrlsByAssetId}
               isBusy={isBusy}

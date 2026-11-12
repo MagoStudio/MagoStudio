@@ -14,7 +14,9 @@ export const useUploadSheetGroupImage = (projectId: string) => {
   const { mutateAsync: uploadReferenceImage } = useUploadReferenceImage();
   const { mutateAsync: addSheetGroupImage, isPending: isFilingImage } =
     useAddSheetGroupImage(projectId);
-  const [pendingFileUploadCount, setPendingFileUploadCount] = useState(0);
+  const [uploadingSheetGroupTokens, setUploadingSheetGroupTokens] = useState<
+    string[]
+  >([]);
 
   const uploadSheetGroupImage = async ({
     timelineId,
@@ -28,8 +30,8 @@ export const useUploadSheetGroupImage = (projectId: string) => {
     file: File;
     nameForNewSheetGroup?: string;
     kindForNewSheetGroup?: SheetKind;
-  }) => {
-    setPendingFileUploadCount((count) => count + 1);
+  }): Promise<boolean> => {
+    setUploadingSheetGroupTokens((tokens) => [...tokens, token]);
     let fileUploadFailure: unknown;
     try {
       const assetId = await uploadReferenceImage({
@@ -52,6 +54,7 @@ export const useUploadSheetGroupImage = (projectId: string) => {
         name: nameForNewSheetGroup,
         kind: kindForNewSheetGroup
       });
+      return true;
     } catch (error) {
       reportScriptProjectFailure(
         error,
@@ -66,13 +69,19 @@ export const useUploadSheetGroupImage = (projectId: string) => {
             kindForNewSheetGroup
           })
       );
+      return false;
     } finally {
-      setPendingFileUploadCount((count) => count - 1);
+      setUploadingSheetGroupTokens((tokens) => {
+        const finishedUploadIndex = tokens.indexOf(token);
+        return tokens.filter((_, index) => index !== finishedUploadIndex);
+      });
     }
   };
 
   return {
     uploadSheetGroupImage,
-    isUploadingSheetGroupImage: pendingFileUploadCount > 0 || isFilingImage
+    isUploadingSheetGroupImage:
+      uploadingSheetGroupTokens.length > 0 || isFilingImage,
+    uploadingSheetGroupTokens
   };
 };

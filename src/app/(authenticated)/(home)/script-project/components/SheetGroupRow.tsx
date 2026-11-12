@@ -1,45 +1,52 @@
-import { AnimatedGradient } from "@components/AnimatedGradient";
+import { CloseButton } from "@components/CloseButton";
+import { Divider } from "@components/Divider";
+import { Icon } from "@components/Icon";
+import { IconActionButton } from "@components/IconActionButton";
 import { MainButton } from "@components/MainButton";
+import { OverlayDialog } from "@components/OverlayDialog";
 import { Text } from "@components/Text";
 import { Textarea } from "@components/Textarea";
 import { SheetImageUrls } from "@domains/scriptProject/utils/buildSheetImageUrlIndex";
-import { findNewestSuccessfulSheetImage } from "@domains/scriptProject/utils/findNewestSuccessfulSheetImage";
 import { sheetGroupDesignLabel } from "@domains/scriptProject/utils/groupSheetGroupsByDesignFamily";
 import {
   DRAFT_SAVING_ACTION_ATTRIBUTE,
   isFocusMovingToDraftSavingAction
 } from "@domains/scriptProject/utils/isFocusMovingToDraftSavingAction";
-import { isNewerSheetVersionAvailableThanPinned } from "@domains/scriptProject/utils/isNewerSheetVersionAvailableThanPinned";
-import { isSheetImageRendering } from "@domains/scriptProject/utils/isSheetImageRendering";
+import { SheetImageVersionSettings } from "@domains/scriptProject/utils/readSheetImageVersionSettings";
 import { resolveSheetRenderBlockedReasonKey } from "@domains/scriptProject/utils/resolveSheetRenderBlockedReasonKey";
+import { buildVoiceSignatureFromStockVoice } from "@domains/voiceLibrary/utils/buildVoiceSignatureFromStockVoice";
 import { useDraftValue } from "@hooks/useDraftValue";
-import { SheetGroup } from "@schemas/scriptProject";
+import { SheetGroup, VoiceSignature } from "@schemas/scriptProject";
+import { StockVoice } from "@schemas/voiceLibrary";
 import { cn } from "@utils";
 import { useState } from "react";
 import { useTranslation } from "react-i18next";
 
 import { AddImageDropTile } from "./AddImageDropTile";
 import { ChangedFieldsNote } from "./ChangedFieldsNote";
+import { CharacterVoiceCard } from "./CharacterVoiceCard";
+import { ElevenLabsVoiceLibrary } from "./ElevenLabsVoiceLibrary";
 import { RenderCostLabel, ScriptProjectRenderCost } from "./RenderCostLabel";
 import { RenderingBadge } from "./RenderingBadge";
 import {
-  SheetGroupReferences,
-  getSheetGroupReferenceLimit
+  getSheetGroupReferenceLimit,
+  SheetGroupReferences
 } from "./SheetGroupReferences";
 import { SheetImageCard } from "./SheetImageCard";
-import { SheetImageInputsPanel } from "./SheetImageInputsPanel";
-export {
-  MAX_SHEET_GROUP_REFERENCE_IMAGES,
-  getSheetGroupReferenceLimit
-} from "./SheetGroupReferences";
+import { SheetImageInputsButton } from "./SheetImageInputsButton";
+
+const VOICE_DIALOG_MAX_WIDTH_PX = 720;
 
 type Props = {
+  projectId?: string;
+  timelineId?: string;
   group: SheetGroup;
   imageUrlsByAssetId: Map<string, SheetImageUrls>;
   isRendering: boolean;
   changedPaths: string[] | undefined;
   onPin: (assetId: string | null) => void;
   onSaveFields: (fields: {
+    voiceSignature?: VoiceSignature | null;
     description?: string;
     prompt?: string;
     referenceAssetIds?: string[] | null;
@@ -58,13 +65,17 @@ type Props = {
   onUploadImage: (file: File) => void;
   onDescribeFromImage: (assetId: string) => void;
   isBusy: boolean;
+  isBusyWithAnythingButImageUploads: boolean;
+  isUploadingImage: boolean;
   isRenderDisabled: boolean;
   renderCost: ScriptProjectRenderCost;
-  shouldFetchImageInputs: boolean;
   supportsImageReferences: boolean;
+  isCharacterVoiceAvailableForProject: boolean;
 };
 
 export const SheetGroupRow: React.FC<Props> = ({
+  projectId,
+  timelineId,
   group,
   imageUrlsByAssetId,
   isRendering,
@@ -73,15 +84,17 @@ export const SheetGroupRow: React.FC<Props> = ({
   onSaveFields,
   onToggleEnabled,
   onRerender,
-  onUploadReference,
   onDescribeFromImage,
   onUploadImage,
   isBusy,
+  isBusyWithAnythingButImageUploads,
+  isUploadingImage,
+  onUploadReference,
+  isRunActive,
   isRenderDisabled,
   renderCost,
-  shouldFetchImageInputs,
   supportsImageReferences,
-  isRunActive
+  isCharacterVoiceAvailableForProject
 }) => {
   const { t } = useTranslation();
   const {
@@ -89,7 +102,28 @@ export const SheetGroupRow: React.FC<Props> = ({
     setDraftValue: setDraftPrompt,
     isDraftDirty: hasUnsavedPrompt
   } = useDraftValue(group.prompt ?? "");
-  const [selectedAssetId, setSelectedAssetId] = useState<string | null>(null);
+  const [isVoiceDialogOpen, setIsVoiceDialogOpen] = useState(false);
+  const isCharacterVoiceAvailable =
+    isCharacterVoiceAvailableForProject &&
+    group.kind === "character" &&
+    !!projectId &&
+    !!timelineId;
+  const savedVoiceSignature = group.voice_signature ?? null;
+  const [draftVoiceSignature, setDraftVoiceSignature] =
+    useState<VoiceSignature | null>(null);
+  const openVoiceDialog = () => {
+    setDraftVoiceSignature(savedVoiceSignature);
+    setIsVoiceDialogOpen(true);
+  };
+  const chooseDraftStockVoice = (stockVoice: StockVoice) =>
+    setDraftVoiceSignature(buildVoiceSignatureFromStockVoice(stockVoice));
+  const saveDraftVoiceSignature = () => {
+    const isDraftVoiceAlreadySaved =
+      draftVoiceSignature?.voice_id === savedVoiceSignature?.voice_id;
+    if (!isDraftVoiceAlreadySaved)
+      onSaveFields({ voiceSignature: draftVoiceSignature });
+    setIsVoiceDialogOpen(false);
+  };
   const [referenceAssetIds, setReferenceAssetIds] = useState(
     group.reference_asset_ids ?? []
   );
@@ -132,19 +166,27 @@ export const SheetGroupRow: React.FC<Props> = ({
       commitReferences(ids, nextInstruction);
   };
 
+  const reuseVersionSettings = (versionSettings: SheetImageVersionSettings) => {
+    if (versionSettings.prompt) setDraftPrompt(versionSettings.prompt);
+    const reusedReferenceAssetIds = versionSettings.referenceAssetIds;
+    const reusedReferenceInstruction =
+      versionSettings.referenceInstruction ?? referenceInstruction;
+    setReferenceAssetIds(reusedReferenceAssetIds);
+    setReferenceInstruction(reusedReferenceInstruction);
+    const areReusedReferencesAlreadySaved =
+      JSON.stringify(reusedReferenceAssetIds) ===
+        JSON.stringify(group.reference_asset_ids ?? []) &&
+      reusedReferenceInstruction === (group.reference_instruction ?? "");
+    if (!areReusedReferencesAlreadySaved)
+      commitReferences(reusedReferenceAssetIds, reusedReferenceInstruction);
+  };
+
   const renderBlockedReasonKey = resolveSheetRenderBlockedReasonKey({
     isRunActive,
     isUploadingReference
   });
 
   const hasUnsavedEdits = hasUnsavedPrompt;
-  const groupDescription = group.description ?? "";
-  const groupSeedDescription = group.seed_description ?? "";
-  const selectedImage = group.images.find(
-    (image) => image.asset_id === selectedAssetId
-  );
-  const shouldBadgeNewerVersion = isNewerSheetVersionAvailableThanPinned(group);
-  const newestSuccessfulImage = findNewestSuccessfulSheetImage(group);
   const designLabel = sheetGroupDesignLabel(group);
   const isRerenderDisabled =
     isRenderDisabled ||
@@ -152,6 +194,41 @@ export const SheetGroupRow: React.FC<Props> = ({
     isBusy ||
     !group.enabled ||
     isUploadingReference;
+  const groupDescription = group.description ?? "";
+  const groupSeedDescription = group.seed_description ?? "";
+  const pinnedImage = group.images.find(
+    (image) => image.asset_id === group.selected_asset_id
+  );
+  const unpinnedImages = group.images.filter(
+    (image) => image.asset_id !== group.selected_asset_id
+  );
+  const hasPinnedResultOrVoiceRow = !!pinnedImage || isCharacterVoiceAvailable;
+  const hasPinnedResultAndVoice = !!pinnedImage && isCharacterVoiceAvailable;
+  const hasOtherVersions = unpinnedImages.length > 0;
+  const renderSheetImageCard = (image: SheetGroup["images"][number]) => (
+    <SheetImageCard
+      key={image.asset_id}
+      image={image}
+      imageUrls={imageUrlsByAssetId.get(image.asset_id)}
+      isPinned={group.selected_asset_id === image.asset_id}
+      isEffective={group.effective_asset_id === image.asset_id}
+      versionInputsButton={
+        <SheetImageInputsButton
+          image={image}
+          seedDescription={groupSeedDescription}
+          versionName={image.name ?? image.asset_id}
+          isBusy={isBusy}
+          onReuseSettings={reuseVersionSettings}
+          onDescribeFromImage={() => onDescribeFromImage(image.asset_id)}
+        />
+      }
+      onPin={() =>
+        onPin(
+          group.selected_asset_id === image.asset_id ? null : image.asset_id
+        )
+      }
+    />
+  );
 
   return (
     <div
@@ -161,43 +238,39 @@ export const SheetGroupRow: React.FC<Props> = ({
         !group.enabled && "opacity-60"
       )}
     >
-      <div className="flex flex-wrap items-center justify-between gap-2">
-        <div className="flex items-center gap-2">
+      <div className="flex items-start justify-between gap-2">
+        <div className="flex flex-wrap items-center gap-2">
           <Text variant="md" weight="semibold">
             {group.name}
+          </Text>
+          <Text variant="xs" color="glyph-tertiary">
+            {group.token}
           </Text>
           {designLabel && (
             <Text variant="xs" color="glyph-secondary">
               {designLabel}
             </Text>
           )}
-          <Text variant="xs" color="glyph-tertiary">
-            {group.token}
-          </Text>
           {!group.enabled && (
             <Text variant="xs" color="glyph-warning">
               {t("script_project.disabled_entity_badge.label")}
             </Text>
           )}
-          {group.effective_source === "upload" && (
-            <Text variant="xs" color="glyph-secondary">
-              {t("script_project.pinned_upload_hint.label")}
-            </Text>
-          )}
-          {isRendering && (
-            <RenderingBadge testId={`sheet-group-rendering-${group.token}`} />
-          )}
         </div>
-        <div className="flex items-center gap-2">
-          {renderBlockedReasonKey && (
-            <Text
-              variant="2xs"
-              color="glyph-tertiary"
-              data-testid={`sheet-group-render-blocked-${group.token}`}
-            >
-              {t(renderBlockedReasonKey)}
-            </Text>
-          )}
+        {group.enabled && (
+          <IconActionButton
+            size="xs"
+            variant="transparent"
+            icon={<Icon iconSet="16" iconName="delete" />}
+            aria-label={t("script_project.disable_entity_button.label")}
+            isDisabled={isBusy}
+            onPress={onToggleEnabled}
+            data-testid={`sheet-group-toggle-${group.token}`}
+          />
+        )}
+      </div>
+      {!group.enabled && (
+        <div className="flex flex-wrap items-center gap-2">
           <MainButton
             size="sm"
             colorScheme="secondary"
@@ -205,10 +278,108 @@ export const SheetGroupRow: React.FC<Props> = ({
             onPress={onToggleEnabled}
             data-testid={`sheet-group-toggle-${group.token}`}
           >
-            {group.enabled
-              ? t("script_project.disable_entity_button.label")
-              : t("script_project.enable_entity_button.label")}
+            {t("script_project.enable_entity_button.label")}
           </MainButton>
+        </div>
+      )}
+
+      {hasPinnedResultOrVoiceRow && (
+        <div
+          className={cn(
+            "grid items-stretch gap-3",
+            hasPinnedResultAndVoice ? "grid-cols-2" : "grid-cols-1"
+          )}
+        >
+          {pinnedImage && renderSheetImageCard(pinnedImage)}
+          {isCharacterVoiceAvailable && (
+            <CharacterVoiceCard
+              token={group.token}
+              voiceSignature={savedVoiceSignature}
+              onOpenVoiceDialog={openVoiceDialog}
+            />
+          )}
+        </div>
+      )}
+
+      {hasPinnedResultOrVoiceRow && <Divider className="bg-element-primary" />}
+
+      {hasOtherVersions && (
+        <>
+          <Text component="h4" variant="xs" weight="semibold">
+            {t("script_project.all_versions.label")}
+          </Text>
+          <div className="grid grid-cols-2 gap-2">
+            {unpinnedImages.map(renderSheetImageCard)}
+          </div>
+        </>
+      )}
+
+      {hasOtherVersions && <Divider className="bg-element-primary" />}
+
+      <div className="flex items-center gap-2">
+        <Text component="h4" variant="xs" weight="semibold">
+          {t("script_project.asset_creation_form.label")}
+        </Text>
+        {isRendering && (
+          <RenderingBadge testId={`sheet-group-rendering-${group.token}`} />
+        )}
+      </div>
+
+      <section
+        className="flex flex-col gap-3 rounded-xl border border-element-primary bg-surface-primary p-3"
+        aria-label={t("script_project.create_asset.label")}
+      >
+        <Text component="h4" variant="xs" weight="semibold">
+          {t("script_project.create_asset.label")}
+        </Text>
+        {supportsImageReferences && (
+          <SheetGroupReferences
+            token={group.token}
+            limit={getSheetGroupReferenceLimit(group.master_token)}
+            assetIds={referenceAssetIds}
+            instruction={referenceInstruction}
+            isDisabled={isBusy}
+            onChange={changeReferences}
+            onCommit={() => {
+              if (referencesDirty) commitReferences();
+            }}
+            onUpload={async (file) => {
+              setIsUploadingReference(true);
+              try {
+                return await onUploadReference(file);
+              } finally {
+                setIsUploadingReference(false);
+              }
+            }}
+          />
+        )}
+
+        <div className="grid grid-cols-1 gap-3">
+          <div className="flex flex-col gap-1.5">
+            <Text variant="xs" color="glyph-secondary">
+              {t("script_project.entity_prompt_input.label")}
+            </Text>
+            <Textarea
+              className="min-h-16"
+              autoResize
+              resize="vertical"
+              value={draftPrompt}
+              onChange={(event) => setDraftPrompt(event.target.value)}
+              onBlur={(event) => {
+                if (!hasUnsavedEdits) return;
+                if (isFocusMovingToDraftSavingAction(event.relatedTarget))
+                  return;
+                onSaveFields({
+                  description: groupDescription,
+                  prompt: draftPrompt
+                });
+              }}
+              data-testid={`sheet-group-prompt-${group.token}`}
+            />
+          </div>
+        </div>
+
+        <div className="flex flex-wrap items-center gap-2">
           <MainButton
             size="sm"
             colorScheme="primary"
@@ -226,150 +397,86 @@ export const SheetGroupRow: React.FC<Props> = ({
             data-testid={`sheet-group-rerender-${group.token}`}
           >
             <span className="flex items-center gap-1.5">
-              {newestSuccessfulImage
-                ? t("script_project.rerender_button.label")
-                : t("script_project.render_button.label")}
+              {t("script_project.generate_asset_version_button.label")}
               <RenderCostLabel
                 cost={renderCost}
                 isDisabled={isRerenderDisabled}
               />
             </span>
           </MainButton>
+          {renderBlockedReasonKey && (
+            <Text
+              variant="2xs"
+              color="glyph-tertiary"
+              data-testid={`sheet-group-render-blocked-${group.token}`}
+            >
+              {t(renderBlockedReasonKey)}
+            </Text>
+          )}
         </div>
-      </div>
 
-      {supportsImageReferences && (
-        <SheetGroupReferences
-          token={group.token}
-          limit={getSheetGroupReferenceLimit(group.master_token)}
-          assetIds={referenceAssetIds}
-          instruction={referenceInstruction}
-          isDisabled={isBusy}
-          onChange={changeReferences}
-          onCommit={() => {
-            if (referencesDirty) commitReferences();
-          }}
-          onUpload={async (file) => {
-            setIsUploadingReference(true);
-            try {
-              return await onUploadReference(file);
-            } finally {
-              setIsUploadingReference(false);
-            }
-          }}
+        <ChangedFieldsNote
+          changedPaths={changedPaths}
+          testId={`sheet-group-changed-${group.token}`}
         />
-      )}
+      </section>
 
-      <div className="grid grid-cols-1 gap-3">
-        <div className="flex flex-col gap-1.5">
-          <Text variant="xs" color="glyph-secondary">
-            {t("script_project.entity_prompt_input.label")}
-          </Text>
-          <Textarea
-            className="min-h-16"
-            autoResize
-            resize="vertical"
-            value={draftPrompt}
-            onChange={(event) => setDraftPrompt(event.target.value)}
-            onBlur={(event) => {
-              if (!hasUnsavedEdits) return;
-              if (isFocusMovingToDraftSavingAction(event.relatedTarget)) return;
-              onSaveFields({
-                description: groupDescription,
-                prompt: draftPrompt
-              });
-            }}
-            data-testid={`sheet-group-prompt-${group.token}`}
-          />
-          <Text variant="2xs" color="glyph-tertiary">
-            {t("script_project.prompt_is_sent_hint.label")}
-          </Text>
-        </div>
-      </div>
-
-      <ChangedFieldsNote
-        changedPaths={changedPaths}
-        testId={`sheet-group-changed-${group.token}`}
-      />
-
-      {shouldBadgeNewerVersion && newestSuccessfulImage && (
-        <div className="flex items-center gap-3 rounded-xl bg-surface-primary px-3 py-2">
-          <Text variant="xs" color="glyph-warning">
-            {t("script_project.newer_version_badge.label")}
-          </Text>
-          <MainButton
-            size="sm"
-            colorScheme="secondary"
-            isDisabled={isBusy}
-            onPress={() => onPin(newestSuccessfulImage.asset_id)}
-            data-testid={`sheet-group-use-newest-${group.token}`}
-          >
-            {t("script_project.use_newest_button.label")}
-          </MainButton>
-        </div>
-      )}
-
-      <div className="flex flex-wrap gap-2">
-        {group.images.map((image) => (
-          <SheetImageCard
-            key={image.asset_id}
-            image={image}
-            imageUrls={imageUrlsByAssetId.get(image.asset_id)}
-            isPinned={group.selected_asset_id === image.asset_id}
-            isEffective={group.effective_asset_id === image.asset_id}
-            isSelected={selectedAssetId === image.asset_id}
-            onSelect={() =>
-              setSelectedAssetId(
-                selectedAssetId === image.asset_id ? null : image.asset_id
-              )
-            }
-            onPin={() =>
-              onPin(
-                group.selected_asset_id === image.asset_id
-                  ? null
-                  : image.asset_id
-              )
-            }
-          />
-        ))}
-        {isRendering && !group.images.some(isSheetImageRendering) && (
-          <div
-            className="relative aspect-square w-48 overflow-hidden rounded-xl border border-element-primary bg-surface-primary"
-            data-testid={`sheet-group-rendering-placeholder-${group.token}`}
-          >
-            <AnimatedGradient />
-            <div className="pointer-events-none absolute inset-0 flex items-center justify-center">
-              <Text variant="xs" color="glyph-secondary">
-                {t("script_project.version_not_ready.label")}
-              </Text>
-            </div>
-          </div>
-        )}
+      <section
+        className="flex flex-col gap-3 rounded-xl border border-element-primary bg-surface-primary p-3"
+        aria-label={t("script_project.upload_own_asset.label")}
+      >
+        <Text component="h4" variant="xs" weight="semibold">
+          {t("script_project.upload_own_asset.label")}
+        </Text>
         <AddImageDropTile
           onFileChosen={onUploadImage}
-          isBusy={isBusy || !group.enabled}
-          className="h-auto w-48 min-h-40"
+          isBusy={isBusyWithAnythingButImageUploads || !group.enabled}
+          isUploadingImage={isUploadingImage}
+          className="min-h-40 w-full"
           testId={`sheet-group-drop-${group.token}`}
         />
-      </div>
+      </section>
 
-      {selectedImage && (
-        <SheetImageInputsPanel
-          key={selectedImage.asset_id}
-          clipId={selectedImage.clip_id}
-          assetId={selectedImage.asset_id}
-          description={selectedImage.description}
-          hasDescription={selectedImage.has_description}
-          seedDescription={groupSeedDescription}
-          recordedPrompt={selectedImage.prompt}
-          versionName={selectedImage.name ?? selectedImage.asset_id}
-          isBusy={isBusy}
-          shouldFetchInputs={shouldFetchImageInputs}
-          onReusePrompt={setDraftPrompt}
-          onDescribeFromImage={() =>
-            onDescribeFromImage(selectedImage.asset_id)
-          }
-        />
+      {isCharacterVoiceAvailable && (
+        <OverlayDialog
+          isOpen={isVoiceDialogOpen}
+          onOpenChange={setIsVoiceDialogOpen}
+          size={{ mode: "hug", maxWidthPx: VOICE_DIALOG_MAX_WIDTH_PX }}
+          className="overflow-y-auto scrollbar-custom"
+        >
+          <div
+            className="relative flex w-[720px] max-w-full flex-col gap-3 p-6"
+            data-testid={`sheet-group-voice-dialog-${group.token}`}
+          >
+            <div className="absolute right-4 top-4 z-10">
+              <CloseButton onPress={() => setIsVoiceDialogOpen(false)} />
+            </div>
+            <div className="flex flex-col gap-1 pr-10">
+              <Text component="h4" variant="lg" weight="semibold">
+                {t("script_project.voice.eleven_labs_library.title")}
+              </Text>
+              <Text variant="sm" color="glyph-secondary">
+                {group.name}
+              </Text>
+            </div>
+            <ElevenLabsVoiceLibrary
+              isDisabled={isBusy || !group.enabled || isRunActive}
+              selectedVoiceId={draftVoiceSignature?.voice_id ?? null}
+              onSelectStockVoice={chooseDraftStockVoice}
+            />
+            <div className="flex pb-2">
+              <MainButton
+                size="md"
+                colorScheme="primary"
+                isDisabled={!draftVoiceSignature}
+                onPress={saveDraftVoiceSignature}
+                data-testid={`sheet-group-save-voice-${group.token}`}
+              >
+                {t("script_project.voice.save_voice_button.label")}
+              </MainButton>
+            </div>
+          </div>
+        </OverlayDialog>
       )}
     </div>
   );

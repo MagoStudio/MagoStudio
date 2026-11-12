@@ -1,3 +1,4 @@
+import type { RequiredLocalInstall } from "@app/components/LocalSetupWizard/requiredLocalInstall";
 import { i18n } from "@config/i18n";
 import { comfyLaunchDialogOpenAtom } from "@store/atoms/comfyLaunchDialogOpenAtom";
 import { localSetupWizardOpenAtom } from "@store/atoms/localSetupWizardOpenAtom";
@@ -16,7 +17,15 @@ beforeEach(() => {
   Object.assign(window, { mago: { comfy: { check } } });
 });
 
-const renderButton = (onSetup?: () => void) => {
+const renderButton = ({
+  onSetup,
+  lockedRenderButton,
+  requiredLocalInstall
+}: {
+  onSetup?: () => void;
+  lockedRenderButton?: React.ReactNode;
+  requiredLocalInstall?: RequiredLocalInstall;
+} = {}) => {
   const store = createStore();
   render(
     <I18nextProvider i18n={i18n}>
@@ -26,7 +35,11 @@ const renderButton = (onSetup?: () => void) => {
             new QueryClient({ defaultOptions: { queries: { retry: false } } })
           }
         >
-          <LaunchComfyOrSetupMagoStudioButton onSetup={onSetup} />
+          <LaunchComfyOrSetupMagoStudioButton
+            onSetup={onSetup}
+            requiredLocalInstall={requiredLocalInstall}
+            lockedRenderButton={lockedRenderButton}
+          />
         </QueryClientProvider>
       </Provider>
     </I18nextProvider>
@@ -89,7 +102,7 @@ describe("Launch ComfyUI or Setup Mago Studio button", () => {
   it("offers setup when the launcher is unknown", async () => {
     check.mockResolvedValue({ available: false, canLaunch: false });
     const onSetup = vi.fn();
-    const store = renderButton(onSetup);
+    const store = renderButton({ onSetup });
     fireEvent.click(
       await screen.findByRole("button", { name: "Setup Mago Studio" })
     );
@@ -112,5 +125,72 @@ describe("Launch ComfyUI or Setup Mago Studio button", () => {
     expect(
       screen.getByRole("button", { name: "Setup Mago Studio" })
     ).toBeInTheDocument();
+  });
+
+  describe("with a locked render button", () => {
+    const lockedGenerateButton = (
+      <button type="button" disabled>
+        Generate
+      </button>
+    );
+
+    it("keeps the locked button and offers to launch ComfyUI in a warning popup", async () => {
+      check.mockResolvedValue({ available: false, canLaunch: true });
+      const store = renderButton({ lockedRenderButton: lockedGenerateButton });
+      const launchComfyButton = await screen.findByRole("button", {
+        name: "Launch ComfyUI"
+      });
+      expect(screen.getByRole("tooltip")).toHaveTextContent(
+        "ComfyUI isn't running. Launch it to render locally."
+      );
+      expect(screen.getByRole("button", { name: "Generate" })).toBeDisabled();
+      fireEvent.click(launchComfyButton);
+      await waitFor(() =>
+        expect(store.get(comfyLaunchDialogOpenAtom)).toBe(true)
+      );
+      expect(screen.queryByRole("tooltip")).toBeNull();
+      expect(screen.getByRole("button", { name: "Generate" })).toBeDisabled();
+    });
+
+    it("keeps the locked button and offers setup in a warning popup before setup is complete", async () => {
+      check.mockResolvedValue({ available: false, canLaunch: false });
+      const store = renderButton({ lockedRenderButton: lockedGenerateButton });
+      expect(screen.getByRole("tooltip")).toHaveTextContent(
+        "To render locally, you need to finish the setup."
+      );
+      expect(screen.getByRole("button", { name: "Generate" })).toBeDisabled();
+      fireEvent.click(
+        screen.getByRole("button", { name: "Setup Mago Studio" })
+      );
+      expect(store.get(localSetupWizardOpenAtom)).toBe(true);
+    });
+
+    it("offers to update the installation in a warning popup once setup is complete", async () => {
+      check.mockResolvedValue({ available: false, canLaunch: false });
+      Object.assign(window, {
+        mago: {
+          comfy: { check },
+          localSetup: {
+            installerStatus: vi
+              .fn()
+              .mockResolvedValue({ hasCompletedInstall: true })
+          }
+        }
+      });
+      const store = renderButton({
+        lockedRenderButton: lockedGenerateButton,
+        requiredLocalInstall: { kind: "manual-download" }
+      });
+      const updateInstallationButton = await screen.findByRole("button", {
+        name: "Update installation"
+      });
+      expect(screen.getByRole("tooltip")).toHaveTextContent(
+        "This model isn't installed yet. Add it to your setup."
+      );
+      fireEvent.click(updateInstallationButton);
+      await waitFor(() =>
+        expect(store.get(localSetupWizardOpenAtom)).toBe(true)
+      );
+    });
   });
 });

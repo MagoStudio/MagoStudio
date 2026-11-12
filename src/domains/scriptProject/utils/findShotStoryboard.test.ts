@@ -56,6 +56,8 @@ describe("findShotStoryboard", () => {
       "https://cdn.example/new.png"
     );
     expect(storyboard.isStoryboardRendering).toBe(false);
+    expect(storyboard.latestFinishedStoryboardClipId).toBe("clip-new");
+    expect(storyboard.latestFinishedStoryboardAssetId).toBe("new");
   });
 
   it("reports a regeneration in progress while still showing the previous image", () => {
@@ -79,6 +81,8 @@ describe("findShotStoryboard", () => {
     );
 
     expect(storyboard.isStoryboardRendering).toBe(true);
+    expect(storyboard.latestFinishedStoryboardClipId).toBe("clip-old");
+    expect(storyboard.latestFinishedStoryboardAssetId).toBe("old");
     expect(storyboard.latestFinishedStoryboardImageUrl).toBe(
       "https://cdn.example/old.png"
     );
@@ -89,7 +93,9 @@ describe("findShotStoryboard", () => {
       latestStoryboardImage: undefined,
       isStoryboardRendering: false,
       hasLatestStoryboardRenderFailed: false,
-      latestFinishedStoryboardImageUrl: undefined
+      latestFinishedStoryboardImageUrl: undefined,
+      latestFinishedStoryboardClipId: undefined,
+      latestFinishedStoryboardAssetId: undefined
     });
   });
 

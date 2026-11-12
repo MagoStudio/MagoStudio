@@ -86,9 +86,11 @@ export const addSetupDestinations = (
     folder ??= root
       ? pathApi(root).join(root, "models", relative)
       : `<ComfyUI>/models/${relative}`;
-    const downloadUrl = item.url.includes("/resolve/")
-      ? item.url
-      : `${item.url.replace(/\/$/, "")}/resolve/main/${encodeURIComponent(item.name)}`;
+    const downloadUrl = !item.url
+      ? undefined
+      : item.url.includes("/resolve/")
+        ? item.url
+        : `${item.url.replace(/\/$/, "")}/resolve/main/${encodeURIComponent(item.name)}`;
     return { ...item, folder, installKind: "model", downloadUrl };
   };
   return {

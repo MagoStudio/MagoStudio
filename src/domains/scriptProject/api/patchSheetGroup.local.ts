@@ -1,4 +1,8 @@
-import { SheetGroup, SheetGroupSchema } from "@schemas/scriptProject";
+import {
+  SheetGroup,
+  SheetGroupSchema,
+  VoiceSignature
+} from "@schemas/scriptProject";
 
 import { backendApiClient } from "@/lib/backend-api-client";
 import { getLocalDesktopApi } from "@/platform/localDesktop";
@@ -9,6 +13,7 @@ export type EditSheetGroupRequest = {
   projectId?: string;
   timelineId: string;
   token: string;
+  voiceSignature?: VoiceSignature | null;
   name?: string;
   description?: string;
   prompt?: string;
@@ -52,6 +57,9 @@ export const patchSheetGroup = async (
   const response = await backendApiClient.patch(
     `/timelines/${request.timelineId}/sheets/${encodeURIComponent(request.token)}/edit`,
     {
+      ...(request.voiceSignature === undefined
+        ? {}
+        : { voice_signature: request.voiceSignature }),
       ...(request.name === undefined ? {} : { name: request.name }),
       ...(request.bodyPlan === undefined
         ? {}

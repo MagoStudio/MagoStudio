@@ -1,6 +1,6 @@
 import { AnimatedGradient } from "@components/AnimatedGradient";
 import { CloseButton } from "@components/CloseButton";
-import { MainButton } from "@components/MainButton";
+import { GhostButton } from "@components/GhostButton";
 import { OverlayDialog } from "@components/OverlayDialog";
 import { Text } from "@components/Text";
 import { STORYBOARD_IMAGE_SIZE } from "@domains/scriptProject/constants";
@@ -9,6 +9,9 @@ import { isSheetImageSuccessful } from "@domains/scriptProject/utils/findNewestS
 import { isSheetImageRendering } from "@domains/scriptProject/utils/isSheetImageRendering";
 import { cn } from "@utils";
 import { useTranslation } from "react-i18next";
+
+import { SceneStoryboardVersionImage } from "./SceneStoryboardVersionImage";
+import { StoryboardVersionInputsButton } from "./StoryboardVersionInputsButton";
 
 const DIALOG_INSET_X_PX = 32;
 const DIALOG_INSET_Y_PX = 56;
@@ -94,10 +97,9 @@ export const SceneStoryboardVersionsDialog: React.FC<Props> = ({
                   {isVersionRendering ? (
                     <AnimatedGradient />
                   ) : version.url ? (
-                    <img
-                      alt=""
-                      src={version.url}
-                      className="h-full w-full object-contain"
+                    <SceneStoryboardVersionImage
+                      versionImageUrl={version.url}
+                      versionAssetId={version.asset_id}
                     />
                   ) : (
                     <Text variant="xs" color="glyph-error">
@@ -107,40 +109,49 @@ export const SceneStoryboardVersionsDialog: React.FC<Props> = ({
                 </div>
 
                 <div className="flex min-w-0 items-center justify-between gap-2">
-                  <Text
-                    variant="2xs"
-                    color="glyph-tertiary"
-                    className="truncate"
-                  >
-                    {t("script_project.version_number.label", {
-                      number: versionsNewestFirst.length - versionIndex
-                    })}
-                  </Text>
+                  <div className="flex min-w-0 items-center gap-1">
+                    <Text
+                      variant="2xs"
+                      color="glyph-tertiary"
+                      className="truncate"
+                    >
+                      {t("script_project.version_number.label", {
+                        number: versionsNewestFirst.length - versionIndex
+                      })}
+                    </Text>
+                    {!!version.panel_count && (
+                      <StoryboardVersionInputsButton
+                        panelCount={version.panel_count}
+                        versionName={t("script_project.version_number.label", {
+                          number: versionsNewestFirst.length - versionIndex
+                        })}
+                        testId={`storyboard-inputs-button-${version.asset_id}`}
+                      />
+                    )}
+                  </div>
 
                   {isVersionPinned ? (
-                    <MainButton
-                      size="sm"
-                      colorScheme="secondary"
+                    <GhostButton
+                      colorScheme="white"
                       isDisabled={isBusy}
                       onPress={() => onPin(null)}
                       data-testid={`storyboard-version-unpin-${version.asset_id}`}
                     >
                       {t("script_project.unpin_shot_version_button.label")}
-                    </MainButton>
+                    </GhostButton>
                   ) : isVersionInUse ? (
                     <Text variant="2xs" color="glyph-action-main">
                       {t("script_project.shot_version_current.label")}
                     </Text>
                   ) : (
-                    <MainButton
-                      size="sm"
-                      colorScheme="secondary"
+                    <GhostButton
+                      colorScheme="white"
                       isDisabled={isBusy || !hasVersionFinished}
                       onPress={() => onPin(version.asset_id)}
                       data-testid={`storyboard-version-use-${version.asset_id}`}
                     >
-                      {t("script_project.use_shot_version_button.label")}
-                    </MainButton>
+                      {t("script_project.pin_button.label")}
+                    </GhostButton>
                   )}
                 </div>
               </div>

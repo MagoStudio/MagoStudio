@@ -41,10 +41,14 @@ const normalizeReferenceGroups = (raw: unknown): Map<string, string[]> => {
   return groups;
 };
 
+export class ReferenceSlotsError extends Error {
+  override name = "ReferenceSlotsError";
+}
+
 /**
- * The slots a shot's references
- * occupy, as asset-id lists in reference order. Only the overflow of the
- * lowest-priority groups is gridded, and nothing is ever dropped.
+ * The slots a shot's references occupy, as asset-id lists in reference order.
+ * Only the overflow of the lowest-priority groups is gridded, nothing is ever
+ * dropped, and a grid never mixes categories.
  */
 export const planReferenceSlots = (
   referenceGroups: unknown,
@@ -52,8 +56,16 @@ export const planReferenceSlots = (
 ): string[][] => {
   const groups = normalizeReferenceGroups(referenceGroups);
   if (!groups.size) return [];
-  const budget = Math.max(1, Math.trunc(limit || 1));
+  const budget = Math.trunc(limit || 0);
   const names = GROUP_ORDER.filter((name) => groups.has(name));
+  if (budget < names.length) {
+    const slotsLeft = Math.max(budget, 0);
+    throw new ReferenceSlotsError(
+      `${names.length} reference categories (${names.join(", ")}) need a slot each, but ` +
+        `only ${slotsLeft} ${budget === 1 ? "is" : "are"} left after the shot's other ` +
+        "references"
+    );
+  }
   const alone = new Map(names.map((name) => [name, [...groups.get(name)!]]));
   const gridded = new Map<string, string[]>(names.map((name) => [name, []]));
   const slotCount = () =>
@@ -75,10 +87,6 @@ export const planReferenceSlots = (
   for (const name of names) {
     buckets.push(...alone.get(name)!.map((id) => [id]));
     if (gridded.get(name)!.length) buckets.push(gridded.get(name)!);
-  }
-  while (buckets.length > budget) {
-    const tail = buckets.pop()!;
-    buckets[buckets.length - 1] = [...buckets[buckets.length - 1]!, ...tail];
   }
   return buckets;
 };

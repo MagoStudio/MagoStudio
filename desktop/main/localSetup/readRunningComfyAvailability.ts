@@ -1,7 +1,10 @@
 import path from "node:path";
 
+import { LOCAL_MODEL_DEFINITIONS } from "../../shared/localModelDefinitions";
 import { asRecord } from "../comfy/asRecord";
 import { normalizeComfyEndpoint } from "../comfy/normalizeComfyEndpoint";
+import { readConfiguredTextModelPath } from "../modelSettings/modelRuntimeHooks";
+import { prepareModelRequirements } from "../modelSettings/prepareModelRequirements";
 
 import type { ModelGroupItem } from "./listModelGroupItems";
 
@@ -44,7 +47,10 @@ const comboChoices = (node: unknown, inputName: string): string[] => {
   return [];
 };
 
-export type RunningComfyAvailability = (item: ModelGroupItem) => boolean;
+export type RunningComfyAvailability = (
+  item: ModelGroupItem,
+  groupId?: string
+) => boolean;
 
 // Availability belongs to the configured server. Item paths remain installation
 // destinations, and runtime observations must never become managed-install hashes.
@@ -53,6 +59,41 @@ export const readRunningComfyAvailability = async (
 ): Promise<RunningComfyAvailability | null> => {
   try {
     const normalized = normalizeComfyEndpoint(endpoint);
+    const configuredFiles = new Map<
+      string,
+      { node: string; input: string; filename: string }
+    >();
+    const configuredLoaders = new Map<string, Set<string>>();
+    for (const definition of LOCAL_MODEL_DEFINITIONS) {
+      if (!definition.wizardGroup || definition.runtime !== "comfy") continue;
+      for (const variant of definition.variants) {
+        const prepared = await prepareModelRequirements(normalized, {
+          nodes: [],
+          files: variant.components.map((component) => ({
+            node: component.loader,
+            input: component.input,
+            filename: component.filename
+          }))
+        });
+        prepared.files.forEach((file, index) =>
+          configuredFiles.set(
+            `${definition.wizardGroup}:${variant.components[index].filename}`,
+            file
+          )
+        );
+        configuredLoaders.set(
+          definition.wizardGroup,
+          new Set(prepared.files.map((file) => file.node))
+        );
+      }
+    }
+    let customText: string | null = null;
+    let textUnavailable = false;
+    try {
+      customText = await readConfiguredTextModelPath(normalized);
+    } catch {
+      textUnavailable = true;
+    }
     const getJson = async (route: string): Promise<unknown> => {
       const response = await fetch(`${normalized}${route}`, {
         signal: AbortSignal.timeout(REQUEST_TIMEOUT_MS)
@@ -89,8 +130,15 @@ export const readRunningComfyAvailability = async (
             .map(basename)
         : []
     );
-    return (item) => {
+    return (item, groupId) => {
       if (item.kind === "node-pack") {
+        const loaders = groupId ? configuredLoaders.get(groupId) : undefined;
+        if (
+          item.name.toLowerCase() === "comfyui-gguf" &&
+          loaders &&
+          !loaders.has("UnetLoaderGGUF")
+        )
+          return [...loaders].every((loader) => !!asRecord(nodes[loader]));
         const requiredNodes = NODE_PACK_NODES[item.name.toLowerCase()];
         return (
           requiredNodes !== undefined &&
@@ -101,7 +149,17 @@ export const readRunningComfyAvailability = async (
         item.name.toLowerCase().endsWith(".gguf") &&
         path.basename(path.dirname(item.absolutePath)) === "text_encoders"
       )
-        return textModels.has(basename(item.name));
+        return (
+          !textUnavailable &&
+          (!!customText || textModels.has(basename(item.name)))
+        );
+      const selected = groupId
+        ? configuredFiles.get(`${groupId}:${item.name}`)
+        : undefined;
+      if (selected)
+        return comboChoices(nodes[selected.node], selected.input).some(
+          (name) => basename(name) === basename(selected.filename)
+        );
       const loader =
         MODEL_LOADERS[path.basename(path.dirname(item.absolutePath))];
       return (

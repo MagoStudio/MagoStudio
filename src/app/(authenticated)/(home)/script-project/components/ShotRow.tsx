@@ -23,10 +23,11 @@ import { formatSceneShotSeconds } from "@domains/scriptProject/utils/formatScene
 import { formatShotTitle } from "@domains/scriptProject/utils/formatShotTitle";
 import { getShotBlockedClauseLabelKey } from "@domains/scriptProject/utils/getShotBlockedClauseLabelKey";
 import { hasShotFailedInPlan } from "@domains/scriptProject/utils/hasShotFailedInPlan";
-import { isCutShotVersionRendering } from "@domains/scriptProject/utils/isCutShotVersionRendering";
 import { DRAFT_SAVING_ACTION_ATTRIBUTE } from "@domains/scriptProject/utils/isFocusMovingToDraftSavingAction";
+import { isRenderingVersionMissingFromCut } from "@domains/scriptProject/utils/isRenderingVersionMissingFromCut";
 import { isShotDurationOutOfBounds } from "@domains/scriptProject/utils/isShotDurationOutOfBounds";
 import { isStoryboardSheetGroup } from "@domains/scriptProject/utils/isStoryboardSheetGroup";
+import { UntaggedSpeaker } from "@domains/scriptProject/utils/listUntaggedSpeakers";
 import { ProjectOutputSize } from "@domains/scriptProject/utils/projectOutputSize";
 import {
   SceneShotDraftEdits,
@@ -68,6 +69,7 @@ import { ShotStoryboardReferenceTile } from "./ShotStoryboardReferenceTile";
 import { ShotStoryboardVersionCard } from "./ShotStoryboardVersionCard";
 import { ShotVersionStrip } from "./ShotVersionStrip";
 import { ShotVideoPreview } from "./ShotVideoPreview";
+import { StoryboardVersionInputsButton } from "./StoryboardVersionInputsButton";
 import { ScenesLayout } from "./utils/scenesLayout";
 import { ScenesView } from "./utils/scenesView";
 
@@ -96,6 +98,9 @@ type Props = {
   changedPaths: string[] | undefined;
   onSaveSceneShots: (sceneShotEdits: SceneShotDraftEdits) => void;
   onSaveTags: (tags: ShotTags) => void;
+  voicedCharacterTokens: ReadonlySet<string>;
+  characterNamesWithoutVoice: string[];
+  untaggedSpeakers: UntaggedSpeaker[];
   onRetryRender: (draft: {
     videoPrompt: string;
     hasUnsavedPrompt: boolean;
@@ -145,6 +150,9 @@ export const ShotRow: React.FC<Props> = ({
   changedPaths,
   onSaveSceneShots,
   onSaveTags,
+  voicedCharacterTokens,
+  characterNamesWithoutVoice,
+  untaggedSpeakers,
   onRetryRender,
   onPinVersion,
   storyboard,
@@ -204,7 +212,7 @@ export const ShotRow: React.FC<Props> = ({
     projectId,
     cutShot
   );
-  const { shownVersion, versionsBelowShownVersion } = versionsInDisplayOrder;
+  const { shownVersion, versionsNewestFirst } = versionsInDisplayOrder;
   const isShotLocked = shot.locked === true;
   const isSceneEditingDisabled = isBusy || isShotLocked;
   const isGenerateNewVersionDisabled =
@@ -257,20 +265,20 @@ export const ShotRow: React.FC<Props> = ({
   const isVideoViewSelected = scenesView === "video";
   const isListLayout = scenesLayout === "list";
   const isRenderingVersionMissingFromVersions =
-    isRendering &&
-    hasShotBeenRendered &&
-    !(cutShot?.versions ?? []).some(isCutShotVersionRendering);
+    isRenderingVersionMissingFromCut({
+      isSceneRendering: isRendering,
+      cutShot
+    });
   const visibleVersionCount =
     (isLandscapeOutput
       ? VISIBLE_LANDSCAPE_VERSION_COUNT
       : VISIBLE_PORTRAIT_VERSION_COUNT) -
     (isRenderingVersionMissingFromVersions ? 1 : 0);
-  const hasMoreVersionsThanShown =
-    versionsBelowShownVersion.length > visibleVersionCount;
   const isVersionColumnShown =
     hasShotBeenRendered &&
     !isShotLocked &&
-    (versionsBelowShownVersion.length > 0 ||
+    (versionsNewestFirst.length > 1 ||
+      !!cutShot?.pinned_asset_id ||
       isRenderingVersionMissingFromVersions);
   const hasChangedFieldsToReport =
     describeChangedFields(collapseReferenceChanges(changedPaths)).length > 0;
@@ -357,6 +365,20 @@ export const ShotRow: React.FC<Props> = ({
             {isStoryboardViewSelected && (
               <ShotStoryboardVersionCard
                 storyboardImageUrl={storyboard.imageUrl}
+                storyboardImageAssetId={storyboard.imageAssetId}
+                versionInputsButton={
+                  storyboard.imageUrl &&
+                  storyboard.canListVersions &&
+                  !!shot.storyboard?.panel_count && (
+                    <StoryboardVersionInputsButton
+                      panelCount={shot.storyboard.panel_count}
+                      versionName={t(
+                        "script_project.shot_version_current.label"
+                      )}
+                      testId={`storyboard-inputs-button-${shotTestIdSuffix}`}
+                    />
+                  )
+                }
                 isStoryboardRendering={isStoryboardBeingMade}
                 failedStoryboardClipId={storyboard.failedRenderClipId}
                 hasStoryboardFailed={storyboard.hasNoUsableVersion}
@@ -396,7 +418,7 @@ export const ShotRow: React.FC<Props> = ({
               )}
 
             {isVideoViewSelected && (
-              <div className="flex flex-col gap-2">
+              <div className="flex flex-col gap-4">
                 <div className="w-full shrink-0">
                   {cutShot && hasShotBeenRendered ? (
                     <CutShotVersionPreview
@@ -404,11 +426,8 @@ export const ShotRow: React.FC<Props> = ({
                       shot={cutShot}
                       outputSize={outputSize}
                       versionsInDisplayOrder={versionsInDisplayOrder}
-                      onOpenVersions={
-                        isShotLocked
-                          ? undefined
-                          : () => setIsVersionDialogOpen(true)
-                      }
+                      isBusy={isSceneEditingDisabled}
+                      onReuseSettings={onReuseVersionSettings}
                     />
                   ) : (
                     <ShotVideoPreview
@@ -422,6 +441,9 @@ export const ShotRow: React.FC<Props> = ({
                 </div>
                 {cutShot && isVersionColumnShown && (
                   <div className="flex w-full flex-col gap-2">
+                    <Text variant="sm" weight="medium" color="glyph-primary">
+                      {t("script_project.all_my_versions_heading.label")}
+                    </Text>
                     <div
                       className={cn(
                         "grid w-full gap-2",
@@ -454,17 +476,15 @@ export const ShotRow: React.FC<Props> = ({
                         onOpenVersions={() => setIsVersionDialogOpen(true)}
                       />
                     </div>
-                    {hasMoreVersionsThanShown && (
-                      <CutShotShowAllVersionsLink
-                        projectId={projectId}
-                        shot={cutShot}
-                        outputSize={outputSize}
-                        versionsInDisplayOrder={versionsInDisplayOrder}
-                        isBusy={isBusy}
-                        onPin={onPinVersion}
-                        onReuseSettings={onReuseVersionSettings}
-                      />
-                    )}
+                    <CutShotShowAllVersionsLink
+                      projectId={projectId}
+                      shot={cutShot}
+                      outputSize={outputSize}
+                      versionsInDisplayOrder={versionsInDisplayOrder}
+                      isBusy={isBusy}
+                      onPin={onPinVersion}
+                      onReuseSettings={onReuseVersionSettings}
+                    />
                   </div>
                 )}
               </div>
@@ -515,12 +535,14 @@ export const ShotRow: React.FC<Props> = ({
                   {isStoryboardSentToVideo && storyboard.imageUrl && (
                     <ShotStoryboardReferenceTile
                       storyboardImageUrl={storyboard.imageUrl}
+                      storyboardImageAssetId={storyboard.imageAssetId}
                       isBusy={isSceneEditingDisabled || isUpdatingStoryboard}
                       onRemove={() => onChangeStoryboardVideoUse(false)}
                       testId={`shot-storyboard-reference-${shotTestIdSuffix}`}
                     />
                   )}
                   <ShotReferenceList
+                    voicedCharacterTokens={voicedCharacterTokens}
                     chips={referenceChipsWithoutStoryboard}
                     imageUrlsByAssetId={imageUrlsByAssetId}
                     isBusy={isSceneEditingDisabled}
@@ -669,6 +691,34 @@ export const ShotRow: React.FC<Props> = ({
               />
             </SceneNoticeCard>
           )}
+          {isVideoViewSelected &&
+            characterNamesWithoutVoice.map((characterName) => (
+              <SceneNoticeCard key={characterName} severity="error">
+                <Text
+                  variant="xs"
+                  color="glyph-error"
+                  data-testid={`shot-character-without-voice-${shotTestIdSuffix}`}
+                >
+                  {t("script_project.voice.character_without_voice.label", {
+                    name: characterName
+                  })}
+                </Text>
+              </SceneNoticeCard>
+            ))}
+          {isVideoViewSelected &&
+            untaggedSpeakers.map((untaggedSpeaker) => (
+              <SceneNoticeCard key={untaggedSpeaker.token} severity="warning">
+                <Text
+                  variant="xs"
+                  color="glyph-warning"
+                  data-testid={`shot-untagged-speaker-${shotTestIdSuffix}-${untaggedSpeaker.token}`}
+                >
+                  {t("script_project.voice.untagged_speaker.label", {
+                    name: untaggedSpeaker.name
+                  })}
+                </Text>
+              </SceneNoticeCard>
+            ))}
           {isDurationOutOfBounds && (
             <SceneNoticeCard severity="error">
               <Text

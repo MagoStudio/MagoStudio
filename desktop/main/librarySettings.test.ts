@@ -295,6 +295,30 @@ describe("LibrarySettings", () => {
     });
   });
 
+  it("keeps the automatic setup recommendation separate from endpoint-specific user variants", async () => {
+    const settings = new LibrarySettings();
+    await settings.setScriptTextModel("qwen38-27b-q3");
+    await writeFile(
+      path.join(electronState.userDataPath, "model-settings.json"),
+      JSON.stringify({
+        endpoints: {
+          "http://127.0.0.1:8188": {
+            settings: {
+              models: { text: { variant: "qwen38-27b-q5" } },
+              memoryPolicy: "auto"
+            }
+          }
+        }
+      })
+    );
+    await expect(settings.getScriptTextModel()).resolves.toBe("qwen38-27b-q5");
+    await expect(settings.getSetupScriptTextModel()).resolves.toBe(
+      "qwen38-27b-q3"
+    );
+    await settings.setComfyEndpoint("http://other:8188");
+    await expect(settings.getScriptTextModel()).resolves.toBe("qwen38-27b-q3");
+  });
+
   it("reads a script text model saved before per-group variants, and moves it on the next variant write", async () => {
     const settingsPath = path.join(electronState.userDataPath, "settings.json");
     await writeFile(

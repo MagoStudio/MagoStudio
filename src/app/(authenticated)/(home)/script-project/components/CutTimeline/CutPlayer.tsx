@@ -17,6 +17,7 @@ type Props = {
   isCutPlaying: boolean;
   canCutPlay: boolean;
   onTogglePlayback: () => void;
+  onClipPlay: (playedVersionAssetId: string | null) => void;
   onClipEnded: () => void;
   onClipError: () => void;
   registerClipVideoElement: (
@@ -32,6 +33,7 @@ export const CutPlayer: React.FC<Props> = ({
   isCutPlaying,
   canCutPlay,
   onTogglePlayback,
+  onClipPlay,
   onClipEnded,
   onClipError,
   registerClipVideoElement
@@ -68,6 +70,8 @@ export const CutPlayer: React.FC<Props> = ({
               key={clips[clipIndex]!.timelineId}
               clip={clips[clipIndex]!}
               isActive={clipIndex === activeClipIndex}
+              isClipPlaying={isCutPlaying && clipIndex === activeClipIndex}
+              onPlay={onClipPlay}
               onEnded={onClipEnded}
               onError={onClipError}
               registerElement={(element) =>

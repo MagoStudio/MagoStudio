@@ -3,6 +3,24 @@ import { describe, expect, it } from "vitest";
 import { describeSceneStoryboardFromSheets } from "./describeSceneStoryboardFromSheets";
 
 describe("describeSceneStoryboardFromSheets", () => {
+  it("exposes the displayed legacy storyboard's clip and asset for its inputs popover and image cache", () => {
+    const view = describeSceneStoryboardFromSheets({
+      shotStoryboard: {
+        latestStoryboardImage: undefined,
+        isStoryboardRendering: false,
+        hasLatestStoryboardRenderFailed: false,
+        latestFinishedStoryboardImageUrl: "https://cdn.example/old.png",
+        latestFinishedStoryboardClipId: "old-clip",
+        latestFinishedStoryboardAssetId: "old-asset"
+      },
+      isStoryboardTaggedOnScene: true
+    });
+    expect(view).toMatchObject({
+      imageClipId: "old-clip",
+      imageAssetId: "old-asset",
+      canListVersions: false
+    });
+  });
   it("reads a failed first storyboard as having no usable version", () => {
     const view = describeSceneStoryboardFromSheets({
       shotStoryboard: {

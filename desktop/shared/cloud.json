@@ -8,5 +8,6 @@
   "cloudStorageHosts": [
     "mago-s3-prod.s3.eu-north-1.amazonaws.com",
     "mago-s3-prod.s3.amazonaws.com"
-  ]
+  ],
+  "voicePreviewSources": ["https://storage.googleapis.com/eleven-public-prod/"]
 }

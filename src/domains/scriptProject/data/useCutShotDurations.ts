@@ -1,4 +1,5 @@
 import { readVideoDurationSeconds } from "@app/utils/video/readVideoDurationSeconds";
+import { resolveCutShotVideo } from "@domains/scriptProject/utils/resolveCutShotVideo";
 import { CutShot } from "@schemas/scriptProject";
 import { useQueries } from "@tanstack/react-query";
 
@@ -20,11 +21,9 @@ const collectMeasurableCutShots = (
   const byAssetId = new Map<string, MeasurableCutShot>();
 
   for (const cutShot of cutShots) {
-    if (!cutShot.asset_id || !cutShot.url) continue;
-    byAssetId.set(cutShot.asset_id, {
-      assetId: cutShot.asset_id,
-      videoUrl: cutShot.url
-    });
+    const { videoUrl, videoAssetId } = resolveCutShotVideo(cutShot);
+    if (!videoAssetId || !videoUrl) continue;
+    byAssetId.set(videoAssetId, { assetId: videoAssetId, videoUrl });
   }
 
   return [...byAssetId.values()];

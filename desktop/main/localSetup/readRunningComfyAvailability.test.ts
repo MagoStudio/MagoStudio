@@ -28,7 +28,7 @@ describe("running ComfyUI availability", () => {
       "http://running-comfy:8188"
     );
     expect(isModelGroupItemAvailable).not.toBeNull();
-    expect(items.every(isModelGroupItemAvailable!)).toBe(true);
+    expect(items.every((item) => isModelGroupItemAvailable!(item))).toBe(true);
   });
 
   it.each([

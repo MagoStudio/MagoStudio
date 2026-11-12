@@ -9,6 +9,7 @@ export const describeSceneStoryboardFromBackend = (
   summary: SceneStoryboardSummary
 ): SceneStoryboardView => ({
   imageUrl: summary.image_url ?? undefined,
+  imageAssetId: summary.effective_asset_id ?? undefined,
   isRendering: summary.status === "generating",
   hasNoUsableVersion: summary.status === "failed",
   failedRenderClipId: undefined,

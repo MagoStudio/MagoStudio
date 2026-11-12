@@ -10,6 +10,7 @@ type Props = {
   isOpen: boolean;
   reasonLabel: string;
   isDownloadingZip: boolean;
+  isZipDownloadDisabled: boolean;
   onCancel: () => void;
   onDownloadZip: () => void;
 };
@@ -18,6 +19,7 @@ export const CutExportFailedDialog: React.FC<Props> = ({
   isOpen,
   reasonLabel,
   isDownloadingZip,
+  isZipDownloadDisabled,
   onCancel,
   onDownloadZip
 }) => {
@@ -62,7 +64,7 @@ export const CutExportFailedDialog: React.FC<Props> = ({
           </MainButton>
           <MainButton
             colorScheme="primary"
-            isDisabled={isDownloadingZip}
+            isDisabled={isDownloadingZip || isZipDownloadDisabled}
             loading={isDownloadingZip}
             onPress={onDownloadZip}
             data-testid="cut-export-failed-download-zip"
