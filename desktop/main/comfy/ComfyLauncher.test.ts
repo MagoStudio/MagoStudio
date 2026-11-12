@@ -10,7 +10,11 @@ const mocks = vi.hoisted(() => ({
   stat: vi.fn(),
   readFile: vi.fn(),
   mkdir: vi.fn(),
-  open: vi.fn()
+  open: vi.fn(),
+  memoryPolicy: vi.fn()
+}));
+vi.mock("../modelSettings/modelRuntimeHooks", () => ({
+  readModelMemoryPolicy: mocks.memoryPolicy
 }));
 vi.mock("node:child_process", () => ({ spawn: mocks.spawn }));
 vi.mock("node:fs/promises", () => ({
@@ -51,6 +55,7 @@ const comfyOutputLogReader = () => {
 
 beforeEach(() => {
   vi.resetAllMocks();
+  mocks.memoryPolicy.mockResolvedValue("auto");
   vi.stubGlobal("process", { ...process, platform: "win32" });
   vi.stubGlobal("fetch", vi.fn().mockRejectedValue(new Error("Offline")));
   mocks.readFile.mockResolvedValue(installerMarker);
@@ -80,6 +85,27 @@ const settings = {
 };
 
 describe("ComfyUI batch launcher", () => {
+  it("launches low-VRAM policy with the portable interpreter and replaces conflicting memory flags", async () => {
+    mocks.memoryPolicy.mockResolvedValue("low-vram");
+    mocks.readFile.mockImplementation(async (file: string) =>
+      file.endsWith("run_nvidia_gpu.bat")
+        ? ".\\python_embeded\\python.exe -s ComfyUI\\main.py --windows-standalone-build --highvram --gpu-only --port 8188\r\npause"
+        : installerMarker
+    );
+    await new ComfyLauncher(settings, comfyOutputLogPath).launch();
+    expect(mocks.spawn).toHaveBeenCalledWith(
+      expect.stringContaining("python_embeded"),
+      [
+        "-s",
+        "ComfyUI/main.py",
+        "--windows-standalone-build",
+        "--port",
+        "8188",
+        "--lowvram"
+      ],
+      expect.objectContaining({ windowsHide: true })
+    );
+  });
   it("does not offer launch for a selected folder without an installed engine", async () => {
     mocks.readFile.mockRejectedValue(new Error("No installer marker"));
     expect(

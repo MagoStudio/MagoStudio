@@ -59,6 +59,27 @@ survives a re-cast. The backend still accepts content edits on a locked Shot, so
 disables them itself and hides the versions and notices. A locked Shot is also left out of the
 Storyboard tab's batch Generate.
 
+### Untagged speaker
+
+The backend saves such dialogue as sent and renders the line
+off-screen, spoken by name. It lists these speakers' tokens in the Shot state's
+`dialogue_untagged_speakers`, in first-spoken order; the frontend never recomputes that list. The
+scene card shows one warning per untagged speaker, and Generate stays enabled. Untagging a
+character keeps its lines' `speaker_token`, so tagging it back relinks them.
+
+### Character name alias
+
+One `/`-separated part of a character's name ("HER / EMILIA" has two), as a list of upper-cased
+words with screenplay cue extensions and parentheses removed (`listCharacterNameAliases`). A
+dialogue speaker matches a character look when one of its aliases matches one of the look's:
+the shorter word list starts the longer one, and the longer one adds no number ("TECH" does not
+match "TECH 2"). So "EMILIA" matches "EMILIA WORK CLOTHES", but "ALEX SMITH" does not match "ALEX
+JONES". A one-word speaker still matches every look that starts with that word, because names
+alone cannot tell a look of one character from a different character. So name matching only
+decides a line's speaker when the line has none yet, or its `speaker_token` is no longer tagged in
+the Shot (a swapped-out look). A line whose `speaker_token` is still tagged keeps it, and the
+missing-voice warning reads that token rather than the name.
+
 ### Track
 
 A layer attached to a Shot. Two kinds:
@@ -546,6 +567,10 @@ Local projects save `settings.storyboard_render_model` separately from `settings
 **Shot table** — the per-Shot editor that replaces the prompt, dialogue and length fields: rows of duration, camera movement, framing, description and dialogue. It saves into the Shot's video prompt as `[Shot n] (start-end s) …` lines; the Shot's length is the sum of its rows. Not to be confused with a Shot itself — a Shot ("scene" in the UI) holds several shot-table rows.
 
 **Stuck render** — a sheet image whose provider never reported back. The backend settles it when the project state is read: after 5 minutes it asks the provider, after 60 it ends the render as `timeout` and refunds it. The Assets tab keeps polling (slower after 5 minutes) while any image is unsettled, and `not_found` counts as finished.
+
+**Dubbed scene** — a Shot's render with its dialogue re-voiced: the same picture, with the chosen character voices laid over an effects bed. The backend calls it the **mix** (`mixed_asset_id`); the frontend says **dubbed**. A dub belongs to one version, the render it was made over, and the backend serves it only while that version is the one the cut plays: the cut's `url` is then the dubbed scene, and `mixed_asset_id` is set. Moving the pin to another version drops the dub and plays that version as rendered. The Scenes tab plays and downloads the dubbed scene for that version, and the Timeline tab plays it in the cut. Every view reads the cut's video through `resolveCutShotVideo` (or `resolveCutShotVersionVideo` for one version), which keys a dubbed scene on the dub's asset id, never the version's. The video cache and the measured durations are keyed by asset id and shared across tabs, so pairing the cut's `url` with the version's `asset_id` anywhere would replay a raw render after a dub lands, or an old dub after the pin moves.
+
+**Being dubbed** — a version that has landed and is waiting for its dub. The backend runs the dub as the last steps of the Scene's render plan, marks the landed render `awaiting_dub: true` on its entry in the cut's `versions[]`, and moves the pin to it only once the dub settles, so the version the cut plays is never one being dubbed. A failed render never counts, even if it still carries the flag (`isCutShotVersionAwaitingDub`). A version being dubbed looks exactly like a render in progress (`isCutShotVersionHiddenUntilDubLands`, `isCutShotVersionShownAsRendering`): the rendering gradient, no poster, no play, no download, no Pin and no "New" badge; the large preview shows it while it is the newest version, and it fills the Scene card's single "Rendering…" slot. A Scene whose first render is being dubbed has nothing in the cut yet, so the whole Scene shows as rendering (`isSceneHiddenUntilDubLands`), in the large preview and the Timeline. The cut is refetched every 5 seconds while any version renders or is being dubbed (`useProjectCut`), so the version appears without a reload; the backend clears the flag when the dub settles, fails or is abandoned, and expires it after an hour. A version that lands while the user first opens the project is left out of the "already viewed" baseline, so it still shows "New" once dubbed.
 
 ### Sidebar
 

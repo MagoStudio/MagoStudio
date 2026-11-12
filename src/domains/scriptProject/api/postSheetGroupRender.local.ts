@@ -26,6 +26,7 @@ import { isSheetRenderModel } from "../utils/isSheetRenderModel";
 import { patchSheetGroup } from "./patchSheetGroup";
 
 export type RenderSheetGroupRequest = {
+  isNewSheetGroup?: boolean;
   projectId?: string;
   timelineId: string;
   token: string;
@@ -129,15 +130,18 @@ export const postSheetGroupRender = async (
           )
         )
       : request.referenceAssetIds;
-  if (cloudReferenceIds !== undefined)
-    await patchSheetGroup({
+  const saveSheetGroupReferences = async (referenceAssetIds: string[]) =>
+    patchSheetGroup({
       timelineId: request.timelineId,
       token: request.token,
-      referenceAssetIds: cloudReferenceIds,
-      referenceInstruction: cloudReferenceIds.length
+      ...(request.isNewSheetGroup ? { prompt: request.prompt } : {}),
+      referenceAssetIds,
+      referenceInstruction: referenceAssetIds.length
         ? (request.referenceInstruction?.trim() ?? "")
         : null
     });
+  if (cloudReferenceIds !== undefined && !request.isNewSheetGroup)
+    await saveSheetGroupReferences(cloudReferenceIds);
   const [inputImageId, ...additionalReferences] = cloudReferenceIds ?? [];
   const [width, height] = request.outputSize;
   await backendApiClient.post(`/assets/img2img/render`, {
@@ -169,5 +173,7 @@ export const postSheetGroupRender = async (
         : {})
     }
   });
+  if (cloudReferenceIds !== undefined && request.isNewSheetGroup)
+    await saveSheetGroupReferences(cloudReferenceIds);
   return null;
 };

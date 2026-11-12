@@ -9,6 +9,11 @@ import {
   formatComfyError,
   formatComfyHttpError
 } from "../imageRenders/comfyError";
+import {
+  observeModelHost,
+  prepareModelGraph,
+  recordModelFailure
+} from "../modelSettings/modelRuntimeHooks";
 import { atomicProduceFile } from "../storage/atomicFile";
 
 import { asRecord } from "./asRecord";
@@ -26,6 +31,8 @@ const REQUEST_TIMEOUT_MS = 30_000;
 const DOWNLOAD_TIMEOUT_MS = 300_000;
 const UPLOAD_SUBFOLDER = "mago";
 const CONTENT_HASH_NAME_LENGTH = 32;
+const submittedModelGraphs = new Map<string, ComfyGraph>();
+const MAX_RECORDED_PROMPTS = 128;
 
 export const COMFY_LOST_PROMPT_MESSAGE =
   "ComfyUI no longer has this render. ComfyUI may have restarted; start the render again.";
@@ -68,21 +75,44 @@ export class ComfyClient {
   }
 
   async getJson(pathname: string): Promise<Record<string, unknown>> {
-    return this.json(pathname, { method: "GET" });
+    const result = await this.json(pathname, { method: "GET" });
+    if (pathname === "/system_stats")
+      await observeModelHost(this.endpoint, result);
+    return result;
   }
 
   async submitGraph(graph: ComfyGraph): Promise<string> {
-    const response = await this.json("/prompt", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        prompt: graph,
-        client_id: COMFY_PROCESS_CLIENT_ID
-      })
-    });
-    if (typeof response.prompt_id !== "string" || !response.prompt_id)
-      throw new Error(formatComfyError(response));
-    this.monitor.watch(response.prompt_id, graph);
+    const preparedGraph = await prepareModelGraph(this.endpoint, graph);
+    let response: Record<string, unknown>;
+    try {
+      response = await this.json("/prompt", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          prompt: preparedGraph,
+          client_id: COMFY_PROCESS_CLIENT_ID
+        })
+      });
+    } catch (error) {
+      await recordModelFailure(
+        this.endpoint,
+        error instanceof Error ? error.message : String(error),
+        preparedGraph
+      );
+      throw error;
+    }
+    if (typeof response.prompt_id !== "string" || !response.prompt_id) {
+      const message = formatComfyError(response);
+      await recordModelFailure(this.endpoint, message, preparedGraph);
+      throw new Error(message);
+    }
+    this.monitor.watch(response.prompt_id, preparedGraph);
+    submittedModelGraphs.set(
+      `${this.endpoint}:${response.prompt_id}`,
+      preparedGraph
+    );
+    if (submittedModelGraphs.size > MAX_RECORDED_PROMPTS)
+      submittedModelGraphs.delete(submittedModelGraphs.keys().next().value!);
     return response.prompt_id;
   }
 
@@ -115,6 +145,11 @@ export class ComfyClient {
     const isPromptOver =
       status.state === "finished" || status.state === "error";
     if (isPromptOver) this.monitor.forget(promptId);
+    const key = `${this.endpoint}:${promptId}`,
+      graph = submittedModelGraphs.get(key);
+    if (status.state === "error" && graph)
+      await recordModelFailure(this.endpoint, status.message, graph);
+    if (isPromptOver) submittedModelGraphs.delete(key);
     return status;
   }
 

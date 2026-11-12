@@ -1,3 +1,5 @@
+import path from "node:path";
+
 /* oxlint-disable eslint/no-magic-numbers -- 4 and 8 are the supported MiniMax step presets; graph dimensions are probe placeholders */
 import type {
   ComfySettings,
@@ -7,6 +9,8 @@ import type {
 import { REQUIRED_COMFYUI_VERSION } from "../../shared/requiredComfyVersion";
 import { asRecord } from "../comfy/asRecord";
 import { ComfyClient } from "../comfy/ComfyClient";
+import { readConfiguredTextModelPath } from "../modelSettings/modelRuntimeHooks";
+import { prepareSetupModelFiles } from "../modelSettings/prepareSetupModelFiles";
 import {
   buildMiniMaxH3Graph,
   LOCAL_SCRIPT_MODEL_FILES as files
@@ -111,7 +115,16 @@ const basename = (name: string) => name.split(/[\\/]/).at(-1)?.toLowerCase();
 
 export const evaluateScriptSetup = (
   info: Record<string, unknown>,
-  settings: SetupSettings = defaultSettings
+  settings: SetupSettings = defaultSettings,
+  templates = {
+    models: modelFiles,
+    nodes: nodeNames(4),
+    optional: optionalScriptSetups(settings),
+    highQualityFiles: [highQualityFile] as ModelFile[],
+    highQualityNodes: nodeNames(8).filter(
+      (name) => !nodeNames(4).includes(name)
+    )
+  }
 ): ScriptSetupStatus => {
   const nodeRequirement = (name: string): ScriptSetupRequirement => ({
     name,
@@ -143,13 +156,13 @@ export const evaluateScriptSetup = (
             : "missing"
     };
   };
-  const nodes = nodeNames(4).map(nodeRequirement);
-  const models = modelFiles.map(modelRequirement);
+  const nodes = templates.nodes.map(nodeRequirement);
+  const models = templates.models.map(modelRequirement);
   return {
     ready: [...nodes, ...models].every((item) => item.status === "installed"),
     nodes,
     models,
-    optional: optionalScriptSetups(settings).map((group) => ({
+    optional: templates.optional.map((group) => ({
       id: group.id,
       title: group.title,
       requirements: [
@@ -158,10 +171,8 @@ export const evaluateScriptSetup = (
       ]
     })),
     highQuality: [
-      ...nodeNames(8)
-        .filter((name) => !nodeNames(4).includes(name))
-        .map(nodeRequirement),
-      modelRequirement(highQualityFile)
+      ...templates.highQualityNodes.map(nodeRequirement),
+      ...templates.highQualityFiles.map(modelRequirement)
     ],
     vfxLoras: MINIMAX_H3_VFX_LORA_FILES.map(modelRequirement)
   };
@@ -172,7 +183,37 @@ export const probeScriptSetup = async (
   settings: SetupSettings = defaultSettings
 ): Promise<ScriptSetupStatus> => {
   const client = new ComfyClient(endpoint);
-  const names = [...new Set([...nodeNames(4), ...nodeNames(8)])];
+  const [core, high, optional] = await Promise.all([
+    prepareSetupModelFiles(endpoint, modelFiles, nodeNames(4)),
+    prepareSetupModelFiles(
+      endpoint,
+      [...modelFiles, highQualityFile],
+      nodeNames(8)
+    ),
+    Promise.all(
+      optionalScriptSetups(settings).map(async (group) => ({
+        ...group,
+        ...(await prepareSetupModelFiles(endpoint, group.files, group.nodes))
+      }))
+    )
+  ]);
+  let customText: string | null = null;
+  let textError = false;
+  try {
+    customText = await readConfiguredTextModelPath(endpoint);
+  } catch {
+    textError = true;
+  }
+  if (customText) {
+    const text = optional.find((group) => group.id === "script-text")!;
+    text.files = text.files.map((file) => ({
+      ...file,
+      name: path.basename(customText!),
+      url: "",
+      sha256: undefined
+    }));
+  }
+  const names = [...new Set([...core.nodes, ...high.nodes])];
   const entries = await Promise.all(
     names.map(async (name) => {
       const info = await client.getJson(
@@ -184,7 +225,7 @@ export const probeScriptSetup = async (
   const info: Record<string, unknown> = Object.fromEntries(entries);
   const optionalNames = [
     ...new Set(
-      optionalScriptSetups(settings).flatMap((group) => [
+      optional.flatMap((group) => [
         ...group.nodes,
         ...group.files.map((file) => file.node)
       ])
@@ -230,13 +271,33 @@ export const probeScriptSetup = async (
   } catch {
     info.scriptTextInventory = { probeError: true };
   }
-  return addSetupDestinations(
+  if (customText)
+    info.scriptTextInventory = {
+      input: { required: { model: [[path.basename(customText)]] } }
+    };
+  if (textError) info.scriptTextInventory = { probeError: true };
+  const result = addSetupDestinations(
     applyRequiredComfyVersion(
-      evaluateScriptSetup(info, settings),
+      evaluateScriptSetup(info, settings, {
+        models: core.files,
+        nodes: core.nodes,
+        optional,
+        highQualityFiles: high.files.slice(modelFiles.length),
+        highQualityNodes: high.nodes.filter(
+          (name) => !core.nodes.includes(name)
+        )
+      }),
       stats,
       REQUIRED_COMFYUI_VERSION
     ),
     stats,
     inventory
   );
+  if (customText) {
+    for (const requirement of result.optional.find(
+      (group) => group.id === "script-text"
+    )!.requirements)
+      if (requirement.folder) requirement.folder = path.dirname(customText);
+  }
+  return result;
 };

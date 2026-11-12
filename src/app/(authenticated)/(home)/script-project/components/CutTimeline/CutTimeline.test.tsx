@@ -16,6 +16,8 @@ const clip = {
   posterUrl: "mago-media://script-project/poster-1",
   videoUrl: "mago-media://script-project/video-1",
   assetId: "video-1",
+  versionAssetId: "video-1",
+  isClipRendering: false,
   isClipPlayable: true,
   doesClipHaveRender: true,
   hasClipRenderFailed: false,

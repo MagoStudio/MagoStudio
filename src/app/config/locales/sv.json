@@ -101,6 +101,7 @@
       "tooltip": "Den här modellen är inte installerad än. Lägg till den i din installation."
     },
     "download": {
+      "downloadedSize": "{{received}} av {{total}} GB",
       "installingDependencies": "Installerar beroenden för nodpaket..."
     },
     "comfyRestart": {
@@ -117,7 +118,19 @@
     },
     "requirementDownload": {
       "savedNodePack": "Sparat i {{savedTo}}. Det fästa nodpaketets SHA-256 har verifierats och paketet har packats upp med CRC-kontroller.",
-      "savedModel": "Sparat i {{savedTo}}. Kontrollera installationen igen när ComfyUI har uppdaterat sin modellista."
+      "savedModel": "Sparat i {{savedTo}}. Kontrollera installationen igen när ComfyUI har uppdaterat sin modellista.",
+      "downloading": "Laddar ner...",
+      "resume": "Återuppta / försök igen...",
+      "downloadAndInstall": "Ladda ner och installera...",
+      "download": "Ladda ner...",
+      "pause": "Pausa",
+      "cancel": "Avbryt",
+      "cancelDialog": {
+        "title": "Avbryta nedladdningen?",
+        "description": "Nedladdningen av {{file}} stoppas och den del som redan har laddats ner raderas.",
+        "back": "Tillbaka",
+        "delete": "Radera"
+      }
     },
     "nodePackUpdate": {
       "title": "Uppdatera det här nodpaketet?",
@@ -233,7 +246,9 @@
       "textModelLabel": "Textmodell",
       "textModelCloud": "Gemini (Mago Cloud)",
       "textModelQwenQ3": "Qwen3.8 27B Q3 (lokal, mindre minne)",
-      "textModelQwenQ5": "Qwen3.8 27B Q5 (lokal, högre kvalitet)"
+      "textModelQwenQ5": "Qwen3.8 27B Q5 (lokal, högre kvalitet)",
+      "comfyVersion": "ComfyUI {{version}}",
+      "comfyVersionTooOld": "Mago Studio kräver ComfyUI {{required}} eller senare. Uppdatera ComfyUI och starta sedan om det."
     },
     "general": {
       "heading": "Projektmapp",
@@ -723,11 +738,11 @@
     },
     "reset_settings": {
       "label": "Återställ",
-      "description": ""
+      "description": "Återställ standardinställningarna."
     },
     "buy_credits": {
       "label": "Köp krediter",
-      "description": ""
+      "description": "Lägg till krediter på ditt konto."
     },
     "back_to_plans": {
       "label": "Tillbaka till sidan"
@@ -845,11 +860,11 @@
     },
     "dont_show_again": {
       "label": "Visa inte igen",
-      "description": ""
+      "description": "Dölj det här meddelandet i framtiden."
     },
     "download": {
       "label": "Ladda ned",
-      "description": ""
+      "description": "Ladda ner den valda filen."
     },
     "zoom_in": {
       "label": "Zooma in"
@@ -859,27 +874,27 @@
     },
     "duplicate_settings": {
       "label": "Duplicera inställningar",
-      "description": ""
+      "description": "Kopiera de här inställningarna för återanvändning."
     },
     "generate_image": {
       "label": "Generera bild",
-      "description": ""
+      "description": "Generera en bild med de aktuella inställningarna."
     },
     "generate_my_video": {
       "label": "Generera min video",
-      "description": ""
+      "description": "Generera en video med de aktuella inställningarna."
     },
     "play_tutorial": {
       "label": "Spela upp instruktionsvideo",
-      "description": ""
+      "description": "Titta på instruktionsvideon."
     },
     "generate_frame": {
       "label": "Generera bildruta",
-      "description": ""
+      "description": "Generera en bildruta med de aktuella inställningarna."
     },
     "generate": {
       "label": "Generera",
-      "description": ""
+      "description": "Starta genereringen med de aktuella inställningarna."
     },
     "setup_local_render": {
       "label": "Konfigurera lokal rendering"
@@ -892,15 +907,15 @@
     },
     "hide_all_hints": {
       "label": "Dölj alla tips",
-      "description": ""
+      "description": "Dölj tips i hela redigeraren."
     },
     "hide_details": {
       "label": "Dölj detaljer",
-      "description": ""
+      "description": "Fäll ihop detaljerna."
     },
     "iterate": {
       "label": "Iterera",
-      "description": ""
+      "description": "Använd det här renderspåret som indata för fler ändringar."
     },
     "loading_process": {
       "label": "Läser in..."
@@ -939,29 +954,29 @@
     },
     "price_details": {
       "label": "Prisdetaljer",
-      "description": ""
+      "description": "Visa kostnadsfördelningen."
     },
     "test": {
       "label": "Testa",
-      "description": ""
+      "description": "Kör ett test med de aktuella inställningarna."
     },
     "subscribe": {
       "label": "Prenumerera",
-      "description": ""
+      "description": "Välj en prenumerationsplan."
     },
     "to_my_projects": {
       "label": "Till mina projekt"
     },
     "tweak_it": {
       "label": "Läs in inställningar",
-      "description": ""
+      "description": "Läs in de här inställningarna i redigeraren."
     },
     "upload_image": {
       "label": "Ladda upp bild"
     },
     "use_this": {
       "label": "Använd den här",
-      "description": ""
+      "description": "Använd det valda resultatet."
     },
     "use_this_frame_as": {
       "label": "Använd den här bildrutan som:",
@@ -1288,11 +1303,11 @@
     },
     "frame_range": {
       "label": "Bildruteintervall",
-      "description": ""
+      "description": "Start- och slutbildrutorna som valts för generering."
     },
     "generation_cost": {
       "label": "Genereringskostnad",
-      "description": ""
+      "description": "Den uppskattade kreditkostnaden för genereringen."
     },
     "modal_video_tutorial": {
       "label": "Mago-guidevideo"
@@ -1481,19 +1496,19 @@
     },
     "setting_name": {
       "label": "Inställningens namn",
-      "description": ""
+      "description": "Inställningens namn."
     },
     "test_cost": {
       "label": "Testkostnad",
-      "description": ""
+      "description": "Den uppskattade kreditkostnaden för testet."
     },
     "total_amount": {
       "label": "Totalbelopp",
-      "description": ""
+      "description": "Totalbeloppet för det här köpet."
     },
     "queue": {
       "label": "Kö",
-      "description": ""
+      "description": "Visa köade och pågående renderingar."
     },
     "create": {
       "label": "Skapa"
@@ -1503,7 +1518,7 @@
     },
     "allProjects": {
       "label": "Alla projekt",
-      "description": ""
+      "description": "Bläddra bland dina projekt."
     },
     "modal_generate_image_from_frame": {
       "label": "Generera en stiliserad bildruta (img2img)"
@@ -1924,7 +1939,7 @@
       "description": "Det gick inte att börja från den här videon. Försök igen."
     },
     "create_project_upload_video": {
-      "label": "",
+      "label": "Starta ett projekt",
       "description": "Kom igång genom att skapa ett projekt och ladda upp en video"
     },
     "queue_completed_renders": {
@@ -2445,7 +2460,6 @@
     },
     "asset_references": {
       "label": "Referensbilder",
-      "hint": "Lägg till upp till {{count}} bilder och beskriv vad som ska hämtas från var och en.",
       "add": "Lägg till referens",
       "instruction": "Instruktioner för referenser",
       "default_instruction": "Använd de här bilderna som visuella referenser för den här entiteten.",
@@ -2758,9 +2772,6 @@
     "shot_version_current": {
       "label": "Aktuell"
     },
-    "use_shot_version_button": {
-      "label": "Använd den här versionen"
-    },
     "unpin_shot_version_button": {
       "label": "Lossa"
     },
@@ -2793,10 +2804,6 @@
     },
     "sequence_timeline_changed_help": {
       "label": "Ändrad och kan renderas om i bulk"
-    },
-    "version_review_good": {
-      "label": "Det som fungerar",
-      "placeholder": "Bra detaljer att behålla"
     },
     "version_review_bad": {
       "label": "Det som inte fungerar",
@@ -2897,12 +2904,6 @@
     "effective_badge": {
       "label": "Kommer att användas"
     },
-    "newer_version_badge": {
-      "label": "Nyare version finns"
-    },
-    "use_newest_button": {
-      "label": "Använd överallt"
-    },
     "disable_entity_button": {
       "label": "Ta bort från rollbesättningen"
     },
@@ -2930,10 +2931,6 @@
     "confirm_remove_entity_confirm_button": {
       "label": "Ta bort från rollbesättningen"
     },
-    "rerender_button": {
-      "label": "Rendera om",
-      "ariaLabel": "Rendera en ny version"
-    },
     "render_button": {
       "label": "Rendera",
       "ariaLabel": "Rendera det här facket"
@@ -2946,9 +2943,6 @@
     },
     "entity_prompt_input": {
       "label": "Renderingsprompt"
-    },
-    "prompt_is_sent_hint": {
-      "label": "Det här får bildmodellen när referensen renderas."
     },
     "no_images": {
       "label": "Ingen bild än"
@@ -3085,7 +3079,7 @@
       "label": "2 MP"
     },
     "will_rerender_because": {
-      "label": "Renderas om – du ändrade: {{fields}}"
+      "label": "Du ändrade: {{fields}}"
     },
     "changed_prompt": {
       "label": "prompten"
@@ -3349,7 +3343,7 @@
       "label": "Ignorera fortsättning för den här körningen ({{count}})"
     },
     "shot_blocked_sequential_unsupported_engine": {
-      "label": "Blockerad – den här motorn kan inte använda en referens mellan scener än. Bara MiniMax kan det."
+      "label": "Blockerad – den här motorn kan inte använda en referens mellan scener än."
     },
     "shot_sequential_reference_ignored": {
       "label": "Renderas utan referens – det finns inget före den att fortsätta från."
@@ -3469,9 +3463,6 @@
     "update_storyboard_failed": {
       "description": "Det gick inte att uppdatera storyboarden. Försök igen."
     },
-    "sent_prompt_field": {
-      "label": "Prompt som skickades till videomodellen"
-    },
     "generate_scene_button": {
       "label": "Generera ({{seconds}} s)"
     },
@@ -3548,11 +3539,8 @@
     "uploaded_badge": {
       "label": "Uppladdad"
     },
-    "pinned_upload_hint": {
-      "label": "Din bild är fäst – bulkkörningar hoppar över den här entiteten."
-    },
     "add_entity_button": {
-      "label": "Lägg till entitet"
+      "label": "Lägg till tillgång"
     },
     "add_entity_name_input": {
       "label": "Namn"
@@ -3569,10 +3557,7 @@
       "label": "Rollbesättningen har redan en entitet med det här namnet."
     },
     "draft_entity_hint": {
-      "label": "Rendera den eller släpp in en bild för att spara den. Tills dess sparas den inte."
-    },
-    "discard_draft_entity_button": {
-      "ariaLabel": "Släng ny entitet"
+      "label": "Generera den, eller släpp in en bild, för att spara den. Tills dess sparas den inte."
     },
     "add_reference_button": {
       "label": "Lägg till referens"
@@ -3588,28 +3573,121 @@
     },
     "reuse_settings_button": {
       "label": "Återanvänd inställningar",
-      "ariaLabel": "Läs in den här versionens inställningar i prompten"
+      "ariaLabel": "Läs in den här versionens inställningar"
     },
     "image_inputs_title": {
       "label": "Vad som användes i {{version}}"
     },
-    "image_inputs_loading": {
-      "label": "Läser in indata…"
-    },
-    "image_inputs_model": {
-      "label": "Modell · {{model}}"
-    },
-    "image_inputs_size": {
-      "label": "Storlek · {{width}}×{{height}}"
-    },
     "image_inputs_missing": {
-      "label": "Ingen prompt sparades för den här versionen."
+      "label": "Den här versionen sparade inga inställningar."
     },
     "cut_membership_count": {
       "label": "{{count}} av {{total}} i klippet"
     },
     "section_group_count": {
       "label": "{{count}}"
+    },
+    "asset_creation_form": {
+      "label": "Skapandeformulär"
+    },
+    "all_versions": {
+      "label": "Alla versioner"
+    },
+    "create_asset": {
+      "label": "Skapa tillgång"
+    },
+    "upload_own_asset": {
+      "label": "Jag har min tillgång"
+    },
+    "voice": {
+      "add_voice_button": {
+        "label": "Lägg till röst"
+      },
+      "edit_voice_button": {
+        "label": "Redigera röst"
+      },
+      "save_voice_button": {
+        "label": "Spara"
+      },
+      "no_voice_chosen": "Ingen röst vald än.",
+      "connected_voice": {
+        "ariaLabel": "Den här karaktärens röst används"
+      },
+      "play_voice_button": {
+        "ariaLabel": "Spela upp den här karaktärens röst"
+      },
+      "stop_voice_button": {
+        "ariaLabel": "Stoppa rösten"
+      },
+      "character_without_voice": {
+        "label": "{{name}} talar i den här scenen men har ingen röst än. Lägg till en i Tillgångar."
+      },
+      "untagged_speaker": {
+        "label": "{{name}} talar men är inte med i den här tagningen. Repliken hörs utanför bild."
+      },
+      "title": "Röst",
+      "eleven_labs_library": {
+        "title": "Välj röst för din karaktär",
+        "all_languages": "Alla språk",
+        "language_dropdown": {
+          "ariaLabel": "Röstens språk"
+        },
+        "all_genders": "Alla röster",
+        "male_voices": "Man",
+        "female_voices": "Kvinna",
+        "gender_dropdown": {
+          "ariaLabel": "Röstens kön"
+        },
+        "play_preview_button": {
+          "ariaLabel": "Spela upp rösten {{name}}"
+        },
+        "all_ages": "Alla åldrar",
+        "kids_voices": "Barn",
+        "elderly_voices": "Äldre",
+        "age_dropdown": {
+          "ariaLabel": "Röstens ålder"
+        },
+        "no_matching_voices": "Inga röster matchar de här filtren.",
+        "library_unavailable": "Röstbiblioteket är inte tillgängligt just nu. Försök igen senare."
+      }
+    },
+    "generate_asset_version_button": {
+      "label": "Generera"
+    },
+    "all_my_versions_heading": {
+      "label": "Alla mina versioner"
+    },
+    "sequential_opening_frame_pin_prompt_only_hint": {
+      "label": "Seedance 2.5 följer föregående bildruta enbart via prompten, så den kanske inte börjar exakt på den."
+    },
+    "show_image_inputs_button": {
+      "ariaLabel": "Visa vad som gick in i den här versionen"
+    },
+    "generate_entity_button": {
+      "label": "Generera"
+    },
+    "add_entity_way": {
+      "generate": "Generera tillgång",
+      "upload": "Ladda upp min tillgång",
+      "upload_hint": "Ladda upp här om du har din tillgångsbild och inte behöver generera"
+    },
+    "add_entity_dialog_title": {
+      "label": "Lägg till entitet"
+    },
+    "version_settings_size": {
+      "label": "Storlek",
+      "value": "{{width}}×{{height}}"
+    },
+    "version_settings_duration": {
+      "label": "Längd"
+    },
+    "version_settings_render": {
+      "label": "Rendering"
+    },
+    "version_settings_panels": {
+      "label": "Rutor",
+      "value_one": "{{count}} ruta",
+      "value_other": "{{count}} rutor"
     }
   },
   "bulk_rendering": {
@@ -4114,7 +4192,7 @@
       },
       "context_mode": {
         "label": "Stabilitet",
-        "description": ""
+        "description": "Välj stabilitetsnivå för den genererade videon."
       },
       "control_sdxl_xinsir_canny": {
         "label": "Canny",
@@ -4162,15 +4240,15 @@
       },
       "enable_unsampling": {
         "label": "Unsampling",
-        "description": ""
+        "description": "Aktivera unsampling för den här renderingen."
       },
       "enable_cache": {
         "label": "Cache",
-        "description": ""
+        "description": "Aktivera cachning under videogenereringen."
       },
       "weight_type": {
         "label": "Stilläge",
-        "description": ""
+        "description": "Välj hur den valda stilen tillämpas."
       },
       "mago_engine": {
         "label": "Mago-motor",
@@ -5599,5 +5677,111 @@
   },
   "authPage": {
     "continueOffline": "Hoppa över och fortsätt offline"
+  },
+  "modelSettings": {
+    "heading": "Modellinställningar",
+    "modelType": "Modelltyp",
+    "filesHeading": "Filer och varianter",
+    "loadHeading": "Inläsningsinställningar",
+    "debugHeading": "Felsökningsinfo",
+    "provider": {
+      "cloud": "Moln",
+      "local": "Lokalt",
+      "cloudHint": "Gemini · Mago Cloud",
+      "localHint": "Använd den lokala textmodellen"
+    },
+    "variant": "Modellvariant",
+    "automatic": "Automatiskt",
+    "workflowDefault": "Arbetsflödets standard",
+    "automaticHint": "Följer installationen: {{variant}}. Egna val behålls.",
+    "manualHint": "Ditt val ersätter installationens rekommendation.",
+    "component": "Komponent",
+    "roles": {
+      "main": "Huvudmodell",
+      "encoder": "Textkodare",
+      "vae": "VAE",
+      "videoVae": "Video-VAE",
+      "audioVae": "Ljud-VAE",
+      "accelerator": "Accelerator",
+      "lora": "Arbetsflödets LoRA"
+    },
+    "currentFile": "Aktuell fil: {{file}}",
+    "selectExistingFile": "Välj en installerad fil",
+    "file": "Befintlig modellfil",
+    "testCandidate": "Testa inläsning av kandidat",
+    "compatibilityHint": "Filintegritet, tensorformer, stöd i laddaren och lyckad inläsning kontrolleras separat. Inläsningstest kräver en tom ComfyUI-kö.",
+    "path": "Sökväg: {{value}}",
+    "url": "Källans URL: {{value}}",
+    "expectedHash": "Förväntad SHA-256: {{value}}",
+    "actualHash": "Faktisk SHA-256: {{value}}",
+    "remotePath": "Inte tillgänglig på denna dator",
+    "unknown": "Okänt",
+    "notComputed": "Inte beräknad",
+    "lastFileCheck": "Senaste kontroll: {{check}} {{outcome}}, {{date}}",
+    "notCheckedYet": "Inte kontrollerad än",
+    "fileFailedLoadTest": "Den här filen klarade inte sitt senaste laddningstest. Testa den igen innan du väljer den.",
+    "fileCheckKinds": {
+      "compatibility": "kompatibilitet",
+      "load": "laddningstest",
+      "hash": "filhash"
+    },
+    "fileCheckOutcomes": {
+      "passed": "godkänd",
+      "failed": "underkänd",
+      "inconclusive": "ej avgjord"
+    },
+    "computeHash": "Beräkna filhash",
+    "loadMode": "Inläsningsläge",
+    "modes": {
+      "auto": "Automatiskt (delvis på GPU)",
+      "custom": "Eget antal GPU-lager",
+      "all": "Hela modellen på GPU",
+      "cpu": "Endast CPU"
+    },
+    "gpuLayers": "GPU-lager",
+    "context": "Kontextlängd",
+    "batch": "Batchstorlek",
+    "contextWarning": "Mindre kontext minskar svarsutrymmet och kanske inte rymmer långa manus. Öka kontexten om laddaren rapporterar en för lång prompt.",
+    "cacheOffload": "Lagra uppmärksamhetscache på GPU",
+    "memoryMap": "Minnesmappa modellfilen",
+    "textRuntimeHint": "Automatiskt läge reserverar minne för kontext och körmiljö. Kontrollera llama.cpp separat; fungerande bildgenerering på GPU bevisar inte GPU-stöd för text.",
+    "memoryPolicy": "ComfyUI:s minnespolicy",
+    "serverPolicyHint": "Delas av alla modeller på denna ComfyUI-värd. Hanterade portabla installationer använder detta vid nästa start.",
+    "lowVram": "Lågt VRAM (starta om ComfyUI)",
+    "restartRequired": "Starta om ComfyUI när kön är tom för att använda serverns minnespolicy.",
+    "encoderDevice": "Enhet för textkodare",
+    "tiledDecode": "VAE-avkodning i delar",
+    "testLoad": "Testa modellinläsning",
+    "saveLoad": "Spara inläsningsinställningar",
+    "checkInstallation": "Kontrollera installation",
+    "repairRuntime": "Reparera GPU-körmiljö",
+    "probeHint": "Kontrollerna använder den hittade ComfyUI-Pythonmiljön. Inläsning av en komponent verifierar inte generering eller hela arbetsflödets minnesbehov.",
+    "remoteProbeHint": "Lokala Pythonkontroller är inte tillgängliga för anslutningen. Kör inläsnings- och reparationskontroller på ComfyUI-värden.",
+    "savedRestart": "Sparat. Starta om ComfyUI när kön är tom för att använda serverns minnespolicy.",
+    "saved": "Inställningarna har sparats. Ändringarna används nästa gång modellen läses in.",
+    "operationFailed": "Modellåtgärden misslyckades.",
+    "operationRunning": "Arbetar… Modellinläsning och reparation av körmiljö kan ta flera minuter.",
+    "checking": "Läser information om ComfyUI och modeller…",
+    "supportReport": "Supportrapport",
+    "copyReport": "Kopiera all felsökningsinfo",
+    "debugHint": "Innehåller maskinvara, lokala sökvägar, modellkällor, hashar, versioner och registrerade problem. Granska innan du delar.",
+    "copied": "Felsökningsinformationen har kopierats",
+    "copyFallback": "Urklippsåtkomst misslyckades. Markera och kopiera rapporttexten.",
+    "refresh": "Uppdatera felsökningsinfo",
+    "recommendedFileSection": "Rekommenderad modell",
+    "localFilesSection": "Lokala filer",
+    "notInstalled": "Inte installerad",
+    "recommendedFileMissing": "Den här filen är inte installerad på ComfyUI-värden än.",
+    "fileInstalled": "{{file}}: installerad",
+    "filePassedCheck": "{{file}}: klarade en kontroll",
+    "fileDetailsButton": "Filinformation och tester",
+    "operationDetailsButton": "Visa kontrollinformation",
+    "missingNodesHeading": "ComfyUI-noder saknas för {{file}}",
+    "missingNodesHint": "Filen kan inte användas förrän noderna är installerade. Installera dem, starta om ComfyUI, så kontrolleras filen igen.",
+    "missingWorkflowNodesHeading": "ComfyUI-noder saknas för {{model}}",
+    "missingWorkflowNodesHint": "{{model}} kan inte köras förrän noderna är installerade. Installera dem och starta om ComfyUI.",
+    "llamaCppPackageMissing": "llama.cpp (llama-cpp-python) är inte installerat i ComfyUI:s Python, så modellen kan inte köras. Använd Reparera GPU-körmiljö nedan för att installera det.",
+    "missingNodeNames": "Noder som saknas: {{names}}",
+    "updateComfyUi": "Uppdatera ComfyUI"
   }
 }

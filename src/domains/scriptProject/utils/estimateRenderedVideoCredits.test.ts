@@ -33,7 +33,7 @@ const expectedCredits = estimateShotRenderCredits({
   shotEngine: "minimax_h3_max",
   outputSize: OUTPUT_SIZE,
   shotFrames: snapShotSecondsToFrames(SHOT_SECONDS),
-  referenceImageCount: 0
+  referenceImageSizes: []
 });
 
 describe("estimateRenderedVideoCredits", () => {

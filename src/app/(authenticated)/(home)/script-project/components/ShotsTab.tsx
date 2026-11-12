@@ -49,12 +49,17 @@ import { findSequentialBlockedLabelKey } from "@domains/scriptProject/utils/find
 import { findSequentialPredecessorShot } from "@domains/scriptProject/utils/findSequentialPredecessorShot";
 import { formatShotTitle } from "@domains/scriptProject/utils/formatShotTitle";
 import { getShotRunRefusalDescriptionKey } from "@domains/scriptProject/utils/getShotRunRefusalDescriptionKey";
+import { hasCharacterReadyVoice } from "@domains/scriptProject/utils/hasCharacterReadyVoice";
+import { haveDialogueVoiceLinksChanged } from "@domains/scriptProject/utils/haveDialogueVoiceLinksChanged";
 import { isPreviousListedShotThePredecessor } from "@domains/scriptProject/utils/isPreviousListedShotThePredecessor";
 import { isSheetRenderModel } from "@domains/scriptProject/utils/isSheetRenderModel";
 import { isShotBlockedForNoReferenceImage } from "@domains/scriptProject/utils/isShotBlockedForNoReferenceImage";
 import { isShotDurationOutOfBounds } from "@domains/scriptProject/utils/isShotDurationOutOfBounds";
 import { isShotSequentialReferenceIgnored } from "@domains/scriptProject/utils/isShotSequentialReferenceIgnored";
+import { linkDialogueSpeakersToConnectedVoices } from "@domains/scriptProject/utils/linkDialogueSpeakersToConnectedVoices";
 import { listScenesAwaitingStoryboard } from "@domains/scriptProject/utils/listScenesAwaitingStoryboard";
+import { listSpeakersWithoutVoice } from "@domains/scriptProject/utils/listSpeakersWithoutVoice";
+import { listUntaggedSpeakers } from "@domains/scriptProject/utils/listUntaggedSpeakers";
 import { normaliseSearchQuery } from "@domains/scriptProject/utils/normaliseSearchQuery";
 import { partitionShotsByDropped } from "@domains/scriptProject/utils/partitionShotsByDropped";
 import { partitionSkippedByRenderProgress } from "@domains/scriptProject/utils/partitionSkippedByRenderProgress";
@@ -86,11 +91,13 @@ import { useTranslation } from "react-i18next";
 import { AddShotDialog } from "./AddShotDialog";
 import { EarlierScriptVersionToggle } from "./EarlierScriptVersionToggle";
 import { GenerateRunButton } from "./GenerateRunButton";
+import { useAutoLinkSceneDialogueToVoices } from "./hooks/useAutoLinkSceneDialogueToVoices";
 import { useScenesLayout } from "./hooks/useScenesLayout";
 import {
   LocalH3QualitySwitch,
   resolveLocalH3QualitySteps
 } from "./LocalH3QualitySwitch";
+import { NothingToGenerateReason } from "./NothingToGenerateReason";
 import { ProjectOutputSizeControls } from "./ProjectOutputSizeControls";
 import { ScenesLayoutSwitcher } from "./ScenesLayoutSwitcher";
 import { SceneStoryboardRenderPoller } from "./SceneStoryboardRenderPoller";
@@ -320,11 +327,13 @@ export const ShotsTab: React.FC<Props> = ({
   const isSubmittingSceneStoryboard = (sceneTimelineId: string) =>
     sceneStoryboards.isSubmittingSceneStoryboard(sceneTimelineId) ||
     isSubmittingSceneStoryboardFromSheets(sceneTimelineId);
+  const isLocalStoryboardRenderLocked =
+    isLocalProject &&
+    (!storyboardInstall.isLocalSheetModelInstalled ||
+      !isStoryboardModelInstalled);
   const canGenerateStoryboardForScene = (scene: ShotState) =>
     (!isLocalProject ||
-      (canRenderStoryboards &&
-        storyboardInstall.isLocalSheetModelInstalled &&
-        isStoryboardModelInstalled)) &&
+      (canRenderStoryboards && !isLocalStoryboardRenderLocked)) &&
     (!!scene.storyboard || canGenerateSceneStoryboardsFromSheets);
   const resolveStoryboardCreditsForScene = (scene: ShotState) =>
     scene.storyboard?.credits_per_render ??
@@ -412,6 +421,37 @@ export const ShotsTab: React.FC<Props> = ({
     });
   };
 
+  const isCharacterVoiceAvailableForProject = !isLocalProject;
+  const characterLooks = isCharacterVoiceAvailableForProject
+    ? projectState.keys.filter(
+        (sheetGroup) => sheetGroup.kind === "character" && sheetGroup.enabled
+      )
+    : [];
+  const voicedCharacterTokens = new Set(
+    characterLooks.filter(hasCharacterReadyVoice).map((look) => look.token)
+  );
+  const linkSceneDialogueToVoices = (
+    dialogue: ShotDialogueTurn[],
+    tags: ShotState["tags"]
+  ) =>
+    linkDialogueSpeakersToConnectedVoices({
+      dialogue,
+      connectedCharacterTokens: new Set(tags.characters),
+      characterLooks
+    });
+  useAutoLinkSceneDialogueToVoices({
+    scenes: projectState.shots,
+    renderingSceneTimelineIds: renderingShotTimelineIds,
+    isLinkingReady: characterLooks.length > 0,
+    linkSceneDialogueToVoices,
+    saveLinkedSceneDialogue: (scene, linkedDialogue, onSaveFailed) => {
+      void editShotAsync({
+        projectId,
+        timelineId: scene.timeline_id,
+        dialogue: linkedDialogue
+      }).catch(onSaveFailed);
+    }
+  });
   const generateShotFromSavedPrompt = async (
     shot: ShotState,
     draft: {
@@ -422,18 +462,18 @@ export const ShotsTab: React.FC<Props> = ({
       durationSeconds?: number;
     }
   ) => {
-    const hasUnsavedSceneLength = draft.durationSeconds !== undefined;
-    if (
-      draft.hasUnsavedPrompt ||
+    const linkedDialogue = linkSceneDialogueToVoices(draft.dialogue, shot.tags);
+    const hasUnsavedDialogue =
       draft.hasUnsavedDialogue ||
-      hasUnsavedSceneLength
-    ) {
+      haveDialogueVoiceLinksChanged(shot.dialogue ?? [], linkedDialogue);
+    const hasUnsavedSceneLength = draft.durationSeconds !== undefined;
+    if (draft.hasUnsavedPrompt || hasUnsavedDialogue || hasUnsavedSceneLength) {
       try {
         await editShotAsync({
           projectId,
           timelineId: shot.timeline_id,
           ...(draft.hasUnsavedPrompt ? { videoPrompt: draft.videoPrompt } : {}),
-          ...(draft.hasUnsavedDialogue ? { dialogue: draft.dialogue } : {}),
+          ...(hasUnsavedDialogue ? { dialogue: linkedDialogue } : {}),
           ...(draft.durationSeconds !== undefined
             ? { durationSeconds: draft.durationSeconds }
             : {})
@@ -500,7 +540,8 @@ export const ShotsTab: React.FC<Props> = ({
     shotEngine,
     outputSize,
     projectShotFrames: shotFrames,
-    attemptsPerShot: shotQualityRetries + 1
+    attemptsPerShot: shotQualityRetries + 1,
+    sheetGroups: projectState.keys
   });
   const blockedShotCount = (dryRun?.blocked ?? []).length;
   const skippedShotsInActiveScript = (dryRun?.skipped ?? []).filter(
@@ -568,11 +609,6 @@ export const ShotsTab: React.FC<Props> = ({
         hasOutOfBoundsStaleShot ||
         isLocalShotRenderLocked
       }
-      nothingToGenerateReason={
-        isEverySceneUpToDate
-          ? t("script_project.toolbar_nothing_to_generate.noChanges")
-          : undefined
-      }
       isPending={isGeneratingShots || isRunActive}
       isPriceLoading={
         isDryRunFetching || isSavingShotRenderEngine || isSavingOutputSize
@@ -590,6 +626,39 @@ export const ShotsTab: React.FC<Props> = ({
         )
       }
       testId="script-project-generate-shots"
+    />
+  );
+
+  const generateStoryboardsButton = (
+    <GenerateRunButton
+      label={t("script_project.generate_storyboards_button.label")}
+      countLabel={t("script_project.generate_storyboards_button.count", {
+        count: scenesAwaitingStoryboard.length
+      })}
+      cost={
+        isStoryboardRenderedLocally
+          ? { kind: "local" }
+          : {
+              kind: "credits",
+              amount: scenesAwaitingStoryboardCredits
+            }
+      }
+      isDisabled={
+        scenesAwaitingStoryboard.length === 0 ||
+        !scenesAwaitingStoryboard.every(({ scene }) =>
+          canGenerateStoryboardForScene(scene)
+        ) ||
+        isAnySceneStoryboardSubmitting ||
+        isEditingShot
+      }
+      isPending={isAnySceneStoryboardSubmitting}
+      onPress={() =>
+        scenesAwaitingStoryboard.forEach(
+          ({ scene, storyboardBeats }) =>
+            void generateStoryboardForScene({ scene, storyboardBeats })
+        )
+      }
+      testId="script-project-generate-storyboards"
     />
   );
 
@@ -625,6 +694,7 @@ export const ShotsTab: React.FC<Props> = ({
           <ShotSequentialSettingsDialog
             shot={shotEditingSequentialSettings}
             predecessorShot={predecessorOfShotEditingSequentialSettings}
+            shotEngine={shotEngine}
             sequentialPromptDefaults={projectState.sequential_prompt_defaults}
             isDisabled={
               isEditingShot ||
@@ -655,13 +725,6 @@ export const ShotsTab: React.FC<Props> = ({
         )}
         {isStoryboardViewSelected && (
           <div className="flex flex-1 items-center justify-end gap-3">
-            {isLocalProject &&
-              (!storyboardInstall.isLocalSheetModelInstalled ||
-                !isStoryboardModelInstalled) && (
-                <SetupMagoStudioButton
-                  requiredLocalInstall={storyboardInstall.requiredLocalInstall}
-                />
-              )}
             {isLocalProject && (
               <SheetRenderModelDropdown
                 sheetRenderModel={storyboardModel.renderModel}
@@ -674,31 +737,8 @@ export const ShotsTab: React.FC<Props> = ({
                 testId="script-project-storyboard-render-model"
               />
             )}
-            <GenerateRunButton
-              label={t("script_project.generate_storyboards_button.label")}
-              countLabel={t(
-                "script_project.generate_storyboards_button.count",
-                {
-                  count: scenesAwaitingStoryboard.length
-                }
-              )}
-              cost={
-                isStoryboardRenderedLocally
-                  ? { kind: "local" }
-                  : {
-                      kind: "credits",
-                      amount: scenesAwaitingStoryboardCredits
-                    }
-              }
-              isDisabled={
-                scenesAwaitingStoryboard.length === 0 ||
-                !scenesAwaitingStoryboard.every(({ scene }) =>
-                  canGenerateStoryboardForScene(scene)
-                ) ||
-                isAnySceneStoryboardSubmitting ||
-                isEditingShot
-              }
-              nothingToGenerateReason={
+            <NothingToGenerateReason
+              reason={
                 isNoSceneAwaitingStoryboard
                   ? t(
                       "script_project.toolbar_nothing_to_generate.noSceneAwaitingStoryboard"
@@ -706,14 +746,16 @@ export const ShotsTab: React.FC<Props> = ({
                   : undefined
               }
               isPending={isAnySceneStoryboardSubmitting}
-              onPress={() =>
-                scenesAwaitingStoryboard.forEach(
-                  ({ scene, storyboardBeats }) =>
-                    void generateStoryboardForScene({ scene, storyboardBeats })
-                )
-              }
               testId="script-project-generate-storyboards"
             />
+            {isLocalStoryboardRenderLocked ? (
+              <SetupMagoStudioButton
+                requiredLocalInstall={storyboardInstall.requiredLocalInstall}
+                lockedRenderButton={generateStoryboardsButton}
+              />
+            ) : (
+              generateStoryboardsButton
+            )}
           </div>
         )}
         {isVideoViewSelected && (
@@ -784,6 +826,20 @@ export const ShotsTab: React.FC<Props> = ({
                 isSavingOutputSize || isGeneratingShots || isRunActive
               }
               onChange={setOutputSize}
+            />
+            <NothingToGenerateReason
+              reason={
+                isEverySceneUpToDate
+                  ? t("script_project.toolbar_nothing_to_generate.noChanges")
+                  : undefined
+              }
+              isPending={isGeneratingShots || isRunActive}
+              isPriceLoading={
+                isDryRunFetching ||
+                isSavingShotRenderEngine ||
+                isSavingOutputSize
+              }
+              testId="script-project-generate-shots"
             />
             {!isMinimalModelGroupInstalled ? (
               <SetupMagoStudioButton
@@ -999,7 +1055,8 @@ export const ShotsTab: React.FC<Props> = ({
                                     shotEngine,
                                     outputSize,
                                     projectShotFrames: shotFrames,
-                                    attemptsPerShot: shotQualityRetries + 1
+                                    attemptsPerShot: shotQualityRetries + 1,
+                                    sheetGroups: projectState.keys
                                   })
                                 }
                         }
@@ -1021,7 +1078,15 @@ export const ShotsTab: React.FC<Props> = ({
                           editShot({
                             projectId,
                             timelineId: shot.timeline_id,
-                            ...sceneShotEdits
+                            ...sceneShotEdits,
+                            ...(sceneShotEdits.dialogue
+                              ? {
+                                  dialogue: linkSceneDialogueToVoices(
+                                    sceneShotEdits.dialogue,
+                                    shot.tags
+                                  )
+                                }
+                              : {})
                           })
                         }
                         storyboard={describeSceneStoryboard(
@@ -1068,13 +1133,35 @@ export const ShotsTab: React.FC<Props> = ({
                         onRetryRender={(draft) =>
                           void generateShotFromSavedPrompt(shot, draft)
                         }
-                        onSaveTags={(tags) =>
+                        onSaveTags={(tags) => {
+                          const linkedDialogue = linkSceneDialogueToVoices(
+                            shot.dialogue ?? [],
+                            tags
+                          );
                           editShot({
                             projectId,
                             timelineId: shot.timeline_id,
-                            tags
-                          })
-                        }
+                            tags,
+                            ...(haveDialogueVoiceLinksChanged(
+                              shot.dialogue ?? [],
+                              linkedDialogue
+                            )
+                              ? { dialogue: linkedDialogue }
+                              : {})
+                          });
+                        }}
+                        voicedCharacterTokens={voicedCharacterTokens}
+                        characterNamesWithoutVoice={listSpeakersWithoutVoice({
+                          dialogue: shot.dialogue ?? [],
+                          connectedCharacterTokens: new Set(
+                            shot.tags.characters
+                          ),
+                          characterLooks
+                        })}
+                        untaggedSpeakers={listUntaggedSpeakers(
+                          shot.dialogue_untagged_speakers,
+                          projectState.keys
+                        )}
                         onToggleHidden={() =>
                           editShot({
                             projectId,
@@ -1110,7 +1197,7 @@ export const ShotsTab: React.FC<Props> = ({
                     </ShotDropTarget>
                     {isLastListedShotInActiveScript &&
                       (isListLayout ? (
-                        <ShotListRowGap placement="insidePreviousShot">
+                        <div className="flex w-full shrink-0 justify-center">
                           <ShotInsertButton
                             isDisabled={isAddingShot}
                             onPress={() =>
@@ -1118,7 +1205,7 @@ export const ShotsTab: React.FC<Props> = ({
                             }
                             testId="shot-insert-end"
                           />
-                        </ShotListRowGap>
+                        </div>
                       ) : (
                         <ShotStripGap
                           controlsMiddleTopPx={sceneCardPreviewMiddlePx}

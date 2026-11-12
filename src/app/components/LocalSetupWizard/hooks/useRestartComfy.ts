@@ -5,6 +5,8 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useState } from "react";
 import { useTranslation } from "react-i18next";
 
+import { refreshModelSettings } from "../utils/refreshModelSettings";
+
 const RESTART_STATUS_REFETCH_MS = 3000;
 const SETUP_STATUS_QUERY_KEYS_REFRESHED_AFTER_RESTART = [
   ["local-script-setup"],
@@ -62,6 +64,7 @@ export const useRestartComfy = ({
       );
     },
     onSuccess: async () => {
+      await refreshModelSettings(queryClient);
       await Promise.all(
         SETUP_STATUS_QUERY_KEYS_REFRESHED_AFTER_RESTART.map((queryKey) =>
           queryClient.invalidateQueries({ queryKey })

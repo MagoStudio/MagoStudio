@@ -26,12 +26,23 @@ export const SetupMagoStudioButton = ({
     else void resolveOpenRequest().then(openLocalSetupWizard);
   };
 
-  if (isUpdatingInstallation && lockedRenderButton)
+  const setupMessage = t(
+    isUpdatingInstallation
+      ? "localSetup.updateInstallation.tooltip"
+      : "localSetup.setupMagoStudio.tooltip"
+  );
+  const setupActionLabel = t(
+    isUpdatingInstallation
+      ? "localSetup.updateInstallation.label"
+      : "localSetup.setupMagoStudio.label"
+  );
+
+  if (lockedRenderButton)
     return (
       <LocalSetupWarningTooltip
         placement="bottom"
-        message={t("localSetup.updateInstallation.tooltip")}
-        actionLabel={t("localSetup.updateInstallation.label")}
+        message={setupMessage}
+        actionLabel={setupActionLabel}
         onAction={openSetup}
       >
         {lockedRenderButton}
@@ -42,18 +53,10 @@ export const SetupMagoStudioButton = ({
     <Tooltip
       isVisible
       placement="top"
-      textContent={t(
-        isUpdatingInstallation
-          ? "localSetup.updateInstallation.tooltip"
-          : "localSetup.setupMagoStudio.tooltip"
-      )}
+      textContent={setupMessage}
       trigger={
         <MainButton fullWidth colorScheme="primary" onPress={openSetup}>
-          {t(
-            isUpdatingInstallation
-              ? "localSetup.updateInstallation.label"
-              : "localSetup.setupMagoStudio.label"
-          )}
+          {setupActionLabel}
         </MainButton>
       }
     />

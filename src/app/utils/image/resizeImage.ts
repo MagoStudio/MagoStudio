@@ -1,3 +1,5 @@
+import { drawCheckerboard } from "./drawCheckerboard";
+
 const DEFAULT_IMAGE_QUALITY = 0.8;
 
 export interface ResizeImageOptions {
@@ -5,6 +7,7 @@ export interface ResizeImageOptions {
   maxHeight?: number;
   imageQuality?: number;
   imageFormat?: "image/jpeg" | "image/png" | "image/webp";
+  showTransparencyAsCheckerboard?: boolean;
 }
 
 const resizeImageOnCanvas = (
@@ -47,6 +50,10 @@ const resizeImageOnCanvas = (
   const ctx = canvas.getContext("2d");
   if (!ctx) {
     throw new Error("Could not get canvas context");
+  }
+
+  if (options.showTransparencyAsCheckerboard) {
+    drawCheckerboard(ctx, width, height);
   }
 
   ctx.drawImage(img, 0, 0, width, height);
@@ -104,10 +111,14 @@ export const resizeImageFromFile = async (
               return;
             }
 
-            const extension = imageFormat.split("/")[1];
-            const newFile = new File([blob], file.name, {
-              type: imageFormat
-            });
+            const outputExtension =
+              imageFormat === "image/jpeg" ? "jpg" : imageFormat.split("/")[1];
+            const fileNameWithoutExtension = file.name.replace(/\.[^.]+$/, "");
+            const newFile = new File(
+              [blob],
+              `${fileNameWithoutExtension}.${outputExtension}`,
+              { type: imageFormat }
+            );
 
             resolve(newFile);
           },

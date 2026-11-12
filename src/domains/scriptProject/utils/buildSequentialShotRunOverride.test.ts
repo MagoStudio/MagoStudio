@@ -16,6 +16,7 @@ const buildShot = (
   tags: { characters: [], environments: [], props: [] },
   references: {},
   missing_references: [],
+  dialogue_untagged_speakers: [],
   sequential
 });
 

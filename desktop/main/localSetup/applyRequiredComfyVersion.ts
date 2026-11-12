@@ -2,40 +2,31 @@ import type {
   ScriptSetupRequirement,
   ScriptSetupStatus
 } from "../../shared/contracts";
+import { isComfyVersionAtLeast } from "../../shared/isComfyVersionAtLeast";
 import { asRecord } from "../comfy/asRecord";
 
-const COMFYUI_REPOSITORY_URL = "https://github.com/Comfy-Org/ComfyUI";
-
-const parseVersion = (version: string): number[] | null => {
-  const match = /^v?(\d+)\.(\d+)\.(\d+)/.exec(version.trim());
-  return match ? match.slice(1).map(Number) : null;
-};
-
-const isVersionAtLeast = (reported: number[], required: number[]) => {
-  for (let index = 0; index < required.length; index++) {
-    if (reported[index] !== required[index])
-      return reported[index] > required[index];
-  }
-  return true;
-};
+import { COMFYUI_REPOSITORY_URL } from "./comfyRepositoryUrl";
 
 export const applyRequiredComfyVersion = (
   status: ScriptSetupStatus,
   systemStats: unknown,
   requiredComfyVersion: string
 ): ScriptSetupStatus => {
-  const required = parseVersion(requiredComfyVersion);
-  if (!required) return status;
+  const isMinimumComfyVersionRequired = requiredComfyVersion.trim() !== "";
+  if (!isMinimumComfyVersionRequired) return status;
   const reportedVersion = asRecord(
     asRecord(systemStats)?.system
   )?.comfyui_version;
-  const reported =
-    typeof reportedVersion === "string" ? parseVersion(reportedVersion) : null;
-  const versionStatus: ScriptSetupRequirement["status"] = !reported
-    ? "unknown"
-    : isVersionAtLeast(reported, required)
-      ? "installed"
-      : "missing";
+  const isReportedVersionSufficient =
+    typeof reportedVersion === "string"
+      ? isComfyVersionAtLeast(reportedVersion, requiredComfyVersion)
+      : null;
+  const versionStatus: ScriptSetupRequirement["status"] =
+    isReportedVersionSufficient === null
+      ? "unknown"
+      : isReportedVersionSufficient
+        ? "installed"
+        : "missing";
   const versionRequirement: ScriptSetupRequirement = {
     name: `ComfyUI ${requiredComfyVersion} or later`,
     url: COMFYUI_REPOSITORY_URL,

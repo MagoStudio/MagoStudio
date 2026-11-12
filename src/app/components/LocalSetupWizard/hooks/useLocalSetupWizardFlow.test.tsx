@@ -1,5 +1,9 @@
 import { LOCAL_SETUP_DEBUG_ENABLED_KEY } from "@hooks/userLocalStorage/useLocalSetupDebugSetting";
-import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+import {
+  QueryClient,
+  QueryClientProvider,
+  QueryObserver
+} from "@tanstack/react-query";
 import { act, renderHook, waitFor } from "@testing-library/react";
 import { ReactNode } from "react";
 import { beforeEach, describe, expect, it, vi } from "vitest";
@@ -67,10 +71,11 @@ beforeEach(() => {
     }
   });
 });
-const setup = () => {
-  const client = new QueryClient({
+const setup = (
+  client = new QueryClient({
     defaultOptions: { queries: { retry: false } }
-  });
+  })
+) => {
   return renderHook(() => useLocalSetupWizardFlow(), {
     wrapper: ({ children }: { children: ReactNode }) => (
       <QueryClientProvider client={client}>{children}</QueryClientProvider>
@@ -85,6 +90,47 @@ const continueToStorage = async (hook: ReturnType<typeof setup>) => {
     await hook.result.current.continueFromModels();
   });
 };
+
+it("refreshes open model settings once on completion and invalidates closed diagnostics", async () => {
+  const client = new QueryClient({
+    defaultOptions: { queries: { retry: false } }
+  });
+  const key = ["local-model-settings", "http://localhost:8188", "minimax"];
+  const debugKey = ["model-diagnostics", "http://localhost:8188"];
+  client.setQueryData(key, "missing");
+  client.setQueryData(debugKey, "old report");
+  const inspect = vi.fn().mockResolvedValue("ready");
+  const observer = new QueryObserver(client, {
+    queryKey: key,
+    queryFn: inspect,
+    staleTime: Infinity
+  });
+  const unsubscribe = observer.subscribe(() => {});
+  const hook = setup(client);
+  try {
+    await act(async () =>
+      client.setQueryData(["starter-installer"], {
+        phase: "downloading",
+        files: []
+      })
+    );
+    expect(inspect).not.toHaveBeenCalled();
+    await act(async () =>
+      client.setQueryData(["starter-installer"], { phase: "done", files: [] })
+    );
+    await waitFor(() => expect(client.getQueryData(key)).toBe("ready"));
+    expect(client.getQueryState(debugKey)?.isInvalidated).toBe(true);
+    expect(inspect).toHaveBeenCalledTimes(1);
+    await act(async () => {
+      client.setQueryData(["starter-installer"], { phase: "done", files: [] });
+    });
+    expect(inspect).toHaveBeenCalledTimes(1);
+  } finally {
+    hook.unmount();
+    unsubscribe();
+    client.clear();
+  }
+});
 
 describe("setup back navigation", () => {
   it("returns through storage and hardware to the initial choices without repeating the hardware check", async () => {

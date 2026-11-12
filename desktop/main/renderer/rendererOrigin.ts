@@ -131,7 +131,8 @@ export const ensureRendererCertificate = async (
 };
 
 export const buildContentSecurityPolicy = (config: CloudConfig): string => {
-  const { clerk, backend, cloudStatus, media } = cloudOrigins(config);
+  const { clerk, backend, cloudStatus, media, voicePreviewAudio } =
+    cloudOrigins(config);
   const remote = (...values: (string | null)[]) =>
     values.filter((value): value is string => value !== null).join(" ");
 
@@ -143,7 +144,7 @@ export const buildContentSecurityPolicy = (config: CloudConfig): string => {
     "style-src 'self' 'unsafe-inline'",
     `img-src 'self' data: blob: mago-media: ${remote(clerk, ...media)}`.trim(),
     "font-src 'self' data:",
-    "media-src 'self' blob: mago-media:",
+    `media-src 'self' blob: mago-media: ${remote(...voicePreviewAudio)}`.trim(),
     "worker-src 'self' blob:",
     `connect-src 'self' mago-media: data: ${remote(clerk, backend, cloudStatus)}`.trim(),
     // Clerk renders parts of some flows in an iframe on its own origin.

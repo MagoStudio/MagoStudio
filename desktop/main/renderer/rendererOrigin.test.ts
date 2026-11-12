@@ -31,7 +31,8 @@ const CONFIG = {
   mediaHosts: ["https://img.clerk.com"],
   signInNavigationHosts: ["accounts.google.com"],
   cloudStatusUrl: "https://mago-state-25qdhq4f4q-uc.a.run.app/state",
-  cloudStorageHosts: ["mago-s3-prod.s3.eu-north-1.amazonaws.com"]
+  cloudStorageHosts: ["mago-s3-prod.s3.eu-north-1.amazonaws.com"],
+  voicePreviewSources: ["https://storage.googleapis.com/eleven-public-prod/"]
 };
 
 const ROOT = path.resolve("/renderer/out");
@@ -139,6 +140,16 @@ describe("buildContentSecurityPolicy", () => {
     expect(policy).toContain("object-src 'none'");
     expect(policy).toContain("base-uri 'none'");
     expect(policy).toContain("frame-ancestors 'none'");
+  });
+
+  it("lets voice previews play from Mago's storage and the ElevenLabs bucket", () => {
+    const media = buildContentSecurityPolicy(CONFIG)
+      .split("; ")
+      .find((directive: string) => directive.startsWith("media-src"));
+
+    expect(media).toBe(
+      "media-src 'self' blob: mago-media: https://mago-s3-prod.s3.eu-north-1.amazonaws.com https://storage.googleapis.com/eleven-public-prod/"
+    );
   });
 
   it("omits remote origins entirely when no cloud is configured", () => {

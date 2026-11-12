@@ -5,4 +5,6 @@ export type SheetGroupDraft = {
   name: string;
   kind: SheetKind;
   prompt: string;
+  referenceAssetIds: string[];
+  referenceInstruction: string;
 };

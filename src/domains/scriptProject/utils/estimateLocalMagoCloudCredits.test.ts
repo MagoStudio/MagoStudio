@@ -45,7 +45,7 @@ describe("estimateLocalMagoCloudCredits", () => {
         shotEngine: MINIMAX_H3_MAX_SHOT_RENDER_ENGINE,
         outputSize: [1280, 720],
         shotFrames: snapShotSecondsToFrames(5),
-        referenceImageCount: 0
+        referenceImageSizes: []
       })
     );
   });
@@ -88,7 +88,7 @@ describe("estimateLocalMagoCloudCredits", () => {
         shotEngine: MINIMAX_H3_MAX_SHOT_RENDER_ENGINE,
         outputSize: [1280, 720],
         shotFrames: snapShotSecondsToFrames(6),
-        referenceImageCount: 0
+        referenceImageSizes: []
       })
     );
   });

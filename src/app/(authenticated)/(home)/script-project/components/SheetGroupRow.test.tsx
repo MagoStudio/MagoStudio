@@ -1,278 +1,324 @@
-import { SheetGroup } from "@schemas/scriptProject";
-import { fireEvent, render, screen, waitFor } from "@testing-library/react";
-import { ReactNode } from "react";
+import { SheetGroupSchema } from "@schemas/scriptProject";
+import { fireEvent, within } from "@testing-library/react";
+import { t } from "@tests/utils/i18n";
 import { describe, expect, it, vi } from "vitest";
 
-vi.mock("@components/AnimatedGradient", () => ({
-  AnimatedGradient: () => null
-}));
+import { renderWithProviders } from "@/test-utils/renderWithProviders";
 
-vi.mock("@components/ImageThumbnail", () => ({
-  ImageThumbnail: ({
-    name,
-    onDelete
-  }: {
-    name?: string;
-    onDelete?: () => void;
-  }) => (
-    <div>
-      <span>{name}</span>
-      {onDelete && <button onClick={onDelete}>remove {name}</button>}
-    </div>
-  )
-}));
+import { ScriptProjectRenderCost } from "./RenderCostLabel";
+import { SheetGroupRow } from "./SheetGroupRow";
 
 vi.mock("@domains/asset/useImageAsset", () => ({
   useImageAsset: () => ({ data: undefined, isLoading: false })
 }));
-
-vi.mock("react-aria-components/FileTrigger", () => ({
-  FileTrigger: ({
-    children,
-    onSelect
+vi.mock("@components/ImageThumbnail", () => ({
+  ImageThumbnail: ({
+    onDelete,
+    name
   }: {
-    children: ReactNode;
-    onSelect: (files: File[]) => void;
-  }) => (
-    <div
-      data-testid="reference-file-trigger"
-      onClick={() => onSelect([new File(["image"], "reference.png")])}
-    >
-      {children}
-    </div>
-  )
+    onDelete?: () => void;
+    name: string;
+  }) => <button onClick={onDelete}>Remove {name}</button>
 }));
 
-vi.mock("react-i18next", () => ({
-  useTranslation: () => ({
-    t: (key: string, values?: { count?: number }) =>
-      values?.count === undefined ? key : `${key}:${values.count}`
-  })
-}));
-
-vi.mock("./AddImageDropTile", () => ({ AddImageDropTile: () => null }));
-vi.mock("./ChangedFieldsNote", () => ({ ChangedFieldsNote: () => null }));
-vi.mock("./RenderingBadge", () => ({ RenderingBadge: () => null }));
-vi.mock("./SheetImageCard", () => ({ SheetImageCard: () => null }));
-vi.mock("./SheetImageInputsPanel", () => ({
-  SheetImageInputsPanel: () => null
-}));
-
-import { SheetGroupRow } from "./SheetGroupRow";
-
-const group = (overrides: Partial<SheetGroup> = {}): SheetGroup => ({
-  token: "hero",
-  name: "Hero",
-  layer_id: "layer-1",
-  layer_order: 0,
-  enabled: true,
-  selected_asset_id: null,
-  effective_asset_id: null,
-  effective_source: null,
-  images: [],
-  prompt: "A brave hero",
-  ...overrides
-});
-
-const renderRow = (
-  overrides: Partial<SheetGroup> = {},
-  onRerender = vi.fn(),
-  onUploadReference = vi.fn<() => Promise<string | undefined>>(),
-  onSaveFields = vi.fn(),
-  isRunActive = false,
-  isRendering = false
+const setup = (
+  withReferences = false,
+  masterToken?: string,
+  localProps: Partial<{
+    renderCost: ScriptProjectRenderCost;
+    isCharacterVoiceAvailableForProject: boolean;
+  }> = {}
 ) => {
-  render(
-    <SheetGroupRow
-      group={group(overrides)}
-      imageUrlsByAssetId={new Map()}
-      isRendering={isRendering}
-      changedPaths={undefined}
-      onPin={vi.fn()}
-      onSaveFields={onSaveFields}
-      onToggleEnabled={vi.fn()}
-      onRerender={onRerender}
-      onUploadReference={onUploadReference}
-      onUploadImage={vi.fn()}
-      onDescribeFromImage={vi.fn()}
-      isBusy={false}
-      isRenderDisabled={false}
-      renderCost={{ kind: "local" }}
-      shouldFetchImageInputs={false}
-      supportsImageReferences
-      isRunActive={isRunActive}
-    />
+  const group = SheetGroupSchema.parse({
+    token: "hero",
+    name: "Hero",
+    kind: "character",
+    layer_id: "layer",
+    images: [],
+    prompt: "Original",
+    reference_asset_ids: withReferences ? ["ref"] : [],
+    reference_instruction: withReferences ? "Use the face" : null,
+    master_token: masterToken
+  });
+  const onSaveFields = vi.fn(),
+    onRerender = vi.fn();
+  const props = {
+    group,
+    imageUrlsByAssetId: new Map(),
+    changedPaths: undefined,
+    isRendering: false,
+    isBusy: false,
+    isBusyWithAnythingButImageUploads: false,
+    isUploadingImage: false,
+    isRunActive: false,
+    onPin: vi.fn(),
+    onSaveFields,
+    onToggleEnabled: vi.fn(),
+    onRerender,
+    onUploadReference: vi.fn(),
+    onUploadImage: vi.fn(),
+    onDescribeFromImage: vi.fn(),
+    projectId: "project",
+    timelineId: "timeline",
+    isRenderDisabled: false,
+    renderCost: { kind: "local" } as ScriptProjectRenderCost,
+    supportsImageReferences: true,
+    isCharacterVoiceAvailableForProject: false,
+    ...localProps
+  };
+  const screen = renderWithProviders(
+    <SheetGroupRow key={group.token} {...props} />
   );
-  return { onRerender, onUploadReference, onSaveFields };
+  return { ...screen, props, onSaveFields, onRerender };
 };
-
-describe("SheetGroupRow render cost", () => {
-  it("shows Local for a local model", () => {
-    renderRow();
-
-    expect(screen.getByText("Local")).toBeVisible();
-  });
-
-  it("shows the credit price for a Mago Cloud model", () => {
-    render(
-      <SheetGroupRow
-        group={group()}
-        imageUrlsByAssetId={new Map()}
-        isRendering={false}
-        changedPaths={undefined}
-        onPin={vi.fn()}
-        onSaveFields={vi.fn()}
-        onToggleEnabled={vi.fn()}
-        onRerender={vi.fn()}
-        onUploadReference={vi.fn()}
-        onUploadImage={vi.fn()}
-        onDescribeFromImage={vi.fn()}
-        isBusy={false}
-        isRenderDisabled={false}
-        renderCost={{ kind: "credits", amount: 120 }}
-        shouldFetchImageInputs={false}
-        supportsImageReferences
-        isRunActive={false}
-      />
-    );
-
-    expect(screen.getByText("120")).toBeVisible();
-  });
-});
-
-describe("SheetGroupRow asset references", () => {
-  it("renders with the persisted references and instructions", () => {
-    const { onRerender } = renderRow({
-      reference_asset_ids: ["reference-1", "reference-2"],
-      reference_instruction: "Use the coat and hairstyle"
-    });
-
-    fireEvent.click(screen.getByTestId("sheet-group-rerender-hero"));
-
-    expect(onRerender).toHaveBeenCalledWith(
-      expect.objectContaining({
-        referenceAssetIds: ["reference-1", "reference-2"],
-        referenceInstruction: "Use the coat and hairstyle"
-      })
-    );
-  });
-
-  it("renders references with an empty instruction", () => {
-    const { onRerender } = renderRow({
-      reference_asset_ids: ["reference-1"],
-      reference_instruction: null
-    });
-
-    const renderButton = screen.getByTestId("sheet-group-rerender-hero");
-    expect(renderButton).toBeEnabled();
-    fireEvent.click(renderButton);
-
-    expect(onRerender).toHaveBeenCalledWith(
-      expect.objectContaining({
-        referenceAssetIds: ["reference-1"],
-        referenceInstruction: ""
-      })
-    );
-  });
-
-  it("saves reference instructions on blur", () => {
-    const onSaveFields = vi.fn();
-    renderRow(
-      {
-        reference_asset_ids: ["reference-1"],
-        reference_instruction: "Use the coat"
-      },
-      vi.fn(),
-      vi.fn(),
-      onSaveFields
-    );
-
-    const instruction = screen.getByTestId(
+describe("asset text and references", () => {
+  it("preserves an in-progress prompt when reference autosave refreshes the row", () => {
+    const screen = setup(true);
+    const instructions = screen.getByTestId(
       "sheet-group-reference-instruction-hero"
     );
-    fireEvent.change(instruction, {
-      target: { value: "Use the coat and hairstyle" }
-    });
-    fireEvent.blur(instruction);
-
-    expect(onSaveFields).toHaveBeenCalledWith({
-      referenceAssetIds: ["reference-1"],
-      referenceInstruction: "Use the coat and hairstyle"
-    });
+    fireEvent.change(instructions, { target: { value: "Use the costume" } });
+    fireEvent.blur(instructions);
+    const prompt = screen.getByTestId("sheet-group-prompt-hero");
+    fireEvent.change(prompt, { target: { value: "Still editing" } });
+    screen.rerender(
+      <SheetGroupRow
+        key="hero"
+        {...screen.props}
+        group={{
+          ...screen.props.group,
+          reference_instruction: "Use the costume"
+        }}
+      />
+    );
+    expect(screen.getByTestId("sheet-group-prompt-hero")).toHaveValue(
+      "Still editing"
+    );
+    fireEvent.blur(screen.getByTestId("sheet-group-prompt-hero"));
+    expect(screen.onSaveFields).toHaveBeenLastCalledWith(
+      expect.objectContaining({ prompt: "Still editing" })
+    );
   });
 
-  it("removes a persisted reference from the next render", () => {
-    const { onRerender } = renderRow({
-      reference_asset_ids: ["reference-1"],
-      reference_instruction: "Use the coat"
+  it("refreshes saved reference images without remounting the row", () => {
+    const screen = setup(true);
+    screen.rerender(
+      <SheetGroupRow
+        key="hero"
+        {...screen.props}
+        group={{
+          ...screen.props.group,
+          reference_asset_ids: ["replacement"]
+        }}
+      />
+    );
+    expect(screen.queryByRole("button", { name: "Remove ref" })).toBeNull();
+    expect(
+      screen.getByRole("button", { name: "Remove replacement" })
+    ).toBeInTheDocument();
+  });
+  it("saves asset prompts and reference instructions on blur", () => {
+    const screen = setup(true);
+    const prompt = screen.getByTestId("sheet-group-prompt-hero");
+    fireEvent.change(prompt, { target: { value: "Edited" } });
+    fireEvent.blur(prompt);
+    expect(screen.onSaveFields).toHaveBeenCalledWith(
+      expect.objectContaining({ prompt: "Edited" })
+    );
+    const instructions = screen.getByTestId(
+      "sheet-group-reference-instruction-hero"
+    );
+    fireEvent.change(instructions, { target: { value: "Use the costume" } });
+    fireEvent.blur(instructions);
+    expect(screen.onSaveFields).toHaveBeenCalledWith({
+      referenceAssetIds: ["ref"],
+      referenceInstruction: "Use the costume"
     });
-
-    fireEvent.click(screen.getByRole("button", { name: "remove reference-1" }));
-    fireEvent.click(screen.getByTestId("sheet-group-rerender-hero"));
-
-    expect(onRerender).toHaveBeenCalledWith(
+    expect(screen.queryByRole("button", { name: /^Save$/u })).toBeNull();
+  });
+  it("immediately persists removal of the last reference and clears its instruction", () => {
+    const screen = setup(true);
+    fireEvent.click(screen.getByRole("button", { name: "Remove ref" }));
+    expect(screen.onSaveFields).toHaveBeenCalledWith({
+      referenceAssetIds: [],
+      referenceInstruction: null
+    });
+  });
+  it("renders references with an empty instruction, sending the current draft directly", () => {
+    const screen = setup(true);
+    const instructions = screen.getByTestId(
+      "sheet-group-reference-instruction-hero"
+    );
+    const render = screen.getByTestId("sheet-group-rerender-hero");
+    fireEvent.change(instructions, { target: { value: "" } });
+    expect(render).toBeEnabled();
+    fireEvent.click(render);
+    expect(screen.onRerender).toHaveBeenCalledWith(
       expect.objectContaining({
-        referenceAssetIds: [],
+        referenceAssetIds: ["ref"],
         referenceInstruction: ""
       })
     );
   });
-
-  it("uploads and includes a new reference in the next render", async () => {
-    const onUploadReference = vi.fn().mockResolvedValue("reference-new");
-    const { onRerender } = renderRow({}, vi.fn(), onUploadReference);
-
-    fireEvent.click(screen.getByTestId("reference-file-trigger"));
-    await waitFor(() => expect(onUploadReference).toHaveBeenCalledOnce());
-    await screen.findByTestId("sheet-group-reference-instruction-hero");
-    fireEvent.change(
-      screen.getByTestId("sheet-group-reference-instruction-hero"),
-      { target: { value: "Use the new costume" } }
+  it("saves a cleared instruction as empty instead of refusing to save", () => {
+    const screen = setup(true);
+    const instructions = screen.getByTestId(
+      "sheet-group-reference-instruction-hero"
     );
-    fireEvent.click(screen.getByTestId("sheet-group-rerender-hero"));
-
-    expect(onRerender).toHaveBeenCalledWith(
-      expect.objectContaining({
-        referenceAssetIds: ["reference-new"],
-        referenceInstruction: "Use the new costume"
-      })
+    fireEvent.change(instructions, { target: { value: "" } });
+    fireEvent.blur(instructions);
+    expect(screen.onSaveFields).toHaveBeenCalledWith({
+      referenceAssetIds: ["ref"],
+      referenceInstruction: ""
+    });
+  });
+  it("shows and saves a default instruction the moment the first reference is uploaded", async () => {
+    const screen = setup(false);
+    screen.props.onUploadReference.mockResolvedValue("uploaded");
+    const referenceFileInput = screen
+      .getByTestId("sheet-group-add-reference-hero")
+      .parentElement!.querySelector("input[type=file]")!;
+    fireEvent.change(referenceFileInput, {
+      target: {
+        files: [new File(["x"], "face.png", { type: "image/png" })]
+      }
+    });
+    const instructions = await screen.findByTestId(
+      "sheet-group-reference-instruction-hero"
     );
+    expect(instructions).toHaveValue(
+      "Use these images as visual references for this entity."
+    );
+    expect(screen.onSaveFields).toHaveBeenCalledWith({
+      referenceAssetIds: ["uploaded"],
+      referenceInstruction:
+        "Use these images as visual references for this entity."
+    });
   });
-
-  it("reserves one reference slot when the entity has a master image", () => {
-    renderRow({ master_token: "hero-master" });
-
-    expect(
-      screen.getByText("script_project.asset_references.hint:2")
-    ).toBeVisible();
-  });
-
   it("says why the render button is disabled while a run is active", () => {
-    renderRow({}, vi.fn(), vi.fn(), vi.fn(), true);
-
+    const screen = setup(false);
+    screen.rerender(<SheetGroupRow key="hero" {...screen.props} isRunActive />);
     expect(
       screen.getByTestId("sheet-group-render-blocked-hero")
-    ).toHaveTextContent("script_project.render_blocked_run_active.label");
-    expect(screen.getByTestId("sheet-group-rerender-hero")).toBeDisabled();
+    ).toHaveTextContent("Wait for the current run to finish.");
   });
-
   it("keeps the render button and the reference editor usable while the asset is rendering", () => {
-    const { onRerender } = renderRow(
-      { reference_asset_ids: ["reference-1"] },
-      vi.fn(),
-      vi.fn(),
-      vi.fn(),
-      false,
-      true
-    );
-
-    const renderButton = screen.getByTestId("sheet-group-rerender-hero");
-    expect(renderButton).toBeEnabled();
+    const screen = setup(true);
+    screen.rerender(<SheetGroupRow key="hero" {...screen.props} isRendering />);
+    const render = screen.getByTestId("sheet-group-rerender-hero");
+    expect(render).toBeEnabled();
     expect(
       screen.getByTestId("sheet-group-reference-instruction-hero")
     ).toBeEnabled();
     expect(screen.getByTestId("sheet-group-add-reference-hero")).toBeEnabled();
-    fireEvent.click(renderButton);
-    expect(onRerender).toHaveBeenCalledTimes(1);
+    fireEvent.click(render);
+    expect(screen.onRerender).toHaveBeenCalledTimes(1);
+  });
+  it("disables the render button while a run is active", () => {
+    const screen = setup(false);
+    screen.rerender(<SheetGroupRow key="hero" {...screen.props} isRunActive />);
+    expect(screen.getByTestId("sheet-group-rerender-hero")).toBeDisabled();
+  });
+  it("reserves a reference slot for the master of a variant", () => {
+    const screen = setup(false, "master");
+    screen.rerender(
+      <SheetGroupRow
+        key="hero"
+        {...screen.props}
+        group={{
+          ...screen.props.group,
+          reference_asset_ids: ["ref", "second-ref"]
+        }}
+      />
+    );
+    expect(screen.getByTestId("sheet-group-add-reference-hero")).toBeDisabled();
+  });
+  it("leaves room for a third reference on an asset that is not a variant", () => {
+    const screen = setup(false);
+    screen.rerender(
+      <SheetGroupRow
+        key="hero"
+        {...screen.props}
+        group={{
+          ...screen.props.group,
+          reference_asset_ids: ["ref", "second-ref"]
+        }}
+      />
+    );
+    expect(screen.getByTestId("sheet-group-add-reference-hero")).toBeEnabled();
+  });
+});
+
+describe("image drop tile", () => {
+  it("stays usable and still while another entity's image uploads", () => {
+    const screen = setup();
+    screen.rerender(<SheetGroupRow key="hero" {...screen.props} isBusy />);
+    const dropTile = within(screen.getByTestId("sheet-group-drop-hero"));
+
+    expect(dropTile.queryByRole("progressbar")).toBeNull();
+    expect(
+      dropTile
+        .getByText(t("script_project.drop_image_hint.label"))
+        .closest("button")
+    ).toBeEnabled();
+  });
+
+  it("spins and takes no second file while this entity's own image uploads", () => {
+    const screen = setup();
+    screen.rerender(
+      <SheetGroupRow key="hero" {...screen.props} isBusy isUploadingImage />
+    );
+    const dropTile = within(screen.getByTestId("sheet-group-drop-hero"));
+
+    expect(dropTile.getByRole("progressbar").closest("button")).toBeDisabled();
+  });
+});
+
+describe("local render cost and voice", () => {
+  it("shows Local on Generate for a local model", () => {
+    const screen = setup();
+
+    expect(
+      within(screen.getByTestId("sheet-group-rerender-hero")).getByText("Local")
+    ).toBeVisible();
+  });
+
+  it("shows the credit price on Generate for a Mago Cloud model", () => {
+    const screen = setup(false, undefined, {
+      renderCost: { kind: "credits", amount: 120 }
+    });
+
+    expect(
+      within(screen.getByTestId("sheet-group-rerender-hero")).getByText("120")
+    ).toBeVisible();
+  });
+
+  it("offers a character voice on a cloud project", () => {
+    const screen = setup(false, undefined, {
+      isCharacterVoiceAvailableForProject: true
+    });
+
+    expect(screen.getAllByText(t("script_project.voice.title")).length).toBe(1);
+  });
+
+  it("shows no All versions section while the first version renders", () => {
+    const screen = renderWithProviders(
+      <SheetGroupRow {...setup().props} key="rendering" isRendering />
+    );
+
+    expect(
+      screen.queryByText(t("script_project.all_versions.label"))
+    ).toBeNull();
+  });
+
+  it("offers no character voice on a local project", () => {
+    const screen = setup(false, undefined, {
+      isCharacterVoiceAvailableForProject: false
+    });
+
+    expect(screen.queryByText(t("script_project.voice.title"))).toBeNull();
+    expect(
+      screen.queryByText(t("script_project.voice.add_voice_button.label"))
+    ).toBeNull();
   });
 });

@@ -19,7 +19,15 @@ export const downloadSetupRequirement = async (
   settings: ComfySettings,
   name: string,
   signal?: AbortSignal,
-  { replaceExistingNodePackIn }: { replaceExistingNodePackIn?: string } = {}
+  {
+    replaceExistingNodePackIn,
+    onProgress,
+    onDestination
+  }: {
+    replaceExistingNodePackIn?: string;
+    onProgress?: (downloadedBytes: number, totalBytes: number | null) => void;
+    onDestination?: (destination: string) => void;
+  } = {}
 ): Promise<SetupRequirementDownloadResult | null> => {
   const [requirement] = await resolveSetupRequirements(settings, [name]);
   const isReplacingNodePack = replaceExistingNodePackIn !== undefined;
@@ -39,7 +47,11 @@ export const downloadSetupRequirement = async (
       requirement,
       folder,
       signal,
-      { replaceExistingNodePack: isReplacingNodePack }
+      {
+        replaceExistingNodePack: isReplacingNodePack,
+        onProgress,
+        onDestination
+      }
     );
   } catch (error) {
     if (!(error instanceof NodePackAlreadyInstalledError)) throw error;

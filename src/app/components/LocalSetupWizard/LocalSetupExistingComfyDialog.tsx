@@ -2,7 +2,6 @@ import { LaunchComfyButton } from "@app/components/LaunchComfyButton";
 import { COMFY_LAUNCH_STATUS_QUERY_KEY } from "@app/components/LaunchComfyButton/hooks/useComfyLaunchStatus";
 import { useMountEffect } from "@app/hooks/useMountEffect";
 import { Checkbox } from "@components/Checkbox";
-import { Icon } from "@components/Icon";
 import { Input } from "@components/Input";
 import { MainButton } from "@components/MainButton";
 import { Modal } from "@components/Modal";
@@ -20,128 +19,13 @@ import type { ScriptSetupRequirement } from "../../../../desktop/shared/contract
 import { useIsComfyRespondingSinceFailedCheck } from "./hooks/useIsComfyRespondingSinceFailedCheck";
 import { useModelLicenseAcceptanceGate } from "./hooks/useModelLicenseAcceptanceGate";
 import { LocalModelLicenseDialog } from "./LocalModelLicenseDialog";
-import { LocalNodePackUpdateDialog } from "./LocalNodePackUpdateDialog";
 import { LocalSetupComfyRestartPrompt } from "./LocalSetupComfyRestartPrompt";
 import { LocalSetupDownloadAllMissingButton } from "./LocalSetupDownloadAllMissingButton";
-import { LocalSetupNodePackDependenciesNote } from "./LocalSetupNodePackDependenciesNote";
+import { LocalSetupRequirementDownload } from "./LocalSetupRequirementDownload";
 import { LocalSetupStatusMark } from "./LocalSetupStatusMark";
 import { RecheckComfyConnectionOnMount } from "./RecheckComfyConnectionOnMount";
 import { groupSetupRequirements } from "./utils/groupSetupRequirements";
-
-const RequirementDownload = ({
-  item,
-  startDownloadOnceLicensesAccepted,
-  onNodePackInstalled
-}: {
-  item: ScriptSetupRequirement;
-  startDownloadOnceLicensesAccepted: (
-    startDownload: () => void
-  ) => Promise<void>;
-  onNodePackInstalled: () => void;
-}) => {
-  const { t } = useTranslation();
-  const download = useMutation({
-    mutationFn: (replaceExistingNodePackIn?: string) =>
-      window.mago.localSetup.downloadRequirement(item.name, {
-        replaceExistingNodePackIn
-      }),
-    onSuccess: (result) => {
-      const isNodePackLoadableAfterRestart =
-        result?.outcome === "saved" &&
-        item.installKind === "node" &&
-        result.nodePackDependencies?.outcome !== "manual";
-      if (isNodePackLoadableAfterRestart) onNodePackInstalled();
-    }
-  });
-  const savedDownload =
-    download.data?.outcome === "saved" ? download.data : null;
-  const isNodePackReadyToLoad =
-    savedDownload !== null &&
-    item.installKind === "node" &&
-    savedDownload.nodePackDependencies?.outcome !== "manual";
-  const nodePackUpdateAwaitingConfirmation =
-    download.data?.outcome === "node-pack-update-needs-confirmation"
-      ? download.data
-      : null;
-  const requestDownload = useMutation({
-    mutationFn: async () => {
-      if (item.installKind !== "model") return download.mutate(undefined);
-      await startDownloadOnceLicensesAccepted(() => download.mutate(undefined));
-    }
-  });
-  if (!item.downloadUrl) return null;
-  return (
-    <div className="flex flex-col items-start gap-1">
-      {!isNodePackReadyToLoad && (
-        <MainButton
-          startIcon={<Icon iconSet="16" iconName="download" />}
-          colorScheme="secondary"
-          isDisabled={download.isPending || requestDownload.isPending}
-          loading={download.isPending}
-          onPress={() => requestDownload.mutate()}
-        >
-          {download.isPending
-            ? "Downloading / installing..."
-            : download.isError
-              ? "Resume / retry..."
-              : item.installKind === "node"
-                ? "Download and install..."
-                : "Download..."}
-        </MainButton>
-      )}
-      {download.isPending && (
-        <MainButton
-          colorScheme="secondary"
-          onPress={() => {
-            void window.mago.localSetup.pauseDownload(item.name);
-          }}
-        >
-          Pause
-        </MainButton>
-      )}
-      {download.isError && (
-        <Text variant="xs" color="glyph-error">
-          {download.error.message}
-        </Text>
-      )}
-      {requestDownload.isError && (
-        <Text variant="xs" color="glyph-error">
-          {requestDownload.error.message}
-        </Text>
-      )}
-      {savedDownload && (
-        <Text variant="xs" color="success">
-          {t(
-            item.installKind === "node"
-              ? "localSetup.requirementDownload.savedNodePack"
-              : "localSetup.requirementDownload.savedModel",
-            { savedTo: savedDownload.savedTo }
-          )}
-        </Text>
-      )}
-      {savedDownload?.nodePackDependencies && (
-        <LocalSetupNodePackDependenciesNote
-          nodePackDependencies={savedDownload.nodePackDependencies}
-        />
-      )}
-      {isNodePackReadyToLoad && (
-        <Text variant="xs" color="glyph-warning">
-          {t("localSetup.comfyRestart.waitingForRestart")}
-        </Text>
-      )}
-      <LocalNodePackUpdateDialog
-        nodePackDirectory={
-          nodePackUpdateAwaitingConfirmation?.nodePackDirectory ?? null
-        }
-        backupsFolder={nodePackUpdateAwaitingConfirmation?.backupsFolder ?? ""}
-        onCancel={() => download.reset()}
-        onConfirm={() =>
-          download.mutate(nodePackUpdateAwaitingConfirmation?.customNodesFolder)
-        }
-      />
-    </div>
-  );
-};
+import { refreshModelSettings } from "./utils/refreshModelSettings";
 
 const Requirements = ({
   title,
@@ -215,7 +99,7 @@ const Requirements = ({
               Pinned bundle version: {item.pinnedRevision}
             </Text>
           )}
-          <RequirementDownload
+          <LocalSetupRequirementDownload
             item={item}
             startDownloadOnceLicensesAccepted={
               startDownloadOnceLicensesAccepted
@@ -283,6 +167,7 @@ const ConnectionForm = ({ onComplete }: { onComplete: () => void }) => {
       ...current,
       endpoint: status.endpoint
     });
+    await refreshModelSettings(queryClient);
     return status;
   };
   const check = useMutation({

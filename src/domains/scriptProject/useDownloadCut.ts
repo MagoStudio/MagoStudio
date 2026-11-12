@@ -8,6 +8,7 @@ import { useTranslation } from "react-i18next";
 
 import { buildCutDownloadName } from "./utils/buildCutDownloadNames";
 import { buildCutExportFileName } from "./utils/buildCutExportFileName";
+import { resolveCutShotVideo } from "./utils/resolveCutShotVideo";
 
 export const useDownloadCut = (
   cutShots: CutShot[],
@@ -17,7 +18,9 @@ export const useDownloadCut = (
   const { showErrorToast } = useToast();
   const [isDownloadingCut, setIsDownloadingCut] = useState(false);
 
-  const downloadableShots = cutShots.filter((cutShot) => !!cutShot.url);
+  const downloadableShots = cutShots.filter(
+    (cutShot) => !!resolveCutShotVideo(cutShot).videoUrl
+  );
 
   /* Checked rather than assumed: a signed asset URL expires, and a 403's XML body saved under a
    * shot's name is a file the user cannot play and cannot diagnose. */
@@ -32,9 +35,10 @@ export const useDownloadCut = (
   };
 
   const downloadOneShot = async (cutShot: CutShot) => {
-    if (!cutShot.url) return;
+    const { videoUrl } = resolveCutShotVideo(cutShot);
+    if (!videoUrl) return;
     try {
-      const response = await fetchShotVideo(cutShot.url);
+      const response = await fetchShotVideo(videoUrl);
       triggerBlobDownload(await response.blob(), buildCutDownloadName(cutShot));
     } catch {
       showErrorToast({
@@ -50,7 +54,9 @@ export const useDownloadCut = (
     try {
       const entries = await Promise.all(
         downloadableShots.map(async (cutShot) => {
-          const response = await fetchShotVideo(cutShot.url!);
+          const response = await fetchShotVideo(
+            resolveCutShotVideo(cutShot).videoUrl!
+          );
           return {
             name: buildCutDownloadName(cutShot),
             data: new Uint8Array(await response.arrayBuffer())

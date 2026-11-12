@@ -2,13 +2,12 @@ import { cn } from "@utils";
 
 type Props = {
   children: React.ReactNode;
-  placement?: "between" | "insideNextShot" | "insidePreviousShot";
+  placement?: "between" | "insideNextShot";
 };
 
 const PLACEMENT_CLASSES = {
   between: "",
-  insideNextShot: "translate-y-[14px]",
-  insidePreviousShot: "-translate-y-[14px]"
+  insideNextShot: "translate-y-[14px]"
 };
 
 export const ShotListRowGap: React.FC<Props> = ({

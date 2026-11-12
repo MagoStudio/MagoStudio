@@ -1,6 +1,8 @@
 import { textOf } from "../../vlm/dialogue";
 import { sequentialShotConfig } from "../shots/planShotRun";
 
+import { listUntaggedSpeakers } from "./untaggedSpeakers";
+
 /**
  * Editing one shot: the backend's request checks (same messages) and its
  * write. Casting-owned fields are tracked individually in
@@ -114,7 +116,8 @@ const shotIndexError = (value: unknown): string | null =>
 /** The cloud's request checks for an added shot. Throws ShotEditError. */
 export const validateAddedShot = (
   fields: JsonRecord,
-  taggableTokens: Set<string>
+  taggableTokens: Set<string>,
+  castCharacterTokens: Set<string>
 ): void => {
   const unknown = Object.keys(fields).filter(
     (field) => !ADD_SHOT_FIELDS.includes(field)
@@ -138,6 +141,7 @@ export const validateAddedShot = (
   validateShotEdit(contentFields, {
     shot: { tags: {} },
     taggableTokens,
+    castCharacterTokens,
     hasRenders: false
   });
 };
@@ -148,6 +152,7 @@ export const validateShotEdit = (
   context: {
     shot: JsonRecord;
     taggableTokens: Set<string>;
+    castCharacterTokens: Set<string>;
     hasRenders: boolean;
   }
 ): void => {
@@ -279,21 +284,14 @@ export const validateShotEdit = (
     throw new ShotEditError("A shot with no renders cannot be locked");
 
   if ("dialogue" in fields && Array.isArray(fields.dialogue)) {
-    const currentTags = isRecord(context.shot.tags) ? context.shot.tags : {};
-    const requestedTags = isRecord(fields.tags) ? fields.tags : {};
-    const characterTokens = new Set(
-      (Array.isArray(requestedTags.characters)
-        ? requestedTags.characters
-        : Array.isArray(currentTags.characters)
-          ? currentTags.characters
-          : []
-      ).map(textOf)
-    );
     (fields.dialogue as JsonRecord[]).forEach((turn, index) => {
       const speakerToken = turn.speaker_token;
-      if (speakerToken && !characterTokens.has(textOf(speakerToken)))
+      if (
+        speakerToken &&
+        !context.castCharacterTokens.has(textOf(speakerToken))
+      )
         throw new ShotEditError(
-          `dialogue[${index}].speaker_token '${textOf(speakerToken)}' is not a character tagged in this shot`
+          `dialogue[${index}].speaker_token '${textOf(speakerToken)}' is not a character in this project's cast`
         );
     });
   }
@@ -400,7 +398,10 @@ export const sequentialPrompt = (shot: JsonRecord): string | null => {
 };
 
 /** The PATCH response body (`shots` is added by the caller after a move or hide). */
-export const editedShotResponse = (shot: JsonRecord): JsonRecord => ({
+export const editedShotResponse = (
+  shot: JsonRecord,
+  castCharacterTokens: ReadonlySet<string>
+): JsonRecord => ({
   timeline_id: shot.timeline_id,
   shot_index: shot.shot_index ?? null,
   heading: shot.heading ?? null,
@@ -408,6 +409,11 @@ export const editedShotResponse = (shot: JsonRecord): JsonRecord => ({
   hidden: !!shot.hidden,
   video_prompt: shot.video_prompt ?? null,
   dialogue: Array.isArray(shot.dialogue) ? shot.dialogue : [],
+  dialogue_untagged_speakers: listUntaggedSpeakers(
+    shot.dialogue,
+    shot.tags,
+    castCharacterTokens
+  ),
   tags: shot.tags ?? null,
   duration_s: shot.duration_s ?? null,
   sequential: shot.sequential ?? null,

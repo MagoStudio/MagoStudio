@@ -87,7 +87,10 @@ export const estimateLocalMagoCloudCredits = (
         shotEngine: MINIMAX_H3_MAX_SHOT_RENDER_ENGINE,
         outputSize,
         shotFrames: snapShotSecondsToFrames(duration),
-        referenceImageCount: referenceImageCount(primary)
+        referenceImageSizes: Array.from(
+          { length: referenceImageCount(primary) },
+          () => null
+        )
       });
     }
   }

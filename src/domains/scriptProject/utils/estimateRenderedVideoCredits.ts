@@ -84,7 +84,10 @@ export const estimateRenderedVideoCredits = (
         shotEngine: readShotRenderEngine(engineSettings?.engine),
         outputSize,
         shotFrames: snapShotSecondsToFrames(durationSeconds),
-        referenceImageCount: countReferenceImages(renderSpec)
+        referenceImageSizes: Array.from(
+          { length: countReferenceImages(renderSpec) },
+          () => null
+        )
       });
     }
   }

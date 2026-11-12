@@ -123,7 +123,10 @@ export const estimateCloudRenderCredits = (
         shotEngine: shotEngine(engineSettings?.engine),
         outputSize: size,
         shotFrames: snapShotSecondsToFrames(duration),
-        referenceImageCount: referenceImageCount(primary)
+        referenceImageSizes: Array.from(
+          { length: referenceImageCount(primary) },
+          () => null
+        )
       });
     }
   }

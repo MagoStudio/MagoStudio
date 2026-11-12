@@ -55,6 +55,16 @@ describe("personal shot version reviews", () => {
     hook.rerender();
     expect(hook.result.current.viewedVersionIds.size).toBe(0);
   });
+  it("skips the storage write when every version is already viewed", () => {
+    const hook = renderHook(() => useShotVersionReview("shared"));
+    act(() => hook.result.current.markVersionsViewed(["take"]));
+    const setItem = vi.spyOn(Storage.prototype, "setItem");
+    act(() => hook.result.current.markVersionsViewed(["take"]));
+    expect(setItem).not.toHaveBeenCalled();
+    act(() => hook.result.current.markVersionsViewed(["take", "next"]));
+    expect(setItem).toHaveBeenCalledOnce();
+    setItem.mockRestore();
+  });
   it("reports the saved review as not ready until the user has loaded", () => {
     identity.userId = undefined;
     const hook = renderHook(() => useShotVersionReview("shared"));

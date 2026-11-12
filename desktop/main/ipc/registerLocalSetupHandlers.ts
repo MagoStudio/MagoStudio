@@ -9,6 +9,7 @@ import {
   MANUAL_COMFY_MODEL_COPY_MESSAGE,
   modelCopyConfirmationMessage
 } from "../localSetup/confirmAndCopyInstallerModels";
+import { deletePartialDownload } from "../localSetup/deletePartialDownload";
 import { downloadSetupRequirement } from "../localSetup/downloadSetupRequirement";
 import { downloadSetupRequirements } from "../localSetup/downloadSetupRequirements";
 import {
@@ -19,13 +20,19 @@ import { probeHardware } from "../localSetup/probeHardware";
 import { readLocalModelGroupsStatus } from "../localSetup/readLocalModelGroupsStatus";
 import { readStarterInstallRequest } from "../localSetup/readStarterInstallRequest";
 import { readVideoMemoryBytesOnce } from "../localSetup/readVideoMemoryBytesOnce";
+import {
+  DOWNLOAD_CANCELLED_BY_USER,
+  RequirementDownloadTracker
+} from "../localSetup/RequirementDownloadTracker";
 import { StarterInstaller } from "../localSetup/starterInstaller";
 
 import { requireTrustedSender } from "./trustedSender";
 
 export const registerLocalSetupHandlers = (options: {
   settings: LibrarySettings;
+  onSetupComplete?: () => Promise<void>;
 }): void => {
+  let diagnosticsRefreshedAfterSetup = false;
   const installer = new StarterInstaller(options.settings, {
     confirmModelCopy: async (bytes) => {
       const result = await dialog.showMessageBox({
@@ -50,6 +57,13 @@ export const registerLocalSetupHandlers = (options: {
   });
   ipcMain.handle(IPC_CHANNELS.localSetupInstallerStatus, async (event) => {
     requireTrustedSender(event);
+    if (
+      installer.status().phase === "done" &&
+      !diagnosticsRefreshedAfterSetup
+    ) {
+      diagnosticsRefreshedAfterSetup = true;
+      await options.onSetupComplete?.();
+    }
     return {
       ...installer.status(),
       hasCompletedInstall: await options.settings.hasCompletedLocalSetup()
@@ -59,6 +73,7 @@ export const registerLocalSetupHandlers = (options: {
     IPC_CHANNELS.localSetupInstallerStart,
     async (event, request: unknown) => {
       requireTrustedSender(event);
+      diagnosticsRefreshedAfterSetup = false;
       return installer.start(readStarterInstallRequest(request));
     }
   );
@@ -121,6 +136,27 @@ export const registerLocalSetupHandlers = (options: {
     }
   );
   const downloads = new Map<string, AbortController>();
+  const runningRequirementDownloads = new Map<string, Promise<unknown>>();
+  const requirementDownloadTracker = new RequirementDownloadTracker(
+    deletePartialDownload
+  );
+  ipcMain.handle(IPC_CHANNELS.localSetupCancelDownload, async (event, name) => {
+    requireTrustedSender(event);
+    if (typeof name !== "string") throw new Error("Invalid requirement");
+    const key = `${event.sender.id}:${name}`;
+    const runningDownload = downloads.get(key);
+    if (!runningDownload) return requirementDownloadTracker.discard(name);
+    runningDownload.abort(DOWNLOAD_CANCELLED_BY_USER);
+    await runningRequirementDownloads.get(key)?.catch(() => null);
+  });
+  ipcMain.handle(
+    IPC_CHANNELS.localSetupRequirementDownloadStatus,
+    async (event, name) => {
+      requireTrustedSender(event);
+      if (typeof name !== "string") throw new Error("Invalid requirement");
+      return requirementDownloadTracker.read(name);
+    }
+  );
   const customNodesFoldersAwaitingNodePackUpdate = new Map<string, string>();
   ipcMain.handle(IPC_CHANNELS.localSetupPauseDownload, async (event, name) => {
     requireTrustedSender(event);
@@ -156,18 +192,26 @@ export const registerLocalSetupHandlers = (options: {
       const controller = new AbortController();
       downloads.set(key, controller);
       try {
-        const result = await downloadSetupRequirement(
-          window,
-          {
-            endpoint: await options.settings.getComfyEndpoint(),
-            vlmBackend: await options.settings.getVlmBackend(),
-            scriptTextModel: await options.settings.getScriptTextModel(),
-            textModelProvider: await options.settings.getTextModelProvider()
-          },
+        const comfySettings = {
+          endpoint: await options.settings.getComfyEndpoint(),
+          vlmBackend: await options.settings.getVlmBackend(),
+          scriptTextModel: await options.settings.getScriptTextModel(),
+          textModelProvider: await options.settings.getTextModelProvider()
+        };
+        const trackedDownload = requirementDownloadTracker.track(
           name,
           controller.signal,
-          { replaceExistingNodePackIn }
+          (onProgress, onDestination) =>
+            downloadSetupRequirement(
+              window,
+              comfySettings,
+              name,
+              controller.signal,
+              { replaceExistingNodePackIn, onProgress, onDestination }
+            )
         );
+        runningRequirementDownloads.set(key, trackedDownload);
+        const result = await trackedDownload;
         if (result?.outcome === "node-pack-update-needs-confirmation")
           customNodesFoldersAwaitingNodePackUpdate.set(
             updateConfirmationKey,
@@ -176,6 +220,7 @@ export const registerLocalSetupHandlers = (options: {
         return result;
       } finally {
         downloads.delete(key);
+        runningRequirementDownloads.delete(key);
       }
     }
   );

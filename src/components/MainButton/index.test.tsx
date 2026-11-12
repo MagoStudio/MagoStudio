@@ -310,3 +310,16 @@ describe("MainButton outlined danger colour scheme is unaffected", () => {
     expect(classList).not.toContain("data-[hovered]:bg-glyph-error-hover");
   });
 });
+
+describe("MainButton keyboard events", () => {
+  test("lets Escape bubble to an enclosing popover or dialog", () => {
+    const onParentKeyDown = vi.fn();
+    const { getByRole } = renderWithProviders(
+      <div onKeyDown={(event) => onParentKeyDown(event.key)}>
+        <MainButton>Go</MainButton>
+      </div>
+    );
+    fireEvent.keyDown(getByRole("button"), { key: "Escape" });
+    expect(onParentKeyDown).toHaveBeenCalledWith("Escape");
+  });
+});

@@ -1,7 +1,7 @@
 {
   "name": "mago-studio",
   "productName": "Mago Studio",
-  "version": "0.19.3",
+  "version": "0.20.2",
   "description": "Local-first desktop edition of Mago",
   "author": "Mago",
   "license": "AGPL-3.0-only",

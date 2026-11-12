@@ -1,5 +1,5 @@
 import { VideoEngine } from "@models/video/types";
-import { ShotState } from "@schemas/scriptProject";
+import { SheetGroup, ShotState } from "@schemas/scriptProject";
 import { describe, expect, it } from "vitest";
 
 import { MINIMAX_H3_MAX_SHOT_RENDER_ENGINE } from "../constants";
@@ -30,7 +30,7 @@ const priceOf = (durationSeconds: number | null) =>
       shotDurationSeconds: durationSeconds,
       projectShotFrames: PROJECT_SHOT_FRAMES
     }),
-    referenceImageCount: 0
+    referenceImageSizes: []
   });
 
 describe("estimateStaleShotsCredits", () => {
@@ -41,7 +41,8 @@ describe("estimateStaleShotsCredits", () => {
         shotEngine: VideoEngine.seedance_2_5,
         outputSize: [1280, 720],
         projectShotFrames: PROJECT_SHOT_FRAMES,
-        attemptsPerShot: 4
+        attemptsPerShot: 4,
+        sheetGroups: []
       })
     ).toBe(5 * 566);
   });
@@ -52,7 +53,8 @@ describe("estimateStaleShotsCredits", () => {
         shotEngine: VideoEngine.minimax_reference,
         outputSize: OUTPUT_SIZE,
         projectShotFrames: PROJECT_SHOT_FRAMES,
-        attemptsPerShot: 1
+        attemptsPerShot: 1,
+        sheetGroups: []
       })
     ).toBe(0);
   });
@@ -63,7 +65,8 @@ describe("estimateStaleShotsCredits", () => {
       shotEngine: VideoEngine.minimax_reference,
       outputSize: OUTPUT_SIZE,
       projectShotFrames: PROJECT_SHOT_FRAMES,
-      attemptsPerShot: 1
+      attemptsPerShot: 1,
+      sheetGroups: []
     });
 
     expect(total).toBe(priceOf(5) + priceOf(10));
@@ -76,7 +79,8 @@ describe("estimateStaleShotsCredits", () => {
       shotEngine: VideoEngine.minimax_reference,
       outputSize: OUTPUT_SIZE,
       projectShotFrames: PROJECT_SHOT_FRAMES,
-      attemptsPerShot: 1
+      attemptsPerShot: 1,
+      sheetGroups: []
     });
 
     expect(total).toBe(priceOf(null));
@@ -88,14 +92,16 @@ describe("estimateStaleShotsCredits", () => {
       shotEngine: VideoEngine.minimax_reference,
       outputSize: OUTPUT_SIZE,
       projectShotFrames: PROJECT_SHOT_FRAMES,
-      attemptsPerShot: 1
+      attemptsPerShot: 1,
+      sheetGroups: []
     });
     const threeAttempts = estimateStaleShotsCredits({
       staleShots: [shot(8)],
       shotEngine: VideoEngine.minimax_reference,
       outputSize: OUTPUT_SIZE,
       projectShotFrames: PROJECT_SHOT_FRAMES,
-      attemptsPerShot: 3
+      attemptsPerShot: 3,
+      sheetGroups: []
     });
 
     expect(oneAttempt).toBe(604);
@@ -108,18 +114,20 @@ describe("estimateStaleShotsCredits", () => {
       shotEngine: VideoEngine.minimax_reference,
       outputSize: OUTPUT_SIZE,
       projectShotFrames: PROJECT_SHOT_FRAMES,
-      attemptsPerShot: 1
+      attemptsPerShot: 1,
+      sheetGroups: []
     });
     const fastTotal = estimateStaleShotsCredits({
       staleShots: [shot(5)],
       shotEngine: MINIMAX_H3_MAX_SHOT_RENDER_ENGINE,
       outputSize: OUTPUT_SIZE,
       projectShotFrames: PROJECT_SHOT_FRAMES,
-      attemptsPerShot: 1
+      attemptsPerShot: 1,
+      sheetGroups: []
     });
 
     expect(slowTotal).toBe(405);
-    expect(fastTotal).toBe(820);
+    expect(fastTotal).toBe(816);
   });
 
   it("threads the Shot's reference images into the price", () => {
@@ -143,9 +151,53 @@ describe("estimateStaleShotsCredits", () => {
       shotEngine: MINIMAX_H3_MAX_SHOT_RENDER_ENGINE,
       outputSize: OUTPUT_SIZE,
       projectShotFrames: PROJECT_SHOT_FRAMES,
-      attemptsPerShot: 1
+      attemptsPerShot: 1,
+      sheetGroups: []
     });
 
-    expect(withReferences).toBe(862);
+    expect(withReferences).toBe(858);
+  });
+
+  it("prices a speaking Shot the same as a silent one, since no render sends a voice", () => {
+    const sixWideReferenceShot = {
+      ...shot(10),
+      references: {
+        characters: Array.from({ length: 6 }, (_, index) => ({
+          token: `@${index}`,
+          asset_id: `wide-${index}`
+        }))
+      }
+    } as ShotState;
+    const speakingShot = {
+      ...sixWideReferenceShot,
+      dialogue: [
+        { speaker_token: "mara", line: "Hi" },
+        { speaker_token: "joe", line: "Hello" },
+        { speaker_token: "ana", line: "Hey" }
+      ]
+    } as ShotState;
+    const sheetGroups = [
+      {
+        token: "mara",
+        images: Array.from({ length: 6 }, (_, index) => ({
+          asset_id: `wide-${index}`,
+          render_spec: { output_size: [1920, 1080] }
+        })),
+        voice_signature: { voice_id: "mara-voice" }
+      },
+      { token: "joe", images: [], voice_signature: { voice_id: "joe-voice" } },
+      { token: "ana", images: [], voice_signature: { voice_id: "ana-voice" } }
+    ] as unknown as SheetGroup[];
+    const priceH3Max = (staleShot: ShotState) =>
+      estimateStaleShotsCredits({
+        staleShots: [staleShot],
+        shotEngine: MINIMAX_H3_MAX_SHOT_RENDER_ENGINE,
+        outputSize: OUTPUT_SIZE,
+        projectShotFrames: PROJECT_SHOT_FRAMES,
+        attemptsPerShot: 1,
+        sheetGroups
+      });
+
+    expect(priceH3Max(speakingShot)).toBe(priceH3Max(sixWideReferenceShot));
   });
 });

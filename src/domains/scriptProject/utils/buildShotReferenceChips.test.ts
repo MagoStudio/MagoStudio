@@ -69,6 +69,7 @@ const shotTagging = (
   tags,
   references,
   missing_references: missingReferences,
+  dialogue_untagged_speakers: [],
   dropped: false,
   hidden: false,
   manual: false

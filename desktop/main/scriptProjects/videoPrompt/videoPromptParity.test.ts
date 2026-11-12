@@ -73,8 +73,13 @@ describe("video prompt parity: payload and slots", () => {
   const slots = fixtures.slots;
 
   it("plans reference slots the way the backend does", () => {
-    for (const { groups, limit, output } of slots.planReferenceSlots)
+    for (const { groups, limit, output, error } of slots.planReferenceSlots) {
+      if (error) {
+        expect(() => planReferenceSlots(groups, limit)).toThrow(error);
+        continue;
+      }
       expect(planReferenceSlots(groups, limit)).toEqual(output);
+    }
   });
 
   it("builds the shot payload from project state", () => {

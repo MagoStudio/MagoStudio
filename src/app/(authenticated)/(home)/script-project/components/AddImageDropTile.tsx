@@ -13,6 +13,7 @@ const ACCEPTED_IMAGE_TYPES = ["image/png", "image/jpeg", "image/webp"];
 type Props = {
   onFileChosen: (file: File) => void;
   isBusy: boolean;
+  isUploadingImage?: boolean;
   /** Match the sibling cards so the tile sits in the strip rather than beside it. */
   className?: string;
   testId?: string;
@@ -21,15 +22,17 @@ type Props = {
 export const AddImageDropTile: React.FC<Props> = ({
   onFileChosen,
   isBusy,
+  isUploadingImage = false,
   className,
   testId
 }) => {
   const { t } = useTranslation();
   const [isDropTarget, setIsDropTarget] = useState(false);
+  const isImageDropDisabled = isBusy || isUploadingImage;
 
   return (
     <DropZone
-      isDisabled={isBusy}
+      isDisabled={isImageDropDisabled}
       getDropOperation={(types) =>
         ACCEPTED_IMAGE_TYPES.some((type) => types.has(type)) ? "copy" : "cancel"
       }
@@ -49,7 +52,7 @@ export const AddImageDropTile: React.FC<Props> = ({
         isDropTarget
           ? "border-glyph-action-main bg-element-primary-active"
           : "border-element-primary",
-        isBusy && "opacity-60",
+        isImageDropDisabled && "opacity-60",
         className
       )}
     >
@@ -61,10 +64,10 @@ export const AddImageDropTile: React.FC<Props> = ({
         }}
       >
         <Button
-          isDisabled={isBusy}
-          className="flex h-full w-full flex-col items-center justify-center gap-1 rounded-xl outline-hidden"
+          isDisabled={isImageDropDisabled}
+          className="flex h-full w-full flex-1 flex-col items-center justify-center gap-1 rounded-xl outline-hidden"
         >
-          {isBusy ? (
+          {isUploadingImage ? (
             <CircularProgress size="md" color="glyph-secondary" />
           ) : (
             <>

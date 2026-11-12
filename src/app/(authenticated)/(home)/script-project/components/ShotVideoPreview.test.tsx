@@ -1,9 +1,13 @@
 import { fireEvent, render, screen } from "@testing-library/react";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
+import { renderWithProviders } from "@/test-utils/renderWithProviders";
+
 const mocks = vi.hoisted(() => ({
   cachedPreview: vi.fn(
-    (): {
+    (_options?: {
+      videoUrl?: string | null;
+    }): {
       videoFirstFrameUrl: string | undefined;
       playableVideoUrl: string | undefined;
       isLoading?: boolean;
@@ -188,5 +192,57 @@ describe("ShotVideoPreview", () => {
     fireEvent.play(video!);
 
     expect(onPlay).toHaveBeenCalledOnce();
+  });
+});
+
+describe("a playing preview", () => {
+  it("keeps playing when the same take comes back under a freshly signed url", () => {
+    mocks.cachedPreview.mockImplementation((options) => ({
+      videoFirstFrameUrl: undefined,
+      playableVideoUrl: options?.videoUrl ?? undefined
+    }));
+    const preview = (videoUrl: string) => (
+      <ShotVideoPreview
+        assetId="take"
+        videoUrl={videoUrl}
+        hasRender
+        outputSize={[1024, 576]}
+        testId="preview"
+      />
+    );
+    const screen = renderWithProviders(
+      preview("https://example.com/take.mp4?sig=1")
+    );
+    fireEvent.click(screen.getByTestId("preview-play"));
+    screen.rerender(preview("https://example.com/take.mp4?sig=2"));
+
+    expect(screen.container.querySelector("video")).toHaveAttribute(
+      "src",
+      "https://example.com/take.mp4?sig=1"
+    );
+  });
+
+  it("stops when the scene moves to another take", () => {
+    const screen = renderWithProviders(
+      <ShotVideoPreview
+        assetId="raw-take"
+        videoUrl="https://example.com/raw.mp4"
+        hasRender
+        outputSize={[1024, 576]}
+        testId="preview"
+      />
+    );
+    fireEvent.click(screen.getByTestId("preview-play"));
+    screen.rerender(
+      <ShotVideoPreview
+        assetId="dubbed-take"
+        videoUrl="https://example.com/dubbed.mp4"
+        hasRender
+        outputSize={[1024, 576]}
+        testId="preview"
+      />
+    );
+
+    expect(screen.container.querySelector("video")).toBeNull();
   });
 });

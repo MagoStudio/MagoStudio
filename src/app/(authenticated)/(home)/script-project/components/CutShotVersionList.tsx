@@ -1,7 +1,8 @@
 import { Text } from "@components/Text";
 import { hasCutShotVersionRenderFailed } from "@domains/scriptProject/utils/hasCutShotVersionRenderFailed";
-import { isCutShotVersionRendering } from "@domains/scriptProject/utils/isCutShotVersionRendering";
+import { isCutShotVersionShownAsRendering } from "@domains/scriptProject/utils/isCutShotVersionShownAsRendering";
 import { ProjectOutputSize } from "@domains/scriptProject/utils/projectOutputSize";
+import { resolveCutShotVersionVideo } from "@domains/scriptProject/utils/resolveCutShotVersionVideo";
 import { CutShot } from "@schemas/scriptProject";
 import { cn } from "@utils";
 import { useTranslation } from "react-i18next";
@@ -31,6 +32,7 @@ export const CutShotVersionList: React.FC<Props> = ({
         const isPinned = shot.pinned_asset_id === version.asset_id;
         const isFallbackForCut =
           !shot.pinned_asset_id && shot.asset_id === version.asset_id;
+        const versionVideo = resolveCutShotVersionVideo(shot, version);
 
         return (
           <div
@@ -43,11 +45,11 @@ export const CutShotVersionList: React.FC<Props> = ({
           >
             <div className="relative">
               <ShotVideoPreview
-                assetId={version.asset_id}
-                videoUrl={version.url}
-                posterUrl={version.poster_url}
+                assetId={versionVideo.videoAssetId}
+                videoUrl={versionVideo.videoUrl}
+                posterUrl={versionVideo.posterUrl}
                 hasRender
-                isRendering={isCutShotVersionRendering(version)}
+                isRendering={isCutShotVersionShownAsRendering(shot, version)}
                 hasRenderFailed={hasCutShotVersionRenderFailed(version)}
                 renderFailedContent={
                   <CutShotVersionRenderError
@@ -61,7 +63,10 @@ export const CutShotVersionList: React.FC<Props> = ({
               <RenderMetricsBadge
                 assetId={version.asset_id}
                 kind="video"
-                hasRenderFinished={version.ready}
+                hasRenderFinished={
+                  version.ready &&
+                  !isCutShotVersionShownAsRendering(shot, version)
+                }
               />
             </div>
 
@@ -74,7 +79,7 @@ export const CutShotVersionList: React.FC<Props> = ({
                 >
                   {version.name ?? version.asset_id}
                 </Text>
-                {isCutShotVersionRendering(version) && (
+                {isCutShotVersionShownAsRendering(shot, version) && (
                   <Text variant="2xs" color="glyph-tertiary">
                     {t("script_project.version_not_ready.label")}
                   </Text>
@@ -88,7 +93,11 @@ export const CutShotVersionList: React.FC<Props> = ({
 
               <button
                 type="button"
-                disabled={!version.ready || isBusy}
+                disabled={
+                  !version.ready ||
+                  isBusy ||
+                  isCutShotVersionShownAsRendering(shot, version)
+                }
                 onClick={() => onPin(isPinned ? null : version.asset_id)}
                 aria-pressed={isPinned}
                 data-testid={`cut-version-pin-${version.asset_id}`}

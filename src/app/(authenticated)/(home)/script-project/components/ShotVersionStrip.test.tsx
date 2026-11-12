@@ -1,6 +1,6 @@
 import { orderCutShotVersionsForDisplay } from "@domains/scriptProject/utils/orderCutShotVersionsForDisplay";
 import { CutShot, ProjectCutSchema } from "@schemas/scriptProject";
-import { fireEvent } from "@testing-library/react";
+import { fireEvent, within } from "@testing-library/react";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
 import { renderWithProviders } from "@/test-utils/renderWithProviders";
@@ -83,7 +83,11 @@ describe("inline version review", () => {
       screen.getByTestId("shot-card-version-new-take")
     ).toBeInTheDocument();
     expect(screen.queryByText(/^Rendered /)).toBeNull();
-    fireEvent.click(screen.getByRole("button", { name: "Play preview" }));
+    fireEvent.click(
+      within(screen.getByTestId("shot-card-version-take")).getByRole("button", {
+        name: "Play preview"
+      })
+    );
     expect(screen.queryByTestId("shot-card-version-new-take")).toBeNull();
     fireEvent.click(screen.getByTestId("shot-card-version-more-take"));
     expect(
@@ -93,7 +97,32 @@ describe("inline version review", () => {
     const restored = renderWithProviders(<ShotVersionStrip {...props} />);
     expect(restored.queryByTestId("shot-card-version-new-take")).toBeNull();
   });
-  it("leaves the shown version out, pins another and passes provenance to the reuse action", async () => {
+  it("flags an auto-pinned version as new until it is played", () => {
+    const screen = renderWithProviders(
+      <ShotVersionStrip
+        projectId="project"
+        {...withVersionsInDisplayOrder({ ...shot, pinned_asset_id: "shown" })}
+        outputSize={[1024, 576]}
+        isBusy={false}
+        onPin={vi.fn()}
+        onReuseSettings={vi.fn()}
+      />
+    );
+    expect(
+      screen.getByTestId("shot-card-version-pinned-shown")
+    ).toBeInTheDocument();
+    expect(
+      screen.getByTestId("shot-card-version-new-shown")
+    ).toBeInTheDocument();
+    fireEvent.click(
+      within(screen.getByTestId("shot-card-version-shown")).getByRole(
+        "button",
+        { name: "Play preview" }
+      )
+    );
+    expect(screen.queryByTestId("shot-card-version-new-shown")).toBeNull();
+  });
+  it("keeps the shown version in the list, pins another and passes provenance to the reuse action", async () => {
     const onPin = vi.fn(),
       onReuseSettings = vi.fn();
     const screen = renderWithProviders(
@@ -106,7 +135,9 @@ describe("inline version review", () => {
         onReuseSettings={onReuseSettings}
       />
     );
-    expect(screen.queryByTestId("shot-card-version-shown")).toBeNull();
+    expect(
+      screen.getByTestId("shot-card-version-pinned-shown")
+    ).toHaveTextContent("Pinned");
     fireEvent.click(screen.getByTestId("shot-card-version-pin-take"));
     expect(onPin).toHaveBeenCalledWith("take");
     expect(screen.getByTestId("shot-card-version-pin-take")).toHaveTextContent(
@@ -117,5 +148,52 @@ describe("inline version review", () => {
       await screen.findByTestId("shot-card-version-more-take-reuse")
     );
     expect(onReuseSettings).toHaveBeenCalledWith(shot.versions[1]);
+  });
+  it("keeps a version in its place and labels it pinned after pinning", () => {
+    const props = {
+      projectId: "project",
+      outputSize: [1024, 576] as [number, number],
+      isBusy: false,
+      onPin: vi.fn(),
+      onReuseSettings: vi.fn(),
+      visibleVersionCount: 2
+    };
+    const screen = renderWithProviders(
+      <ShotVersionStrip {...props} {...withVersionsInDisplayOrder(shot)} />
+    );
+    fireEvent.click(screen.getByTestId("shot-card-version-pin-take"));
+    expect(props.onPin).toHaveBeenCalledWith("take");
+    screen.rerender(
+      <ShotVersionStrip
+        {...props}
+        {...withVersionsInDisplayOrder({ ...shot, pinned_asset_id: "take" })}
+      />
+    );
+    expect(
+      screen.getByTestId("shot-card-version-pinned-take")
+    ).toHaveTextContent("Pinned");
+    expect(
+      screen
+        .getAllByTestId(/^shot-card-version-(shown|take)$/u)
+        .map((card) => card.dataset.testid)
+    ).toEqual(["shot-card-version-shown", "shot-card-version-take"]);
+    expect(screen.queryByTestId("shot-card-version-new-take")).toBeNull();
+  });
+  it("keeps the pinned version visible even outside the newest-version limit", () => {
+    const screen = renderWithProviders(
+      <ShotVersionStrip
+        projectId="project"
+        outputSize={[1024, 576]}
+        isBusy={false}
+        onPin={vi.fn()}
+        onReuseSettings={vi.fn()}
+        visibleVersionCount={1}
+        {...withVersionsInDisplayOrder({ ...shot, pinned_asset_id: "take" })}
+      />
+    );
+    expect(screen.getByTestId("shot-card-version-shown")).toBeInTheDocument();
+    expect(
+      screen.getByTestId("shot-card-version-pinned-take")
+    ).toHaveTextContent("Pinned");
   });
 });

@@ -102,3 +102,6 @@ __pycache__/
 
 # Local Python parity-check dependencies
 /.uv-cache/
+
+# Feature demo videos (feature-demo-video skill)
+demo-videos/

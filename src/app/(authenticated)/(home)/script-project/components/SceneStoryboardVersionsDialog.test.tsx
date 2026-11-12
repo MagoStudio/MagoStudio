@@ -6,6 +6,9 @@ import { renderWithProviders } from "@/test-utils/renderWithProviders";
 
 import { SceneStoryboardVersionsDialog } from "./SceneStoryboardVersionsDialog";
 
+const OLDER_VERSION_OBJECT_URL =
+  "https://mago-assets.s3.us-east-1.amazonaws.com/older.png?X-Amz-Signature=abc";
+
 const sceneStoryboard = SceneStoryboardResponseSchema.parse({
   timeline_id: "scene",
   storyboard: {
@@ -27,7 +30,7 @@ const sceneStoryboard = SceneStoryboardResponseSchema.parse({
       {
         asset_id: "older",
         status: "success",
-        url: "https://cdn.example/older.png"
+        url: OLDER_VERSION_OBJECT_URL
       }
     ]
   }
@@ -62,6 +65,17 @@ describe("SceneStoryboardVersionsDialog", () => {
 
     fireEvent.click(screen.getByTestId("storyboard-version-unpin-pinned"));
     expect(screen.onPin).toHaveBeenCalledWith(null);
+  });
+
+  it("loads a version stored on S3 through the desktop media proxy", () => {
+    const screen = setup();
+    const versionImageSources = [
+      ...screen.baseElement.querySelectorAll("img")
+    ].map((image) => image.getAttribute("src"));
+    expect(versionImageSources).toContain(
+      `mago-media://cloud-storage/?url=${encodeURIComponent(OLDER_VERSION_OBJECT_URL)}`
+    );
+    expect(versionImageSources).toContain("https://cdn.example/pinned.png");
   });
 
   it("does not let a failed version be pinned", () => {

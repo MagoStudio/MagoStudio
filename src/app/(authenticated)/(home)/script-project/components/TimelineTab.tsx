@@ -5,6 +5,7 @@ import { useExportCut } from "@domains/scriptProject/useExportCut";
 import { useProjectCut } from "@domains/scriptProject/useProjectCut";
 import { useProjectOutputSize } from "@domains/scriptProject/useProjectOutputSize";
 import { useShotsByDropped } from "@domains/scriptProject/useShotsByDropped";
+import { useShotVersionReview } from "@domains/scriptProject/useShotVersionReview";
 import { buildCutTimelineClips } from "@domains/scriptProject/utils/buildCutTimelineClips";
 import { filterCutToActiveScript } from "@domains/scriptProject/utils/filterCutToActiveScript";
 import { useTranslation } from "react-i18next";
@@ -24,6 +25,7 @@ export const TimelineTab: React.FC<Props> = ({ projectId }) => {
   const { data: cut } = useProjectCut(projectId);
   const { outputSize, shotFrames } = useProjectOutputSize(projectId);
   const { shotsDroppedByRecast } = useShotsByDropped(projectId);
+  const { markVersionsViewed } = useShotVersionReview(projectId);
   const { cutShotsInActiveScript: shots } = filterCutToActiveScript(
     cut,
     shotsDroppedByRecast
@@ -35,6 +37,7 @@ export const TimelineTab: React.FC<Props> = ({ projectId }) => {
     isExportingCut,
     isDownloadingCut,
     downloadableShotCount,
+    isAnySceneInCutHiddenUntilDubLands,
     expectedRefusal,
     failedExport,
     dismissFailedExport
@@ -69,6 +72,7 @@ export const TimelineTab: React.FC<Props> = ({ projectId }) => {
             shots: failedExport.shotNumbers.join(", ")
           })}
           isDownloadingZip={isDownloadingCut}
+          isZipDownloadDisabled={isAnySceneInCutHiddenUntilDubLands}
           onCancel={dismissFailedExport}
           onDownloadZip={() => void downloadCutAsZipAndDismiss()}
         />
@@ -81,7 +85,11 @@ export const TimelineTab: React.FC<Props> = ({ projectId }) => {
         )}
         <MainButton
           colorScheme="primary"
-          isDisabled={downloadableShotCount === 0 || isExportingCut}
+          isDisabled={
+            downloadableShotCount === 0 ||
+            isExportingCut ||
+            isAnySceneInCutHiddenUntilDubLands
+          }
           loading={isExportingCut}
           onPress={() => void downloadCut()}
           data-testid="script-project-download-cut"
@@ -100,6 +108,10 @@ export const TimelineTab: React.FC<Props> = ({ projectId }) => {
           isCutPlaying={isCutPlaying}
           canCutPlay={canCutPlay}
           onTogglePlayback={toggleCutPlayback}
+          onClipPlay={(playedVersionAssetId) => {
+            if (playedVersionAssetId)
+              markVersionsViewed([playedVersionAssetId]);
+          }}
           onClipEnded={handleActiveClipEnded}
           onClipError={handleActiveClipError}
           registerClipVideoElement={registerClipVideoElement}

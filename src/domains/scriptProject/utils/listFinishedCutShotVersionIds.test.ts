@@ -3,15 +3,20 @@ import { describe, expect, it } from "vitest";
 
 import { listFinishedCutShotVersionIds } from "./listFinishedCutShotVersionIds";
 
-const versionWith = (assetId: string, ready: boolean) => ({
+const versionWith = (
+  assetId: string,
+  ready: boolean,
+  isAwaitingDub = false
+) => ({
   layer_id: "layer",
   asset_id: assetId,
   ready,
-  status: ready ? "finished" : "pending"
+  status: ready ? "finished" : "pending",
+  awaiting_dub: isAwaitingDub
 });
 
 describe("listFinishedCutShotVersionIds", () => {
-  it("lists the finished versions of shown and hidden scenes, leaving out ones still rendering", () => {
+  it("lists the finished versions of shown and hidden scenes, leaving out ones still rendering or awaiting their dub", () => {
     const cut = ProjectCutSchema.parse({
       project_id: "project",
       shots: [
@@ -21,7 +26,8 @@ describe("listFinishedCutShotVersionIds", () => {
           sequence_id: 1,
           versions: [
             versionWith("finished", true),
-            versionWith("rendering", false)
+            versionWith("rendering", false),
+            versionWith("awaiting-dub", true, true)
           ]
         }
       ],

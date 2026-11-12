@@ -34,7 +34,9 @@ import {
   requiredBundles
 } from "../shared/localModelManifest";
 
+import { normalizeComfyEndpoint } from "./comfy/normalizeComfyEndpoint";
 import { detectPriorSetup } from "./localSetup/detectPriorSetup";
+import { ModelSettingsStore } from "./modelSettings/ModelSettingsStore";
 import { resolveAppFolder } from "./resolveAppFolder";
 
 interface StoredSettings {
@@ -253,6 +255,21 @@ export class LibrarySettings {
   }
 
   async getScriptTextModel(): Promise<LocalScriptTextModel> {
+    return (
+      (await this.getScriptTextVariantOverride()) ??
+      this.getSetupScriptTextModel()
+    );
+  }
+
+  async getScriptTextVariantOverride(): Promise<LocalScriptTextModel | null> {
+    const modelSettings = await new ModelSettingsStore(
+      path.join(app.getPath("userData"), "model-settings.json")
+    ).endpoint(normalizeComfyEndpoint(await this.getComfyEndpoint()));
+    const variant = modelSettings.settings?.models.text?.variant;
+    return isLocalScriptTextModel(variant) ? variant : null;
+  }
+
+  async getSetupScriptTextModel(): Promise<LocalScriptTextModel> {
     const localLlmVariant = resolveSelectedHardwareVariant(
       findLocalModelGroup(SCRIPT_TEXT_MODEL_GROUP_ID),
       await this.getSelectedModelGroupVariants()

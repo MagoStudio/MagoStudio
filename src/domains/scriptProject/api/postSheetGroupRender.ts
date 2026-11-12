@@ -20,6 +20,7 @@ const referenceRenderModels: Record<string, string> = {
 
 export type RenderSheetGroupRequest = {
   projectId?: string;
+  isNewSheetGroup?: boolean;
   timelineId: string;
   token: string;
   name?: string;
@@ -35,6 +36,7 @@ export type RenderSheetGroupRequest = {
 
 export const postSheetGroupRender = async ({
   projectId,
+  isNewSheetGroup = false,
   timelineId,
   token,
   name,
@@ -66,7 +68,7 @@ export const postSheetGroupRender = async ({
     return SheetGenerateResultSchema.parse(response.data);
   }
   const [inputImageId, ...additionalReferences] = referenceAssetIds ?? [];
-  if (referenceAssetIds !== undefined)
+  if (referenceAssetIds !== undefined && !isNewSheetGroup)
     await patchSheetGroup({
       timelineId,
       token,
@@ -102,5 +104,15 @@ export const postSheetGroupRender = async ({
         : {})
     }
   });
+  if (referenceAssetIds !== undefined && isNewSheetGroup)
+    await patchSheetGroup({
+      timelineId,
+      token,
+      prompt,
+      referenceAssetIds,
+      referenceInstruction: inputImageId
+        ? (referenceInstruction?.trim() ?? "")
+        : null
+    });
   return null;
 };

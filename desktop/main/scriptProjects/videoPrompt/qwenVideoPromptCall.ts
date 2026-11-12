@@ -1,7 +1,11 @@
 import { buildStructuredPrompt } from "../casting/qwenStructuredCall";
 import { stripQwenReasoning } from "../stripQwenReasoning";
 
-import { SECTION_ORDER, type VideoPromptModelCall } from "./videoPrompt";
+import {
+  SCENE_OVERVIEW_MAX_WORDS,
+  SECTION_ORDER,
+  type VideoPromptModelCall
+} from "./videoPrompt";
 
 /**
  * The local stand-in for the composer's Gemini call. Gemini enforces the
@@ -35,9 +39,13 @@ export const VIDEO_PROMPT_SCHEMA: Record<string, unknown> = {
       type: "string",
       description: "ambience and physical sound, no dialogue"
     },
-    non_diegetic_music: { type: "string", description: "score, or N/A" }
+    non_diegetic_music: { type: "string", description: "score, or N/A" },
+    scene_overview: {
+      type: "string",
+      description: `2-4 sentences, at most ${SCENE_OVERVIEW_MAX_WORDS} words, heading the shot list`
+    }
   },
-  required: [...SECTION_ORDER]
+  required: [...SECTION_ORDER, "scene_overview"]
 };
 
 const problemsWith = (

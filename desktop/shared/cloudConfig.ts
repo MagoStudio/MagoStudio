@@ -31,6 +31,7 @@ export interface CloudConfig {
   signInNavigationHosts: string[];
   cloudStatusUrl: string;
   cloudStorageHosts: string[];
+  voicePreviewSources: string[];
 }
 
 /** Clerk keys are base64 of the frontend API host with a trailing `$`. */
@@ -96,7 +97,9 @@ export const resolveCloudConfig = (
     cloudStorageHosts:
       built.cloudStorageHosts ??
       environment.MAGO_CLOUD_STORAGE_HOSTS?.split(",") ??
-      defaults.cloudStorageHosts
+      defaults.cloudStorageHosts,
+    voicePreviewSources:
+      built.voicePreviewSources ?? defaults.voicePreviewSources
   };
 };
 
@@ -127,6 +130,7 @@ export const cloudOrigins = (
   backend: string | null;
   cloudStatus: string | null;
   media: string[];
+  voicePreviewAudio: string[];
 } => {
   const frontendApi = clerkFrontendApiHost(config.clerkPublishableKey);
   let backend: string | null = null;
@@ -139,6 +143,12 @@ export const cloudOrigins = (
     clerk: frontendApi ? `https://${frontendApi}` : null,
     backend,
     cloudStatus: originOf(config.cloudStatusUrl),
-    media: config.mediaHosts
+    media: config.mediaHosts,
+    voicePreviewAudio: backend
+      ? [
+          ...config.cloudStorageHosts.map((host) => `https://${host}`),
+          ...config.voicePreviewSources
+        ]
+      : []
   };
 };

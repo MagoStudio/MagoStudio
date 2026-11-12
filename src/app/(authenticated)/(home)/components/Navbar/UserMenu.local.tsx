@@ -1,6 +1,7 @@
 "use client";
 
 import { useComfyLaunchStatus } from "@app/components/LaunchComfyButton/hooks/useComfyLaunchStatus";
+import { refreshModelSettings } from "@app/components/LocalSetupWizard/utils/refreshModelSettings";
 import { Icon } from "@components/Icon";
 import { Modal } from "@components/Modal";
 import { TabMenuRegular } from "@components/TabMenuRegular";
@@ -32,6 +33,7 @@ import type {
 import { LocalAppVersion } from "./LocalAppVersion";
 import { LocalSettingsAccountTab } from "./LocalSettings/LocalSettingsAccountTab";
 import { LocalSettingsAttentionDot } from "./LocalSettings/LocalSettingsAttentionDot";
+import { LocalSettingsDebugTab } from "./LocalSettings/LocalSettingsDebugTab";
 import { LocalSettingsGeneralTab } from "./LocalSettings/LocalSettingsGeneralTab";
 import { LocalSettingsModelsTab } from "./LocalSettings/LocalSettingsModelsTab";
 import {
@@ -98,6 +100,7 @@ export function UserMenu() {
       if (id === endpointCheckId.current) {
         setComfyEndpoint(result.endpoint);
         setComfyStatus(result);
+        await refreshModelSettings(queryClient);
       }
     } catch (error) {
       if (id === endpointCheckId.current)
@@ -127,10 +130,9 @@ export function UserMenu() {
       vlmBackend
     ],
     queryFn: () =>
-      window.mago.comfy.scriptSetupStatus({
-        endpoint: comfyStatus?.endpoint,
-        scriptTextModel,
-        vlmBackend
+      window.mago.models.inspect({
+        model: "text",
+        endpoint: comfyStatus?.endpoint
       }),
     enabled: open && comfyStatus?.available === true && savedEndpointMatches,
     retry: false,
@@ -144,9 +146,13 @@ export function UserMenu() {
   const connectionHint = !savedEndpointMatches
     ? t("localSettings.hints.endpointUnchecked")
     : (comfyStatus?.message ?? t("localSettings.hints.comfyNotResponding"));
-  const textRequirements = textCheck.data?.optional.find(
-    (group) => group.id === "script-text"
-  )?.requirements;
+  const textRequirements = textCheck.data?.components.map((component) => ({
+    name: component.selectedFile,
+    status:
+      component.status === "installed" && !textCheck.data?.loadersAvailable
+        ? "missing"
+        : component.status
+  }));
   const requirementsReady = (requirements: typeof textRequirements) => {
     if (connectionReady === false || textCheck.isError) return false;
     if (textCheck.isFetching) return null;
@@ -285,6 +291,7 @@ export function UserMenu() {
         textModelProvider: status.textModelProvider
       });
       await Promise.all([
+        refreshModelSettings(queryClient),
         queryClient.invalidateQueries({ queryKey: ["settings-vlm-status"] }),
         queryClient.invalidateQueries({
           queryKey: ["settings-script-text-status"]
@@ -388,13 +395,17 @@ export function UserMenu() {
                 name: t("localSettings.tabs.account")
               },
               {
+                id: LOCAL_SETTINGS_TAB_IDS.general,
+                name: t("localSettings.tabs.general")
+              },
+              {
                 id: LOCAL_SETTINGS_TAB_IDS.models,
                 name: t("localSettings.tabs.models"),
                 badge: showsModelsTabAttention && <LocalSettingsAttentionDot />
               },
               {
-                id: LOCAL_SETTINGS_TAB_IDS.general,
-                name: t("localSettings.tabs.general")
+                id: LOCAL_SETTINGS_TAB_IDS.debug,
+                name: t("modelSettings.debugHeading")
               }
             ]}
           />
@@ -435,13 +446,17 @@ export function UserMenu() {
               isSavedComfyEndpointUnavailable={isSavedComfyEndpointUnavailable}
               onSetupMagoStudio={() => void saveComfyEndpoint()}
               onBeforeOpenComfyLaunch={saveComfyEndpoint}
-              selectedTextModel={usesCloudText ? "cloud" : scriptTextModel}
+              textModelProvider={textModelProvider}
               isCloudTextModelDisabled={
                 !isCloudAccountActive() || !providerPreferences["mago-cloud"]
               }
-              onTextModelChange={(textModel) => {
-                setTextModelProvider(textModel === "cloud" ? "cloud" : "local");
-                if (textModel !== "cloud") setScriptTextModel(textModel);
+              onTextModelChange={setTextModelProvider}
+              onModelSettingsSaved={async () => {
+                const settings = await window.mago.comfy.get();
+                setScriptTextModel(settings.scriptTextModel);
+                await queryClient.invalidateQueries({
+                  queryKey: queryKeys.comfySettings.all
+                });
               }}
               textModelReady={providerReady}
               textModelHint={providerHint}
@@ -456,6 +471,15 @@ export function UserMenu() {
               libraryError={libraryError}
               onChooseLibrary={() => void chooseLibrary()}
               onRevealLibrary={() => void window.mago.library.reveal()}
+            />
+          </TabPanel>
+          <TabPanel
+            id={LOCAL_SETTINGS_TAB_IDS.debug}
+            className="flex min-h-0 flex-1 flex-col overflow-hidden outline-hidden"
+          >
+            <LocalSettingsDebugTab
+              key={comfyEndpoint}
+              endpoint={comfyEndpoint}
             />
           </TabPanel>
         </Tabs>

@@ -61,6 +61,8 @@ describe("CutShotVersionPreview", () => {
         shot={shot}
         versionsInDisplayOrder={orderCutShotVersionsForDisplay(shot, new Map())}
         outputSize={[1920, 1080]}
+        isBusy={false}
+        onReuseSettings={vi.fn()}
       />
     );
 

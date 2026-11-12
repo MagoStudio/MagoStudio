@@ -5,6 +5,7 @@ import { isCutShotVersionNew } from "./isCutShotVersionNew";
 const finishedVersion = {
   asset_id: "take",
   ready: true,
+  awaiting_dub: false,
   upscale_of: null,
   timeline_upscale_of: null
 };
@@ -12,6 +13,12 @@ const finishedVersion = {
 describe("isCutShotVersionNew", () => {
   it("counts a finished version nobody has played as new", () => {
     expect(isCutShotVersionNew(finishedVersion, new Set())).toBe(true);
+  });
+
+  it("does not count a version awaiting its dub as new", () => {
+    expect(
+      isCutShotVersionNew({ ...finishedVersion, awaiting_dub: true }, new Set())
+    ).toBe(false);
   });
 
   it("does not count a played, unfinished or upscaled version as new", () => {

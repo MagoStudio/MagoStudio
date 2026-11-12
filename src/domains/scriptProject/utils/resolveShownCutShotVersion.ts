@@ -1,6 +1,6 @@
 import { CutShot, CutShotVersion } from "@schemas/scriptProject";
 
-import { isCutShotVersionRendering } from "./isCutShotVersionRendering";
+import { isCutShotVersionShownAsRendering } from "./isCutShotVersionShownAsRendering";
 import { resolveCutShotVersionAssetIdToShow } from "./resolveCutShotVersionAssetIdToShow";
 
 export const resolveShownCutShotVersion = (
@@ -12,5 +12,7 @@ export const resolveShownCutShotVersion = (
       version.asset_id ===
       resolveCutShotVersionAssetIdToShow(shot, versionsNewestFirst)
   ) ??
-  versionsNewestFirst.find((version) => !isCutShotVersionRendering(version)) ??
+  versionsNewestFirst.find(
+    (version) => !isCutShotVersionShownAsRendering(shot, version)
+  ) ??
   versionsNewestFirst[0];

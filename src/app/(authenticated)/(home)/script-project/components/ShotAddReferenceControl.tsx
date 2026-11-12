@@ -3,6 +3,7 @@ import { GhostButton } from "@components/GhostButton";
 import { Icon } from "@components/Icon";
 import { OverlayDialog } from "@components/OverlayDialog";
 import { Text } from "@components/Text";
+import { toDesktopCloudStorageUrl } from "@domains/asset/utils/toDesktopCloudStorageUrl";
 import { resolveSheetGroupPreviewImage } from "@domains/scriptProject/utils/resolveSheetGroupPreviewImage";
 import { getTagCategoryForSheetKind } from "@domains/scriptProject/utils/shotTagCategories";
 import { SheetGroup } from "@schemas/scriptProject";
@@ -90,7 +91,7 @@ export const ShotAddReferenceControl: React.FC<Props> = ({
                   <div className="aspect-square w-full overflow-hidden rounded-lg bg-element-primary">
                     {previewImageUrl ? (
                       <img
-                        src={previewImageUrl}
+                        src={toDesktopCloudStorageUrl(previewImageUrl)}
                         alt={group.name}
                         loading="lazy"
                         className="h-full w-full object-cover"

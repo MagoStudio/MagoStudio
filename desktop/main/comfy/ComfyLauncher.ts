@@ -4,6 +4,7 @@ import path from "node:path";
 
 import type { ComfyLaunchedProcess } from "../../shared/contracts";
 import type { LibrarySettings } from "../librarySettings";
+import { readModelMemoryPolicy } from "../modelSettings/modelRuntimeHooks";
 import { resolveAppFolder } from "../resolveAppFolder";
 
 import { extractComfyStartupFailureReason } from "./extractComfyStartupFailureReason";
@@ -229,12 +230,36 @@ export class ComfyLauncher {
     await mkdir(path.dirname(this.comfyOutputLogPath), { recursive: true });
     const comfyOutputLog = await open(this.comfyOutputLogPath, "w");
     try {
-      const child = spawn("cmd.exe", ["/d", "/s", "/c", "run_nvidia_gpu.bat"], {
-        cwd: directory,
-        detached: true,
-        stdio: ["ignore", comfyOutputLog.fd, comfyOutputLog.fd],
-        windowsHide: true
-      });
+      const lowVram = (await readModelMemoryPolicy(endpoint)) === "low-vram";
+      const launchScript = lowVram
+        ? await readFile(path.join(directory, "run_nvidia_gpu.bat"), "utf8")
+        : "";
+      const scriptFlags = /ComfyUI[\\/]main\.py["']?\s+([^\r\n]*)/i
+        .exec(launchScript)?.[1]
+        ?.match(/"[^"]*"|'[^']*'|\S+/g)
+        ?.filter(
+          (value) =>
+            !/^--(?:lowvram|normalvram|highvram|novram|gpu-only|cpu)$/.test(
+              value
+            ) && !/[&|<>%]/.test(value)
+        )
+        .map((value) => value.replace(/^["']|["']$/g, "")) ?? [
+        "--windows-standalone-build"
+      ];
+      const child = spawn(
+        lowVram
+          ? path.join(directory, "python_embeded", "python.exe")
+          : "cmd.exe",
+        lowVram
+          ? ["-s", "ComfyUI/main.py", ...scriptFlags, "--lowvram"]
+          : ["/d", "/s", "/c", "run_nvidia_gpu.bat"],
+        {
+          cwd: directory,
+          detached: true,
+          stdio: ["ignore", comfyOutputLog.fd, comfyOutputLog.fd],
+          windowsHide: true
+        }
+      );
       this.child = child;
       this.launchedProcessExit = null;
       child.once("exit", (exitCode: number | null) => {

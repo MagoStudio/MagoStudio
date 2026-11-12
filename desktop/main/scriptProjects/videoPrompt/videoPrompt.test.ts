@@ -2,6 +2,7 @@ import { describe, expect, it, vi } from "vitest";
 
 import {
   generateVideoPrompt,
+  LOCAL_VIDEO_PROMPT_ENGINE,
   PINNED_CAMERA,
   VideoPromptError
 } from "./videoPrompt";
@@ -118,6 +119,18 @@ describe("continuing from the previous shot", () => {
     expect(result.retention["<Picture 2>"]).toBe("partially_preserved");
   });
 
+  it("keeps the model's sections when its scene overview is not text", async () => {
+    const result = await generateVideoPrompt(
+      continuingPayload("cut"),
+      async () => ({
+        ...lookReferenceAnswer,
+        scene_overview: { text: "The courier talks." }
+      })
+    );
+    expect(result.fallback).toBe(false);
+    expect(result.scene_overview).toBeNull();
+  });
+
   it("briefs the model with a Continuity block", async () => {
     const sent: string[][] = [];
     await generateVideoPrompt(continuingPayload("cut"), async (contents) => {
@@ -159,5 +172,22 @@ describe("continuing from the previous shot", () => {
     ).toEqual(
       expect.objectContaining({ continuation: "pin", character_sheet: false })
     );
+  });
+});
+
+describe("local engine references", () => {
+  it("refuses an audio reference: character voice is cloud-only", async () => {
+    await expect(
+      generateVideoPrompt(
+        {
+          shot: { description: "x", duration_s: 6 },
+          references: [{ type: "reference_audio", asset_id: "voice" }]
+        },
+        async () => ({})
+      )
+    ).rejects.toMatchObject({
+      message: `${LOCAL_VIDEO_PROMPT_ENGINE} takes no audio references`,
+      status: 422
+    });
   });
 });

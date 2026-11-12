@@ -1,3 +1,4 @@
+import { LocalSetupWarningTooltip } from "@app/components/LocalSetupWizard/LocalSetupWarningTooltip";
 import type { RequiredLocalInstall } from "@app/components/LocalSetupWizard/requiredLocalInstall";
 import { SetupMagoStudioButton } from "@app/components/LocalSetupWizard/SetupMagoStudioButton";
 import { MainButton } from "@components/MainButton";
@@ -37,6 +38,19 @@ export const LaunchComfyOrSetupMagoStudioButton = ({
     const isReadyToLaunch = (await onBeforeOpenComfyLaunch?.()) ?? true;
     if (isReadyToLaunch) setComfyLaunchDialogOpen(true);
   };
+
+  if (lockedRenderButton)
+    return (
+      <LocalSetupWarningTooltip
+        isVisible={!isComfyLaunchDialogOpen}
+        placement="bottom"
+        message={t("localSetup.comfyLaunch.tooltip")}
+        actionLabel={t("localSetup.comfyLaunch.label")}
+        onAction={() => void openComfyLaunchDialog()}
+      >
+        {lockedRenderButton}
+      </LocalSetupWarningTooltip>
+    );
 
   return (
     <Tooltip

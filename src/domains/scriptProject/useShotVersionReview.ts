@@ -115,11 +115,16 @@ export const useShotVersionReview = (projectId: string) => {
         viewed: [...new Set([...current.viewed, ...finishedVersionIds])],
         isBaselineRecorded: true
       })),
-    markVersionsViewed: (ids: string[]) =>
+    markVersionsViewed: (ids: string[]) => {
+      const isEveryVersionAlreadyViewed = ids.every((id) =>
+        review.viewed.includes(id)
+      );
+      if (isEveryVersionAlreadyViewed) return;
       update((current) => ({
         ...current,
         viewed: [...new Set([...current.viewed, ...ids])]
-      })),
+      }));
+    },
     setVersionRating: (assetId: string, rating: -1 | 0 | 1) =>
       update((current) => {
         const ratings = { ...current.ratings };

@@ -2,6 +2,7 @@ import type {
   LocalModelGroupId,
   LocalModelGroupInstallState
 } from "./localModelGroups";
+import type { ModelSettingsApi } from "./modelSettings";
 import type { TextModelRequest, TextModelResponse } from "./textModelRequest";
 /**
  * Whether this window talks to cloud Mago at all.
@@ -533,6 +534,12 @@ export interface StarterInstallFile {
   downloadedBytes: number;
   state: "waiting" | "downloading" | "verifying" | "done" | "error";
 }
+export interface RequirementDownloadStatus {
+  phase: "downloading" | "paused" | "error" | "done";
+  downloadedBytes: number;
+  totalBytes: number | null;
+  error: string | null;
+}
 export interface StarterInstallStatus {
   hasCompletedInstall?: boolean;
   isComfyRestartNeeded?: boolean;
@@ -605,6 +612,7 @@ export interface LocalSetupFolderChoice {
 }
 
 export interface MagoDesktopApi {
+  models: ModelSettingsApi;
   textModel: {
     onRequest: (listener: (request: TextModelRequest) => void) => () => void;
     onCancel: (listener: (id: string) => void) => () => void;
@@ -641,6 +649,10 @@ export interface MagoDesktopApi {
       folderPath: string
     ) => Promise<LocalSetupFolderChoice>;
     pauseDownload: (name: string) => Promise<void>;
+    cancelDownload: (name: string) => Promise<void>;
+    requirementDownloadStatus: (
+      name: string
+    ) => Promise<RequirementDownloadStatus | null>;
     downloadRequirement: (
       name: string,
       options?: { replaceExistingNodePackIn?: string }
@@ -983,6 +995,10 @@ export interface MagoDesktopApi {
 }
 
 export const IPC_CHANNELS = {
+  modelSettingsInspect: "model-settings:inspect",
+  modelSettingsSave: "model-settings:save",
+  modelSettingsCheck: "model-settings:check",
+  modelSettingsDiagnostics: "model-settings:diagnostics",
   textModelRequest: "text-model:request",
   textModelResponse: "text-model:response",
   textModelReady: "text-model:ready",
@@ -1009,6 +1025,9 @@ export const IPC_CHANNELS = {
   cloudRenderFail: "cloud:render-fail",
   cloudRenderSetStatus: "cloud:render-set-status",
   localSetupPauseDownload: "local-setup:pause-download",
+  localSetupCancelDownload: "local-setup:cancel-download",
+  localSetupRequirementDownloadStatus:
+    "local-setup:requirement-download-status",
   localSetupDownloadRequirement: "local-setup:download-requirement",
   localSetupDownloadRequirements: "local-setup:download-requirements",
   localSetupProbeHardware: "local-setup:probe-hardware",

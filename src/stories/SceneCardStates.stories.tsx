@@ -6,6 +6,7 @@ import { ShotStoryboard } from "@domains/scriptProject/utils/findShotStoryboard"
 import { RenderMetrics } from "@domains/scriptProject/utils/renderMetricsTypes";
 import { SceneStoryboardView } from "@domains/scriptProject/utils/sceneStoryboardView";
 import { GenerateRunButton } from "@home/script-project/components/GenerateRunButton";
+import { NothingToGenerateReason } from "@home/script-project/components/NothingToGenerateReason";
 import { ShotRow } from "@home/script-project/components/ShotRow";
 import { ScenesLayout } from "@home/script-project/components/utils/scenesLayout";
 import { ScenesView } from "@home/script-project/components/utils/scenesView";
@@ -320,6 +321,9 @@ const SceneCard = ({
     changedPaths={example.changedPaths}
     onSaveSceneShots={doNothing}
     onSaveTags={doNothing}
+    voicedCharacterTokens={new Set()}
+    characterNamesWithoutVoice={[]}
+    untaggedSpeakers={[]}
     onRetryRender={doNothing}
     onPinVersion={doNothing}
     storyboard={
@@ -742,6 +746,12 @@ const ToolbarGenerateStates = () => (
         <p className="w-48 font-lato text-sm text-glyph-secondary">
           {state.title}
         </p>
+        <NothingToGenerateReason
+          reason={state.nothingToGenerateReason}
+          isPending={state.isPending ?? false}
+          isPriceLoading={state.isPriceLoading ?? false}
+          testId={`toolbar-generate-${state.title}`}
+        />
         <GenerateRunButton
           label="Generate"
           countLabel={state.countLabel}
@@ -749,7 +759,6 @@ const ToolbarGenerateStates = () => (
           isDisabled={state.isDisabled ?? false}
           isPending={state.isPending ?? false}
           isPriceLoading={state.isPriceLoading ?? false}
-          nothingToGenerateReason={state.nothingToGenerateReason}
           onPress={doNothing}
           testId={`toolbar-generate-${state.title}`}
         />

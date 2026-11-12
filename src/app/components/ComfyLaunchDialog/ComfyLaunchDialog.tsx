@@ -4,6 +4,7 @@ import {
 } from "@app/components/LaunchComfyButton/hooks/useComfyLaunchStatus";
 import { useOpenLocalSetupWizard } from "@app/components/LocalSetupWizard/hooks/useOpenLocalSetupWizard";
 import { LocalSetupStatusMark } from "@app/components/LocalSetupWizard/LocalSetupStatusMark";
+import { refreshModelSettings } from "@app/components/LocalSetupWizard/utils/refreshModelSettings";
 import { useMountEffect } from "@app/hooks/useMountEffect";
 import { CircularProgress } from "@components/CircularProgress";
 import { MainButton } from "@components/MainButton";
@@ -27,6 +28,7 @@ export const ComfyLaunchDialog = ({ onClose }: { onClose: () => void }) => {
   const { attempt, start, cancel } = useComfyLaunchAttempt({
     onComfyResponded: (comfyStatus) => {
       queryClient.setQueryData(COMFY_LAUNCH_STATUS_QUERY_KEY, comfyStatus);
+      void refreshModelSettings(queryClient);
       void queryClient.invalidateQueries({ queryKey: ["local-video-setup"] });
       void queryClient.invalidateQueries({ queryKey: ["local-script-setup"] });
       onClose();

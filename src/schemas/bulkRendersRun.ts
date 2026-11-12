@@ -110,7 +110,10 @@ export const BulkRendersRunStepListSchema = z.array(BulkRendersRunStepSchema);
 const BulkRendersRunInputSettingsSchema = z.looseObject({
   img2img_settings: BulkRendersRunSettingsSchema.nullish(),
   video_settings: BulkRendersRunSettingsSchema.nullish(),
-  timeline_ids: z.array(z.string()).default([])
+  timeline_ids: z
+    .array(z.string())
+    .nullish()
+    .transform((timelineIds) => timelineIds ?? [])
 });
 
 type BulkRendersRunInputSettings = z.infer<

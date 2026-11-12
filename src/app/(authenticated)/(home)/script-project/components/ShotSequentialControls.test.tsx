@@ -1,4 +1,9 @@
+import {
+  MINIMAX_H3_MAX_SHOT_RENDER_ENGINE,
+  ShotRenderEngine
+} from "@domains/scriptProject/constants";
 import { resolveSequentialShotConfig } from "@domains/scriptProject/utils/resolveSequentialShotConfig";
+import { VideoEngine } from "@models/video/types";
 import { ProjectStateSchema } from "@schemas/scriptProject";
 import { fireEvent } from "@testing-library/react";
 import { describe, expect, it, vi } from "vitest";
@@ -42,7 +47,8 @@ const renderControls = (
   sequential: object,
   sequentialPrompt: string | null,
   onChange = vi.fn(),
-  defaults?: object
+  defaults?: object,
+  shotEngine: ShotRenderEngine = MINIMAX_H3_MAX_SHOT_RENDER_ENGINE
 ) => {
   const state = parseState(sequential, sequentialPrompt, defaults);
   const [predecessorShot, shot] = state.shots;
@@ -51,6 +57,7 @@ const renderControls = (
       sequential={resolveSequentialShotConfig(shot!.sequential)}
       sequentialPromptDefaults={state.sequential_prompt_defaults}
       predecessorShot={predecessorShot!}
+      shotEngine={shotEngine}
       isDisabled={false}
       onChange={onChange}
       testIdSuffix={2}
@@ -212,6 +219,31 @@ describe("ShotSequentialControls", () => {
         { enabled: true, mode: "key_frames" },
         DEFAULT_TEXT
       ).screen.queryByTestId("shot-sequential-opening-frame-2")
+    ).toBeNull();
+  });
+
+  it("warns that Seedance 2.5 may not open exactly on the previous frame", () => {
+    const pinnedLastFrame = {
+      enabled: true,
+      mode: "last_frame",
+      opening_frame: "pin"
+    };
+    const hintTestId = "shot-sequential-opening-frame-prompt-only-hint-2";
+
+    const seedanceScreen = renderWithProviders(
+      renderControls(
+        pinnedLastFrame,
+        PIN_TEXT,
+        vi.fn(),
+        undefined,
+        VideoEngine.seedance_2_5
+      )
+    );
+    expect(seedanceScreen.queryByTestId(hintTestId)).not.toBeNull();
+    seedanceScreen.unmount();
+
+    expect(
+      setup(pinnedLastFrame, PIN_TEXT).screen.queryByTestId(hintTestId)
     ).toBeNull();
   });
 });

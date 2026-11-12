@@ -4,16 +4,23 @@ import { backendApiClient } from "@/lib/backend-api-client";
 
 import { listLocalBulkRendersRuns } from "./localBulkRendersRun";
 
+const hasRawTimelineList = (run: unknown): boolean => {
+  if (!run || typeof run !== "object" || Array.isArray(run)) return false;
+  const inputSettings = (run as Record<string, unknown>).input_settings;
+  return (
+    !!inputSettings &&
+    typeof inputSettings === "object" &&
+    Array.isArray((inputSettings as Record<string, unknown>).timeline_ids)
+  );
+};
+
 const parseCloudRuns = (value: unknown): BulkRendersRun[] =>
   !Array.isArray(value)
     ? []
     : value.flatMap((run) => {
+        if (!hasRawTimelineList(run)) return [];
         const parsed = BulkRendersRunSchema.safeParse(run);
-        // Scenario-agent plans have no timeline list and belong in Plans, not Bulk Rendering.
-        return parsed.success &&
-          Array.isArray(parsed.data.input_settings?.timeline_ids)
-          ? [parsed.data]
-          : [];
+        return parsed.success ? [parsed.data] : [];
       });
 
 export const fetchBulkRendersRuns = async (

@@ -1,12 +1,11 @@
 import { AssetDownloadIndicator } from "@components/AssetDownloadIndicator";
 import { CloseButton } from "@components/CloseButton";
+import { GhostButton } from "@components/GhostButton";
 import { Icon } from "@components/Icon";
 import { IconActionButton } from "@components/IconActionButton";
-import { MainButton } from "@components/MainButton";
 import { OverlayDialog } from "@components/OverlayDialog";
 import { PlayButton } from "@components/PlayButton";
 import { Text } from "@components/Text";
-import { Textarea } from "@components/Textarea";
 import { useCachedVideoPreview } from "@domains/asset/useCachedVideoPreview";
 import { useShotVersionComments } from "@domains/scriptProject/useShotVersionComments";
 import { useShotVersionRatings } from "@domains/scriptProject/useShotVersionRatings";
@@ -14,8 +13,10 @@ import { useViewedShotVersionIds } from "@domains/scriptProject/useViewedShotVer
 import { buildAspectFitStyle } from "@domains/scriptProject/utils/buildAspectFitStyle";
 import { formatShotTitle } from "@domains/scriptProject/utils/formatShotTitle";
 import { hasCutShotVersionRenderFailed } from "@domains/scriptProject/utils/hasCutShotVersionRenderFailed";
+import { isCutShotVersionShownAsRendering } from "@domains/scriptProject/utils/isCutShotVersionShownAsRendering";
 import { CutShotVersionsInDisplayOrder } from "@domains/scriptProject/utils/orderCutShotVersionsForDisplay";
 import { ProjectOutputSize } from "@domains/scriptProject/utils/projectOutputSize";
+import { resolveCutShotVersionVideo } from "@domains/scriptProject/utils/resolveCutShotVersionVideo";
 import { SHOT_FPS } from "@domains/scriptProject/utils/snapShotFrames";
 import { CutShot, CutShotVersion } from "@schemas/scriptProject";
 import { cn } from "@utils";
@@ -24,6 +25,8 @@ import { useTranslation } from "react-i18next";
 
 import { CutShotVersionRenderError } from "./CutShotVersionRenderError";
 import { CutShotVersionRenderSettingsBadge } from "./CutShotVersionRenderSettingsBadge";
+import { CutShotVersionReviewNotes } from "./CutShotVersionReviewNotes";
+import { CutShotVersionSettingsButton } from "./CutShotVersionSettingsButton";
 import { RenderMetricsBadge } from "./RenderMetricsBadge";
 
 const TICKS = 5;
@@ -38,26 +41,22 @@ const formatTime = (value: number) => {
 };
 
 const VersionPreview: React.FC<{
-  shotTimelineId: string;
+  shot: CutShot;
   version: CutShotVersion;
   outputSize: ProjectOutputSize;
   register: (id: string, video: HTMLVideoElement | null) => void;
   setVersionDuration: (id: string, duration: number) => void;
   onPlay: (assetId: string) => void;
-}> = ({
-  shotTimelineId,
-  version,
-  outputSize,
-  register,
-  setVersionDuration,
-  onPlay
-}) => {
+}> = ({ shot, version, outputSize, register, setVersionDuration, onPlay }) => {
   const { t } = useTranslation();
+  const versionVideo = resolveCutShotVersionVideo(shot, version);
+  const isVersionPlayable =
+    version.ready && !isCutShotVersionShownAsRendering(shot, version);
   const { videoFirstFrameUrl, playableVideoUrl } = useCachedVideoPreview({
-    assetId: version.asset_id,
-    videoUrl: version.url,
+    assetId: versionVideo.videoAssetId,
+    videoUrl: versionVideo.videoUrl,
     fps: SHOT_FPS,
-    enabled: version.ready
+    enabled: isVersionPlayable
   });
   const ref = useCallback(
     (video: HTMLVideoElement | null) => register(version.asset_id, video),
@@ -68,12 +67,14 @@ const VersionPreview: React.FC<{
       style={buildAspectFitStyle(outputSize)}
       className="relative mx-auto flex max-h-[min(42vh,400px)] items-center justify-center overflow-hidden rounded-lg bg-surface-primary"
     >
-      {version.ready && <AssetDownloadIndicator assetId={version.asset_id} />}
-      {version.ready && playableVideoUrl ? (
+      {isVersionPlayable && versionVideo.videoAssetId && (
+        <AssetDownloadIndicator assetId={versionVideo.videoAssetId} />
+      )}
+      {isVersionPlayable && playableVideoUrl ? (
         <video
           ref={ref}
           src={playableVideoUrl}
-          poster={videoFirstFrameUrl ?? version.poster_url ?? undefined}
+          poster={videoFirstFrameUrl ?? versionVideo.posterUrl ?? undefined}
           muted
           playsInline
           preload="auto"
@@ -86,12 +87,12 @@ const VersionPreview: React.FC<{
         />
       ) : hasCutShotVersionRenderFailed(version) ? (
         <CutShotVersionRenderError
-          shotTimelineId={shotTimelineId}
+          shotTimelineId={shot.timeline_id}
           version={version}
         />
-      ) : version.poster_url ? (
+      ) : versionVideo.posterUrl ? (
         <img
-          src={version.poster_url}
+          src={versionVideo.posterUrl}
           alt=""
           className="h-full w-full object-contain opacity-60"
         />
@@ -103,7 +104,7 @@ const VersionPreview: React.FC<{
       <RenderMetricsBadge
         assetId={version.asset_id}
         kind="video"
-        hasRenderFinished={version.ready}
+        hasRenderFinished={isVersionPlayable}
       />
     </div>
   );
@@ -138,9 +139,8 @@ export const CutShotVersionDialog: React.FC<Props> = ({
   const { ratingsByAssetId, setVersionRating } = useShotVersionRatings(
     projectId ?? ""
   );
-  const { commentsByAssetId, setVersionComment } = useShotVersionComments(
-    projectId ?? ""
-  );
+  const { commentsByAssetId, setVersionComment, appendScoringReview } =
+    useShotVersionComments(projectId ?? "");
   const { markVersionsViewed } = useViewedShotVersionIds(projectId ?? "");
   const videos = useRef(new Map<string, HTMLVideoElement>());
   const durations = useRef(new Map<string, number>());
@@ -223,8 +223,11 @@ export const CutShotVersionDialog: React.FC<Props> = ({
     }
     onOpenChange(open);
   };
-  const { versionsNewestFirst, pinnedVersionAssetId, versionNumberByAssetId } =
-    versionsInDisplayOrder;
+  const {
+    versionsNewestFirst,
+    displayedPinnedVersionAssetId,
+    versionNumberByAssetId
+  } = versionsInDisplayOrder;
 
   return (
     <OverlayDialog
@@ -250,7 +253,12 @@ export const CutShotVersionDialog: React.FC<Props> = ({
           data-testid={`cut-version-options-${shot.timeline_id}`}
         >
           {versionsNewestFirst.map((version) => {
-            const pinned = pinnedVersionAssetId === version.asset_id;
+            const isVersionShown = version.asset_id === shownVersionAssetId;
+            const isVersionPinned =
+              displayedPinnedVersionAssetId === version.asset_id;
+            const versionName = t("script_project.version_number.label", {
+              number: versionNumberByAssetId.get(version.asset_id)
+            });
             const rating = ratingsByAssetId[version.asset_id] ?? 0;
             const comments = commentsByAssetId[version.asset_id] ?? {
               good: "",
@@ -262,14 +270,14 @@ export const CutShotVersionDialog: React.FC<Props> = ({
                 key={version.asset_id}
                 className={cn(
                   "flex w-[360px] shrink-0 flex-col gap-3 rounded-xl border p-3",
-                  version.asset_id === shownVersionAssetId
+                  isVersionShown
                     ? "border-glyph-action-main"
                     : "border-element-primary"
                 )}
                 data-testid={`cut-version-option-${version.asset_id}`}
               >
                 <VersionPreview
-                  shotTimelineId={shot.timeline_id}
+                  shot={shot}
                   version={version}
                   outputSize={outputSize}
                   register={register}
@@ -283,14 +291,18 @@ export const CutShotVersionDialog: React.FC<Props> = ({
                       color="glyph-tertiary"
                       className="truncate"
                     >
-                      {t("script_project.version_number.label", {
-                        number: versionNumberByAssetId.get(version.asset_id)
-                      })}
+                      {versionName}
                     </Text>
                     <CutShotVersionRenderSettingsBadge
                       version={version}
                       className="pointer-events-none min-w-0 shrink-0"
                       testId={`cut-version-render-settings-${version.asset_id}`}
+                    />
+                    <CutShotVersionSettingsButton
+                      version={version}
+                      versionName={versionName}
+                      isBusy={isBusy}
+                      onReuseSettings={onReuseSettings}
                     />
                   </div>
                   <div className="flex gap-1">
@@ -336,68 +348,46 @@ export const CutShotVersionDialog: React.FC<Props> = ({
                   </div>
                 </div>
                 <div className="flex items-center gap-2">
-                  <MainButton
-                    size="sm"
-                    colorScheme="secondary"
-                    isDisabled={isBusy || !version.ready}
-                    onPress={() => onPin(pinned ? null : version.asset_id)}
-                  >
-                    {t(
-                      pinned
-                        ? "script_project.unpin_shot_version_button.label"
-                        : "script_project.pin_button.label"
-                    )}
-                  </MainButton>
-                  <IconActionButton
-                    size="sm"
-                    variant="dark"
-                    icon={<Icon iconSet="16" iconName="reuse" />}
-                    isDisabled={
-                      isBusy ||
-                      (!version.render_spec && !version.input_settings)
-                    }
-                    aria-label={t("script_project.reuse_settings_button.label")}
-                    onPress={() => onReuseSettings(version)}
-                    data-testid={`cut-version-reuse-${version.asset_id}`}
-                  />
-                </div>
-                {version.sent_prompt && (
-                  <label className="flex flex-col gap-1">
-                    <Text variant="2xs" color="glyph-tertiary">
-                      {t("script_project.sent_prompt_field.label")}
+                  {isVersionPinned ? (
+                    <GhostButton
+                      colorScheme="white"
+                      isDisabled={isBusy}
+                      onPress={() => onPin(null)}
+                      data-testid={`cut-version-unpin-${version.asset_id}`}
+                    >
+                      {t("script_project.unpin_shot_version_button.label")}
+                    </GhostButton>
+                  ) : isVersionShown ? (
+                    <Text variant="2xs" color="glyph-action-main">
+                      {t("script_project.shot_version_current.label")}
                     </Text>
-                    <Textarea
-                      readOnly
-                      className="min-h-16"
-                      autoResize
-                      value={version.sent_prompt}
-                      data-testid={`cut-version-sent-prompt-${version.asset_id}`}
-                    />
-                  </label>
-                )}
-                {(["good", "bad", "todo"] as const).map((field) => (
-                  <label key={field} className="flex flex-col gap-1">
-                    <Text variant="2xs" color="glyph-tertiary">
-                      {t(`script_project.version_review_${field}.label`)}
-                    </Text>
-                    <Textarea
-                      rows={2}
-                      resize="vertical"
-                      className="min-h-14"
-                      value={comments[field]}
-                      onChange={(event) =>
-                        setVersionComment(
-                          version.asset_id,
-                          field,
-                          event.target.value
-                        )
+                  ) : (
+                    <GhostButton
+                      colorScheme="white"
+                      isDisabled={
+                        isBusy ||
+                        !version.ready ||
+                        isCutShotVersionShownAsRendering(shot, version)
                       }
-                      placeholder={t(
-                        `script_project.version_review_${field}.placeholder`
-                      )}
-                    />
-                  </label>
-                ))}
+                      onPress={() => onPin(version.asset_id)}
+                      data-testid={`cut-version-use-${version.asset_id}`}
+                    >
+                      {t("script_project.pin_button.label")}
+                    </GhostButton>
+                  )}
+                </div>
+                <CutShotVersionReviewNotes
+                  assetId={version.asset_id}
+                  hasRenderFinished={
+                    version.ready &&
+                    !isCutShotVersionShownAsRendering(shot, version)
+                  }
+                  comments={comments}
+                  onChangeComment={(field, comment) =>
+                    setVersionComment(version.asset_id, field, comment)
+                  }
+                  appendScoringReview={appendScoringReview}
+                />
               </article>
             );
           })}

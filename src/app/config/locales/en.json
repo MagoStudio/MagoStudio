@@ -101,6 +101,7 @@
       "tooltip": "This model isn't installed yet. Add it to your setup."
     },
     "download": {
+      "downloadedSize": "{{received}} of {{total}} GB",
       "installingDependencies": "Installing node pack dependencies..."
     },
     "comfyRestart": {
@@ -117,7 +118,19 @@
     },
     "requirementDownload": {
       "savedNodePack": "Saved to {{savedTo}}. Pinned node pack SHA-256 verified and extracted with CRC checks.",
-      "savedModel": "Saved to {{savedTo}}. Check setup again after ComfyUI refreshes its model list."
+      "savedModel": "Saved to {{savedTo}}. Check setup again after ComfyUI refreshes its model list.",
+      "downloading": "Downloading...",
+      "resume": "Resume / retry...",
+      "downloadAndInstall": "Download and install...",
+      "download": "Download...",
+      "pause": "Pause",
+      "cancel": "Cancel",
+      "cancelDialog": {
+        "title": "Cancel this download?",
+        "description": "This stops the download of {{file}} and deletes the part downloaded so far.",
+        "back": "Back",
+        "delete": "Delete"
+      }
     },
     "nodePackUpdate": {
       "title": "Update this node pack?",
@@ -233,7 +246,9 @@
       "textModelLabel": "Text model",
       "textModelCloud": "Gemini (Mago cloud)",
       "textModelQwenQ3": "Qwen3.8 27B Q3 (local, lower memory)",
-      "textModelQwenQ5": "Qwen3.8 27B Q5 (local, higher quality)"
+      "textModelQwenQ5": "Qwen3.8 27B Q5 (local, higher quality)",
+      "comfyVersion": "ComfyUI {{version}}",
+      "comfyVersionTooOld": "Mago Studio needs ComfyUI {{required}} or later. Update ComfyUI, then restart it."
     },
     "general": {
       "heading": "Project folder",
@@ -723,11 +738,11 @@
     },
     "reset_settings": {
       "label": "Reset",
-      "description": ""
+      "description": "Restore the default settings."
     },
     "buy_credits": {
       "label": "Buy credits",
-      "description": ""
+      "description": "Add credits to your account."
     },
     "back_to_plans": {
       "label": "Back to page"
@@ -845,11 +860,11 @@
     },
     "dont_show_again": {
       "label": "Don't show again",
-      "description": ""
+      "description": "Hide this message in future."
     },
     "download": {
       "label": "Download",
-      "description": ""
+      "description": "Download the selected file."
     },
     "zoom_in": {
       "label": "Zoom in"
@@ -859,27 +874,27 @@
     },
     "duplicate_settings": {
       "label": "Duplicate settings",
-      "description": ""
+      "description": "Copy these settings for reuse."
     },
     "generate_image": {
       "label": "Generate image",
-      "description": ""
+      "description": "Generate an image with the current settings."
     },
     "generate_my_video": {
       "label": "Generate my video",
-      "description": ""
+      "description": "Generate a video with the current settings."
     },
     "play_tutorial": {
       "label": "Play tutorial video",
-      "description": ""
+      "description": "Watch the tutorial video."
     },
     "generate_frame": {
       "label": "Generate frame",
-      "description": ""
+      "description": "Generate a frame with the current settings."
     },
     "generate": {
       "label": "Generate",
-      "description": ""
+      "description": "Start generation with the current settings."
     },
     "setup_local_render": {
       "label": "Set up local render"
@@ -892,15 +907,15 @@
     },
     "hide_all_hints": {
       "label": "Hide all hints",
-      "description": ""
+      "description": "Hide hints throughout the editor."
     },
     "hide_details": {
       "label": "Hide details",
-      "description": ""
+      "description": "Collapse the details."
     },
     "iterate": {
       "label": "Iterate",
-      "description": ""
+      "description": "Use this Render Track as the input for further edits."
     },
     "loading_process": {
       "label": "Loading..."
@@ -939,29 +954,29 @@
     },
     "price_details": {
       "label": "Price details",
-      "description": ""
+      "description": "View the cost breakdown."
     },
     "test": {
       "label": "Test",
-      "description": ""
+      "description": "Run a test with the current settings."
     },
     "subscribe": {
       "label": "Subscribe",
-      "description": ""
+      "description": "Choose a subscription plan."
     },
     "to_my_projects": {
       "label": "To my projects"
     },
     "tweak_it": {
       "label": "Load settings",
-      "description": ""
+      "description": "Load these settings into the editor."
     },
     "upload_image": {
       "label": "Upload image"
     },
     "use_this": {
       "label": "Use this",
-      "description": ""
+      "description": "Use the selected result."
     },
     "use_this_frame_as": {
       "label": "Use this frame as:",
@@ -1288,11 +1303,11 @@
     },
     "frame_range": {
       "label": "Frame range",
-      "description": ""
+      "description": "The start and end frames selected for generation."
     },
     "generation_cost": {
       "label": "Generation cost",
-      "description": ""
+      "description": "The estimated credit cost of generation."
     },
     "modal_video_tutorial": {
       "label": "Mago tutorial video"
@@ -1479,19 +1494,19 @@
     },
     "setting_name": {
       "label": "Setting name",
-      "description": ""
+      "description": "The name of the setting."
     },
     "test_cost": {
       "label": "Test cost",
-      "description": ""
+      "description": "The estimated credit cost of the test."
     },
     "total_amount": {
       "label": "Total amount",
-      "description": ""
+      "description": "The total amount for this purchase."
     },
     "queue": {
       "label": "Queue",
-      "description": ""
+      "description": "View queued and running renders."
     },
     "create": {
       "label": "Create"
@@ -1501,7 +1516,7 @@
     },
     "allProjects": {
       "label": "All projects",
-      "description": ""
+      "description": "Browse your projects."
     },
     "modal_generate_image_from_frame": {
       "label": "Generate a stylized frame (img2img)"
@@ -1922,7 +1937,7 @@
       "description": "Couldn't start from this video. Please try again."
     },
     "create_project_upload_video": {
-      "label": "",
+      "label": "Start a project",
       "description": "To start working, create a project and upload a video"
     },
     "queue_completed_renders": {
@@ -2443,7 +2458,6 @@
     },
     "asset_references": {
       "label": "Reference images",
-      "hint": "Add up to {{count}} images and describe what to take from each.",
       "add": "Add reference",
       "instruction": "Reference instructions",
       "default_instruction": "Use these images as visual references for this entity.",
@@ -2756,9 +2770,6 @@
     "shot_version_current": {
       "label": "Current"
     },
-    "use_shot_version_button": {
-      "label": "Use this version"
-    },
     "unpin_shot_version_button": {
       "label": "Unpin"
     },
@@ -2791,10 +2802,6 @@
     },
     "sequence_timeline_changed_help": {
       "label": "Changed and eligible for bulk rerender"
-    },
-    "version_review_good": {
-      "label": "What works",
-      "placeholder": "Good details to preserve"
     },
     "version_review_bad": {
       "label": "What does not work",
@@ -2895,12 +2902,6 @@
     "effective_badge": {
       "label": "Will be used"
     },
-    "newer_version_badge": {
-      "label": "Newer version available"
-    },
-    "use_newest_button": {
-      "label": "Use this everywhere"
-    },
     "disable_entity_button": {
       "label": "Remove from cast"
     },
@@ -2928,10 +2929,6 @@
     "confirm_remove_entity_confirm_button": {
       "label": "Remove from cast"
     },
-    "rerender_button": {
-      "label": "Re-render",
-      "ariaLabel": "Render another version"
-    },
     "render_button": {
       "label": "Render",
       "ariaLabel": "Render this slot"
@@ -2944,9 +2941,6 @@
     },
     "entity_prompt_input": {
       "label": "Render prompt"
-    },
-    "prompt_is_sent_hint": {
-      "label": "What the image model receives when rendering this reference."
     },
     "no_images": {
       "label": "No image yet"
@@ -3083,7 +3077,7 @@
       "label": "2 MP"
     },
     "will_rerender_because": {
-      "label": "Will re-render — you changed: {{fields}}"
+      "label": "You changed: {{fields}}"
     },
     "changed_prompt": {
       "label": "the prompt"
@@ -3347,7 +3341,7 @@
       "label": "Ignore sequential for this run ({{count}})"
     },
     "shot_blocked_sequential_unsupported_engine": {
-      "label": "Blocked — this engine cannot use a cross-scene reference yet. Only MiniMax can."
+      "label": "Blocked — this engine cannot use a cross-scene reference yet."
     },
     "shot_sequential_reference_ignored": {
       "label": "Renders without a reference — nothing before it to continue from."
@@ -3467,9 +3461,6 @@
     "update_storyboard_failed": {
       "description": "Could not update the storyboard. Try again."
     },
-    "sent_prompt_field": {
-      "label": "Prompt sent to the video model"
-    },
     "generate_scene_button": {
       "label": "Generate ({{seconds}} sec)"
     },
@@ -3546,11 +3537,8 @@
     "uploaded_badge": {
       "label": "Uploaded"
     },
-    "pinned_upload_hint": {
-      "label": "Your image is pinned — bulk runs skip this entity."
-    },
     "add_entity_button": {
-      "label": "Add entity"
+      "label": "Add asset"
     },
     "add_entity_name_input": {
       "label": "Name"
@@ -3567,10 +3555,7 @@
       "label": "The cast already has an entity with this name."
     },
     "draft_entity_hint": {
-      "label": "Render it, or drop in an image, to save it. Until then it is not saved."
-    },
-    "discard_draft_entity_button": {
-      "ariaLabel": "Discard new entity"
+      "label": "Generate it, or drop in an image, to save it. Until then it is not saved."
     },
     "add_reference_button": {
       "label": "Add reference"
@@ -3586,28 +3571,121 @@
     },
     "reuse_settings_button": {
       "label": "Reuse settings",
-      "ariaLabel": "Load this version's settings into the prompt"
+      "ariaLabel": "Load this version's settings"
     },
     "image_inputs_title": {
       "label": "What went into {{version}}"
     },
-    "image_inputs_loading": {
-      "label": "Loading inputs…"
-    },
-    "image_inputs_model": {
-      "label": "Model · {{model}}"
-    },
-    "image_inputs_size": {
-      "label": "Size · {{width}}×{{height}}"
-    },
     "image_inputs_missing": {
-      "label": "This version recorded no prompt."
+      "label": "This version recorded no settings."
     },
     "cut_membership_count": {
       "label": "{{count}} of {{total}} in the cut"
     },
     "section_group_count": {
       "label": "{{count}}"
+    },
+    "asset_creation_form": {
+      "label": "Creation form"
+    },
+    "all_versions": {
+      "label": "All versions"
+    },
+    "create_asset": {
+      "label": "Create asset"
+    },
+    "upload_own_asset": {
+      "label": "I have my asset"
+    },
+    "voice": {
+      "add_voice_button": {
+        "label": "Add voice"
+      },
+      "edit_voice_button": {
+        "label": "Edit voice"
+      },
+      "save_voice_button": {
+        "label": "Save"
+      },
+      "no_voice_chosen": "No voice chosen yet.",
+      "connected_voice": {
+        "ariaLabel": "This character's voice is used"
+      },
+      "play_voice_button": {
+        "ariaLabel": "Play this character's voice"
+      },
+      "stop_voice_button": {
+        "ariaLabel": "Stop the voice"
+      },
+      "character_without_voice": {
+        "label": "{{name}} speaks in this scene but has no voice yet. Add one in Assets."
+      },
+      "untagged_speaker": {
+        "label": "{{name}} speaks but isn't in this shot. Their line will be heard off-screen."
+      },
+      "title": "Voice",
+      "eleven_labs_library": {
+        "title": "Select the voice for your character",
+        "all_languages": "All languages",
+        "language_dropdown": {
+          "ariaLabel": "Voice language"
+        },
+        "all_genders": "All voices",
+        "male_voices": "Male",
+        "female_voices": "Female",
+        "gender_dropdown": {
+          "ariaLabel": "Voice gender"
+        },
+        "play_preview_button": {
+          "ariaLabel": "Play {{name}}'s voice"
+        },
+        "all_ages": "All ages",
+        "kids_voices": "Kids",
+        "elderly_voices": "Elderly",
+        "age_dropdown": {
+          "ariaLabel": "Voice age"
+        },
+        "no_matching_voices": "No voices match these filters.",
+        "library_unavailable": "The voice library is unavailable right now. Try again later."
+      }
+    },
+    "generate_asset_version_button": {
+      "label": "Generate"
+    },
+    "all_my_versions_heading": {
+      "label": "All my versions"
+    },
+    "sequential_opening_frame_pin_prompt_only_hint": {
+      "label": "Seedance 2.5 follows the previous frame from the prompt only, so it may not open exactly on it."
+    },
+    "show_image_inputs_button": {
+      "ariaLabel": "Show what went into this version"
+    },
+    "generate_entity_button": {
+      "label": "Generate"
+    },
+    "add_entity_way": {
+      "generate": "Generate asset",
+      "upload": "Upload my asset",
+      "upload_hint": "Upload here if you have your asset image and do not need to generate"
+    },
+    "add_entity_dialog_title": {
+      "label": "Add entity"
+    },
+    "version_settings_size": {
+      "label": "Size",
+      "value": "{{width}}×{{height}}"
+    },
+    "version_settings_duration": {
+      "label": "Duration"
+    },
+    "version_settings_render": {
+      "label": "Render"
+    },
+    "version_settings_panels": {
+      "label": "Panels",
+      "value_one": "{{count}} panel",
+      "value_other": "{{count}} panels"
     }
   },
   "bulk_rendering": {
@@ -4110,7 +4188,7 @@
       },
       "context_mode": {
         "label": "Stability",
-        "description": ""
+        "description": "Choose the stability level for the generated video."
       },
       "control_sdxl_xinsir_canny": {
         "label": "Canny",
@@ -4158,15 +4236,15 @@
       },
       "enable_unsampling": {
         "label": "Unsampling",
-        "description": ""
+        "description": "Enable unsampling for this render."
       },
       "enable_cache": {
         "label": "Cache",
-        "description": ""
+        "description": "Enable caching during video generation."
       },
       "weight_type": {
         "label": "Style mode",
-        "description": ""
+        "description": "Choose how the selected style is applied."
       },
       "mago_engine": {
         "label": "Mago Engine",
@@ -5595,5 +5673,111 @@
   },
   "authPage": {
     "continueOffline": "Skip and continue offline"
+  },
+  "modelSettings": {
+    "heading": "Model settings",
+    "modelType": "Model type",
+    "filesHeading": "Files & variants",
+    "loadHeading": "Load settings",
+    "debugHeading": "Debug info",
+    "provider": {
+      "cloud": "Cloud",
+      "local": "Local",
+      "cloudHint": "Gemini · Mago cloud",
+      "localHint": "Use the local text model"
+    },
+    "variant": "Model variant",
+    "automatic": "Automatic",
+    "workflowDefault": "Workflow default",
+    "automaticHint": "Follows setup: {{variant}}. Explicit choices are preserved.",
+    "manualHint": "Your choice overrides the setup recommendation.",
+    "component": "Component",
+    "roles": {
+      "main": "Main model",
+      "encoder": "Text encoder",
+      "vae": "VAE",
+      "videoVae": "Video VAE",
+      "audioVae": "Audio VAE",
+      "accelerator": "Accelerator",
+      "lora": "Workflow LoRA"
+    },
+    "currentFile": "Current file: {{file}}",
+    "selectExistingFile": "Select an installed file",
+    "file": "Existing model file",
+    "testCandidate": "Test candidate load",
+    "compatibilityHint": "File integrity, tensor compatibility, loader support and successful loading are separate checks. Load tests require an empty ComfyUI queue.",
+    "path": "Path: {{value}}",
+    "url": "Source URL: {{value}}",
+    "expectedHash": "Expected SHA-256: {{value}}",
+    "actualHash": "Actual SHA-256: {{value}}",
+    "remotePath": "Not available on this computer",
+    "unknown": "Unknown",
+    "notComputed": "Not computed",
+    "lastFileCheck": "Last check: {{check}} {{outcome}}, {{date}}",
+    "notCheckedYet": "Not checked yet",
+    "fileFailedLoadTest": "This file failed its last load test. Test it again before selecting it.",
+    "fileCheckKinds": {
+      "compatibility": "compatibility",
+      "load": "load test",
+      "hash": "file hash"
+    },
+    "fileCheckOutcomes": {
+      "passed": "passed",
+      "failed": "failed",
+      "inconclusive": "inconclusive"
+    },
+    "computeHash": "Compute file hash",
+    "loadMode": "Load mode",
+    "modes": {
+      "auto": "Automatic (partial GPU offload)",
+      "custom": "Custom GPU layers",
+      "all": "Full GPU offload",
+      "cpu": "CPU only"
+    },
+    "gpuLayers": "GPU layers",
+    "context": "Context length",
+    "batch": "Batch size",
+    "contextWarning": "Smaller contexts reduce the response budget and may not fit long scripts. Increase the context if the loader reports an oversized prompt.",
+    "cacheOffload": "Offload attention cache to GPU",
+    "memoryMap": "Memory-map model file",
+    "textRuntimeHint": "Automatic reserves memory for the context and runtime. Check the llama.cpp backend separately; a working image GPU does not prove text GPU acceleration.",
+    "memoryPolicy": "ComfyUI memory policy",
+    "serverPolicyHint": "Shared by all models on this ComfyUI host. Managed portable installs apply this at the next launch.",
+    "lowVram": "Low VRAM (restart ComfyUI)",
+    "restartRequired": "Restart ComfyUI when idle to apply this server memory policy.",
+    "encoderDevice": "Text encoder device",
+    "tiledDecode": "Tiled VAE decode",
+    "testLoad": "Test model load",
+    "saveLoad": "Save load settings",
+    "checkInstallation": "Check installation",
+    "repairRuntime": "Repair GPU runtime",
+    "probeHint": "Checks target the detected ComfyUI Python. A component load does not verify generation or combined workflow memory.",
+    "remoteProbeHint": "Local Python checks are unavailable for this connection. Run load and repair checks on the ComfyUI host.",
+    "savedRestart": "Saved. Restart ComfyUI when idle to apply the server memory policy.",
+    "saved": "Settings saved. Changes apply to the next model load.",
+    "operationFailed": "The model operation failed.",
+    "operationRunning": "Working… Model loads and runtime repairs can take several minutes.",
+    "checking": "Reading ComfyUI and model information…",
+    "supportReport": "Support report",
+    "copyReport": "Copy all debug info",
+    "debugHint": "Includes hardware, local paths, model sources, hashes, versions and recorded problems. Review before sharing.",
+    "copied": "Debug info copied",
+    "copyFallback": "Clipboard access failed. Select and copy the report text.",
+    "refresh": "Refresh diagnostics",
+    "recommendedFileSection": "Recommended model",
+    "localFilesSection": "Local files",
+    "notInstalled": "Not installed",
+    "recommendedFileMissing": "This file is not installed on the ComfyUI host yet.",
+    "fileInstalled": "{{file}}: installed",
+    "filePassedCheck": "{{file}}: passed a check",
+    "fileDetailsButton": "File details and tests",
+    "operationDetailsButton": "Show check details",
+    "missingNodesHeading": "Missing ComfyUI nodes for {{file}}",
+    "missingNodesHint": "This file cannot be used until these nodes are installed. Install them, restart ComfyUI, and the file is checked again.",
+    "missingWorkflowNodesHeading": "Missing ComfyUI nodes for {{model}}",
+    "missingWorkflowNodesHint": "{{model}} cannot run until these nodes are installed. Install them and restart ComfyUI.",
+    "llamaCppPackageMissing": "llama.cpp (llama-cpp-python) is not installed in ComfyUI's Python, so this model cannot run. Use Repair GPU runtime below to install it.",
+    "missingNodeNames": "Missing nodes: {{names}}",
+    "updateComfyUi": "Update ComfyUI"
   }
 }

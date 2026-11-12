@@ -161,11 +161,15 @@ describe("cloudOrigins", () => {
       mediaHosts: [],
       signInNavigationHosts: [],
       cloudStatusUrl: "",
-      cloudStorageHosts: []
+      cloudStorageHosts: ["mago-s3-prod.s3.amazonaws.com"],
+      voicePreviewSources: [
+        "https://storage.googleapis.com/eleven-public-prod/"
+      ]
     });
 
     expect(origins.clerk).toBeNull();
     expect(origins.backend).toBeNull();
     expect(origins.cloudStatus).toBeNull();
+    expect(origins.voicePreviewAudio).toEqual([]);
   });
 });

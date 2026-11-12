@@ -113,6 +113,7 @@ export type SheetImageSource = z.infer<typeof SheetImageSourceSchema>;
 
 const SheetImageSchema = z.object({
   asset_id: z.string(),
+  size: z.array(z.number()).nullable().optional(),
   clip_id: z.string(),
   name: z.string().nullable().optional(),
   status: z.string(),
@@ -133,6 +134,7 @@ const SheetImageSchema = z.object({
   /** Legacy desktop snapshots stored the same provenance under this key. */
   _local_render_spec: z.record(z.string(), z.unknown()).nullable().optional(),
   fingerprint: z.string().nullable().optional(),
+  reference_asset_ids: z.array(z.string()).nullable().optional(),
   /** This version's own description, or `null` if it has none yet. Presence
    * (`has_description`) rather than truthiness distinguishes "never described" from a
    * deliberate blank. */
@@ -142,6 +144,15 @@ const SheetImageSchema = z.object({
 
 export type SheetImage = z.infer<typeof SheetImageSchema>;
 
+const VoiceSignatureSchema = z.object({
+  provider: z.string(),
+  voice_id: z.string(),
+  library_voice_asset_id: z.string().nullable().optional(),
+  name: z.string().nullable().optional(),
+  tags: z.array(z.string()).optional(),
+  preview_url: TrustedAssetUrlSchema
+});
+export type VoiceSignature = z.infer<typeof VoiceSignatureSchema>;
 export const SheetGroupSchema = z.object({
   token: z.string(),
   name: z.string(),
@@ -171,6 +182,7 @@ export const SheetGroupSchema = z.object({
   selected_asset_id: z.string().nullable().default(null),
   effective_asset_id: z.string().nullable().default(null),
   effective_source: SheetImageSourceSchema.nullable().default(null),
+  voice_signature: VoiceSignatureSchema.nullable().optional(),
   images: z.array(SheetImageSchema).default([])
 });
 
@@ -344,6 +356,7 @@ const ShotStateSchema = z.object({
   }),
   references: z.record(z.string(), z.array(ShotReferenceSchema)).default({}),
   missing_references: z.array(MissingReferenceSchema).default([]),
+  dialogue_untagged_speakers: z.array(z.string()).catch([]),
   /** `null` when the Shot has never opted in to continuing from its predecessor. */
   sequential: SequentialShotConfigSchema.nullable().optional().catch(null),
   /** Read-only: the continuation text the render uses — the Shot's own `prompt_appendix`, else
@@ -450,7 +463,10 @@ const CutShotVersionSchema = z.object({
     .union([CutShotContinuationSchema, z.string()])
     .nullable()
     .optional(),
-  sent_prompt: z.string().nullable().optional()
+  sent_prompt: z.string().nullable().optional(),
+  awaiting_dub: z.boolean().nullable().optional(),
+  mixed_url: TrustedAssetUrlSchema.optional(),
+  mixed_asset_id: z.string().nullable().optional()
 });
 
 export type CutShotVersion = z.infer<typeof CutShotVersionSchema>;
@@ -465,11 +481,14 @@ const CutShotSchema = z.object({
   version_name: z.string().nullable().optional(),
   is_upscale: z.boolean().default(false),
   url: TrustedAssetUrlSchema,
+  mixed_asset_id: z.string().nullable().optional(),
   poster_url: TrustedAssetUrlSchema,
   versions: z.array(CutShotVersionSchema).default([])
 });
 
-export type CutShot = z.infer<typeof CutShotSchema>;
+export type CutShot = z.infer<typeof CutShotSchema> & {
+  isSceneHiddenUntilDubLands?: boolean;
+};
 
 const CutExportSchema = z.object({
   asset_id: z.string().nullable().optional(),
@@ -489,7 +508,9 @@ export const ProjectCutSchema = z.object({
   export: CutExportSchema.nullable().default(null)
 });
 
-export type ProjectCut = z.infer<typeof ProjectCutSchema>;
+export type ProjectCut = Omit<z.infer<typeof ProjectCutSchema>, "shots"> & {
+  shots: CutShot[];
+};
 
 const CutExportVideoProfileSchema = z.object({
   width: z.number().optional(),

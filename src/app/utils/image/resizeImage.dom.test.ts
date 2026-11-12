@@ -228,6 +228,18 @@ describe("resizeImage utilities", () => {
       expect(mockContext.drawImage).toHaveBeenCalled();
     });
 
+    it("names the output file with the extension of the output format", async () => {
+      const file = new File(["test"], "reference.png", { type: "image/png" });
+
+      const result = await resizeImageFromFile(file, {
+        maxWidth: 800,
+        imageFormat: "image/jpeg"
+      });
+
+      expect(result.name).toBe("reference.jpg");
+      expect(result.type).toBe("image/jpeg");
+    });
+
     it("should reject when blob creation fails", async () => {
       mockCanvas.toBlob = vi.fn((callback) => {
         callback(null);

@@ -42,11 +42,39 @@ const withVersionsInDisplayOrder = (shot: CutShot) => ({
 });
 
 describe("CutShotVersionPreview", () => {
+  it("shows the version's settings, not the sent prompt, to every user", async () => {
+    const shot = shotWithVersionStatus("completed");
+    const screen = renderWithProviders(
+      <CutShotVersionPreview
+        {...withVersionsInDisplayOrder({
+          ...shot,
+          versions: [
+            {
+              ...shot.versions[0]!,
+              sent_prompt: "Composed prompt for the model",
+              render_spec: {
+                kind: "shot",
+                video_prompt: "Follow the lone astronaut"
+              }
+            }
+          ]
+        })}
+        outputSize={[1024, 576]}
+        isBusy={false}
+        onReuseSettings={vi.fn()}
+      />
+    );
+    fireEvent.click(screen.getByTestId("cut-version-settings-button-asset"));
+    expect(await screen.findByText("Follow the lone astronaut")).toBeVisible();
+    expect(screen.queryByText("Composed prompt for the model")).toBeNull();
+  });
   it("shows the render error badge instead of the rendering gradient for an errored version", () => {
     const screen = renderWithProviders(
       <CutShotVersionPreview
         {...withVersionsInDisplayOrder(shotWithVersionStatus("error"))}
         outputSize={[1024, 576]}
+        isBusy={false}
+        onReuseSettings={vi.fn()}
       />
     );
     expect(screen.getByText("Unknown Error")).toBeInTheDocument();
@@ -57,33 +85,43 @@ describe("CutShotVersionPreview", () => {
       <CutShotVersionPreview
         {...withVersionsInDisplayOrder(shotWithVersionStatus("inprogress"))}
         outputSize={[1024, 576]}
+        isBusy={false}
+        onReuseSettings={vi.fn()}
       />
     );
     expect(screen.queryByText("Unknown Error")).toBeNull();
   });
 
-  it("opens the versions on a click on the video, but not on a click on its play button", () => {
-    const onOpenVersions = vi.fn();
-    const finishedShot = shotWithVersionStatus("completed");
+  it("names the version it shows, numbered like the versions below it", () => {
+    const shot = shotWithVersionStatus("completed");
     const screen = renderWithProviders(
       <CutShotVersionPreview
         {...withVersionsInDisplayOrder({
-          ...finishedShot,
-          versions: finishedShot.versions.map((version) => ({
-            ...version,
-            ready: true,
-            url: "https://assets.mago.studio/asset.mp4"
-          }))
+          ...shot,
+          versions: [
+            {
+              ...shot.versions[0]!,
+              asset_id: "newest",
+              created_at: "2026-10-02T12:00:00Z",
+              ready: true
+            },
+            {
+              ...shot.versions[0]!,
+              asset_id: "oldest",
+              created_at: "2026-10-01T12:00:00Z",
+              ready: true
+            }
+          ],
+          pinned_asset_id: "oldest"
         })}
         outputSize={[1024, 576]}
-        onOpenVersions={onOpenVersions}
+        isBusy={false}
+        onReuseSettings={vi.fn()}
       />
     );
 
-    fireEvent.click(screen.getByTestId("cut-version-video-asset-play"));
-    expect(onOpenVersions).not.toHaveBeenCalled();
-
-    fireEvent.click(screen.getByTestId("cut-version-video-asset"));
-    expect(onOpenVersions).toHaveBeenCalledTimes(1);
+    expect(screen.getByTestId("cut-version-name-oldest")).toHaveTextContent(
+      "Version 1"
+    );
   });
 });

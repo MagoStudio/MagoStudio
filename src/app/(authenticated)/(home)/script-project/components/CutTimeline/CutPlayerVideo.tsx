@@ -11,6 +11,8 @@ import { useTranslation } from "react-i18next";
 type Props = {
   clip: CutTimelineClip;
   isActive: boolean;
+  isClipPlaying: boolean;
+  onPlay: (playedVersionAssetId: string | null) => void;
   onEnded: () => void;
   onError: () => void;
   registerElement: (element: HTMLVideoElement | null) => void;
@@ -19,6 +21,8 @@ type Props = {
 export const CutPlayerVideo: React.FC<Props> = ({
   clip,
   isActive,
+  isClipPlaying,
+  onPlay,
   onEnded,
   onError,
   registerElement
@@ -35,10 +39,25 @@ export const CutPlayerVideo: React.FC<Props> = ({
     priority: isActive ? DOWNLOAD_PRIORITY.playback : DOWNLOAD_PRIORITY.project
   });
 
-  // Wait for the scheduled copy, then pin its source once playback starts.
-  const [pinnedVideoUrl, setPinnedVideoUrl] = useState<string>();
-  const videoUrl = pinnedVideoUrl ?? playableVideoUrl;
-  if (!videoUrl) {
+  const [pinnedSource, setPinnedSource] = useState({
+    videoUrl: playableVideoUrl,
+    assetId: clip.assetId,
+    versionAssetId: clip.versionAssetId
+  });
+  const isPinnedSourceAnOlderTake = pinnedSource.assetId !== clip.assetId;
+  const isPinnedSourceAwaitingCachedCopy =
+    !pinnedSource.videoUrl && !!playableVideoUrl;
+  if (
+    (isPinnedSourceAnOlderTake && !isClipPlaying) ||
+    isPinnedSourceAwaitingCachedCopy
+  ) {
+    setPinnedSource({
+      videoUrl: playableVideoUrl,
+      assetId: clip.assetId,
+      versionAssetId: clip.versionAssetId
+    });
+  }
+  if (!pinnedSource.videoUrl) {
     return isActive && !isDownloading ? (
       <CircularProgress aria-label={t("status.loading_video.label")} />
     ) : null;
@@ -47,10 +66,10 @@ export const CutPlayerVideo: React.FC<Props> = ({
   return (
     <video
       ref={registerElement}
-      src={videoUrl}
-      onPlay={() => setPinnedVideoUrl(playableVideoUrl)}
+      src={pinnedSource.videoUrl}
       preload="auto"
       playsInline
+      onPlay={() => onPlay(pinnedSource.versionAssetId)}
       onEnded={onEnded}
       onError={onError}
       className={cn(

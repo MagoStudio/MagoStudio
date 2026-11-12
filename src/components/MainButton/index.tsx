@@ -173,14 +173,18 @@ export const MainButton: React.FC<MainButtonProps> = ({
   };
 
   const handleKeyDownWhileAriaDisabled = (
-    event: React.KeyboardEvent<HTMLElement>
-  ) => {
-    if (
-      isAriaDisabledWithoutNativeDisable &&
-      (event.key === "Enter" || event.key === " ")
-    ) {
-      event.preventDefault();
+    event: React.KeyboardEvent<HTMLElement> & {
+      continuePropagation?: () => void;
     }
+  ) => {
+    const isPressKeyOnAriaDisabledButton =
+      isAriaDisabledWithoutNativeDisable &&
+      (event.key === "Enter" || event.key === " ");
+    if (isPressKeyOnAriaDisabledButton) {
+      event.preventDefault();
+      return;
+    }
+    event.continuePropagation?.();
   };
 
   const ariaDisabledAttrs = isAriaDisabledWithoutNativeDisable

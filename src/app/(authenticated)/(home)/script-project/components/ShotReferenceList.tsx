@@ -7,6 +7,7 @@ type Props = {
   chips: ShotReferenceChip[];
   imageUrlsByAssetId: Map<string, SheetImageUrls>;
   isBusy: boolean;
+  voicedCharacterTokens: ReadonlySet<string>;
   onRemoveReference: (chip: ShotReferenceChip) => void;
 };
 
@@ -14,6 +15,7 @@ export const ShotReferenceList: React.FC<Props> = ({
   chips,
   imageUrlsByAssetId,
   isBusy,
+  voicedCharacterTokens,
   onRemoveReference
 }) => {
   return chips.map((chip) => (
@@ -24,6 +26,9 @@ export const ShotReferenceList: React.FC<Props> = ({
         chip.assetId ? imageUrlsByAssetId.get(chip.assetId) : undefined
       }
       isBusy={isBusy}
+      hasVoice={
+        chip.category === "characters" && voicedCharacterTokens.has(chip.token)
+      }
       onRemove={() => onRemoveReference(chip)}
     />
   ));

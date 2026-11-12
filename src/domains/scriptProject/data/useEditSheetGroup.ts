@@ -17,6 +17,9 @@ export const useEditSheetGroup = (
       patchSheetGroup({ ...request, projectId: projectId ?? undefined }),
     onSuccess: () => {
       void queryClient.invalidateQueries({
+        queryKey: queryKeys.projectCut.byProjectId(projectId)
+      });
+      void queryClient.invalidateQueries({
         queryKey: queryKeys.projectState.byProjectId(projectId)
       });
     },

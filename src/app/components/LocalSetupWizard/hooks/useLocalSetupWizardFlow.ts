@@ -1,7 +1,7 @@
 /* oxlint-disable custom-react/no-use-effect -- synchronize hardware probing with the selected wizard step */
 /* oxlint-disable react-you-might-not-need-an-effect/no-event-handler -- no event ends these states; the timer that advances them is the external system being synchronised */
 import { useLocalSetupDebugSetting } from "@hooks/userLocalStorage/useLocalSetupDebugSetting";
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { useInterval } from "usehooks-ts";
@@ -19,6 +19,7 @@ import {
 } from "../localSetupWizardStubs";
 import { buildStarterInstallPreview } from "../utils/buildStarterInstallPreview";
 import { licensesForModelGroups } from "../utils/licensesForModelGroups";
+import { refreshModelSettings } from "../utils/refreshModelSettings";
 import { requiredBytesForModelGroups } from "../utils/requiredBytesForModelGroups";
 import { resolveModelGroupSelection } from "../utils/resolveModelGroupSelection";
 import { simulateStarterInstallProgress } from "../utils/simulateStarterInstallProgress";
@@ -358,6 +359,13 @@ export const useLocalSetupWizardFlow = () => {
     enabled: state.step === "download",
     refetchInterval: state.step === "download" ? INSTALLER_POLL_MS : false
   });
+  const queryClient = useQueryClient();
+  const installPhase = installer.data?.phase;
+  // The installer completes asynchronously while the wizard may be collapsed.
+  // Depend on the phase so subsequent "done" polls do not repeat the refresh.
+  useEffect(() => {
+    if (installPhase === "done") void refreshModelSettings(queryClient);
+  }, [installPhase, queryClient]);
   const installerCommand = async (command: "start" | "pause" | "cancel") => {
     setStorageError(null);
     try {
