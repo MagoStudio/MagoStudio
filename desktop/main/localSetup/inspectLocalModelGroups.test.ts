@@ -128,7 +128,8 @@ describe("inspectLocalModelGroups", () => {
                   "unet_name",
                   "vae_name",
                   "lora_name",
-                  "pdd_file"
+                  "pdd_file",
+                  "model_name"
                 ].map((input) => [input, ["COMBO", { options: filenames }]])
               )
             }

@@ -134,6 +134,22 @@ export const LOCAL_MODEL_BUNDLES: LocalModelBundle[] = [
         bytes: 620306000,
         sha256:
           "3be2d89ca3476ed952251463499896a4a323cce9d82af6d0e83609ceb4e1e25e"
+      },
+      {
+        targetPath:
+          "models/loras/MiniMax-H3_Ref2VA-LoRA-CrossView-Warp_v1_3500.safetensors",
+        url: "https://huggingface.co/Cseti/MiniMax-H3_Ref2VA-LoRA-CrossView-Warp_v1/resolve/main/MiniMax-H3_Ref2VA-LoRA-CrossView-Warp_v1_3500.safetensors",
+        bytes: 596452584,
+        sha256:
+          "aab492964261f6611ced672c70866ce9d64bab66fbd28fd39d26bcd09c852f91"
+      },
+      {
+        targetPath:
+          "models/geometry_estimation/moge_2_vitl_normal_fp16.safetensors",
+        url: "https://huggingface.co/Comfy-Org/MoGe/resolve/main/geometry_estimation/moge_2_vitl_normal_fp16.safetensors",
+        bytes: 661859924,
+        sha256:
+          "cb1a692d03235671e959e81360d7b4d9f44aefadb1f852d6ca6aa17799d5e31f"
       }
     ]
   },

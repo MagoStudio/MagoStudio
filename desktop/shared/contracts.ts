@@ -208,7 +208,8 @@ export type OptionalScriptSetupId =
   | "vlm-captioning"
   | "script-text"
   | "flux-klein-4b-sheet"
-  | "flux-klein-9b-sheet";
+  | "flux-klein-9b-sheet"
+  | "minimax-h3-new-camera-angle";
 
 export interface ScriptSetupStatus {
   comfyRoot?: string;

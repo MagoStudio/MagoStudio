@@ -192,6 +192,39 @@ describe("probeComfyRenderModel", () => {
     expect(requestedNodeNames).toContain("LoraLoaderModelOnly");
   });
 
+  it("requires the warp and depth nodes and the depth model for crossview", async () => {
+    const requestedNodeNames: string[] = [];
+    vi.stubGlobal(
+      "fetch",
+      vi.fn(async (url: string | URL | Request) => {
+        const nodeName = requestedNodeName(url);
+        requestedNodeNames.push(nodeName);
+        return Response.json(nodePayload(nodeName, installedFiles));
+      })
+    );
+
+    await expect(
+      probeComfyRenderModel("http://127.0.0.1:8188", "minimax_h3_local", {
+        h3_quality: "high",
+        vfx_mode: "crossview"
+      })
+    ).resolves.toMatchObject({
+      ready: false,
+      missingModels: [
+        "MiniMax-H3_Ref2VA-LoRA-CrossView-Warp_v1_3500.safetensors",
+        "moge_2_vitl_normal_fp16.safetensors"
+      ]
+    });
+    expect(requestedNodeNames).toEqual(
+      expect.arrayContaining([
+        "MiniMaxH3AddGuide",
+        "LoadMoGeModel",
+        "MoGeInference",
+        "CrossViewWarp"
+      ])
+    );
+  });
+
   it("skips the guide node when the VFX mode keeps the source as a reference", async () => {
     const requestedNodeNames: string[] = [];
     vi.stubGlobal(

@@ -18,6 +18,11 @@ import { IMAGE_UPLOAD_LIMITS } from "@utils/image/imageUploadLimits";
 
 import {
   doesMiniMaxH3VfxModeKeepSourceShape,
+  doesMiniMaxH3VfxModeTakeSourceAudio,
+  MINIMAX_H3_CROSSVIEW_AZIMUTH_RANGE,
+  MINIMAX_H3_CROSSVIEW_DEFAULT_AZIMUTH_DEGREES,
+  MINIMAX_H3_CROSSVIEW_DEFAULT_ELEVATION_DEGREES,
+  MINIMAX_H3_CROSSVIEW_DEFAULT_LORA_STRENGTH,
   MINIMAX_H3_VFX_DEFAULT_LORA_STRENGTH,
   MINIMAX_H3_VFX_LORA_STRENGTH_RANGE,
   type MiniMaxH3VfxMode,
@@ -95,7 +100,8 @@ const MINIMAX_H3_VFX_MODE_OPTIONS: {
   { value: "vfx_edit", label: "VFX edit" },
   { value: "head_swap", label: "Head swap" },
   { value: "character_swap", label: "Character swap" },
-  { value: "style_transfer", label: "Style transfer" }
+  { value: "style_transfer", label: "Style transfer" },
+  { value: "crossview", label: "New camera angle" }
 ];
 
 const isVfxModeSelected = (
@@ -119,6 +125,13 @@ const doesVfxModeKeepSourceShape = (
   settings: Record<string, unknown>
 ): boolean =>
   doesMiniMaxH3VfxModeKeepSourceShape(
+    resolveMiniMaxH3VfxMode(settings.vfx_mode)
+  );
+
+const doesVfxModeTakeSourceAudio = (
+  settings: Record<string, unknown>
+): boolean =>
+  doesMiniMaxH3VfxModeTakeSourceAudio(
     resolveMiniMaxH3VfxMode(settings.vfx_mode)
   );
 
@@ -262,6 +275,24 @@ export const minimaxH3LocalModel: VideoModelDefinition = {
               hidingCondition: () => true
             },
             {
+              key: "crossview_azimuth",
+              secondKey: "crossview_elevation",
+              type: "number",
+              label: "New camera view",
+              tooltip:
+                "Drag the camera, or use the arrow keys, to choose the new viewpoint around the subject. The filled zone holds the checked angles, tested by the LoRA's author. The hatched zone holds angles that were trained but are less reliable. The view shows only the angles the camera can reach: 90° left or right, 45° up or down.",
+              ui: "CrossviewCameraView",
+              min: MINIMAX_H3_CROSSVIEW_AZIMUTH_RANGE.min,
+              max: MINIMAX_H3_CROSSVIEW_AZIMUTH_RANGE.max,
+              step: 1,
+              defaultValue: MINIMAX_H3_CROSSVIEW_DEFAULT_AZIMUTH_DEGREES,
+              secondDefaultValue:
+                MINIMAX_H3_CROSSVIEW_DEFAULT_ELEVATION_DEGREES,
+              nullable: false,
+              hidingCondition: (settings) =>
+                !isVfxModeSelected(settings, "crossview")
+            },
+            {
               key: "source_image_slot",
               type: "string",
               label: "Edited frame",
@@ -289,8 +320,20 @@ export const minimaxH3LocalModel: VideoModelDefinition = {
                 "Describe your render. Refer to references as <Picture n> and <Video n>. Optimize prompt rewrites it with those tags, on local Qwen3.8 or on Mago cloud depending on the text model setting.",
               ui: "PromptWithAdaptI2vButton",
               defaultValue: MINIMAX_H3_MULTIPURPOSE_DEFAULT_PROMPT,
-              nullable: false,
-              errorMessage: "You need to add a prompt",
+              nullable: true,
+              customValidation: (value, allValues) => {
+                const isPromptRequired = !isVfxModeSelected(
+                  allValues,
+                  "crossview"
+                );
+                const isPromptEmpty =
+                  typeof value !== "string" || value.trim() === "";
+                return isPromptRequired && isPromptEmpty
+                  ? "You need to add a prompt"
+                  : null;
+              },
+              hidingCondition: (settings) =>
+                isVfxModeSelected(settings, "crossview"),
               specificConfig: {
                 hideAutoPrompt: true,
                 doubleHeight: true,
@@ -380,7 +423,9 @@ export const minimaxH3LocalModel: VideoModelDefinition = {
                 "Carry the source video's own soundtrack into the render. Turn off to let the model invent a soundtrack instead.",
               ui: "CheckboxInput",
               defaultValue: true,
-              nullable: false
+              nullable: false,
+              hidingCondition: (settings) =>
+                !doesVfxModeTakeSourceAudio(settings)
             },
             {
               key: "vfx_lora_strength",
@@ -394,7 +439,24 @@ export const minimaxH3LocalModel: VideoModelDefinition = {
               step: 0.05,
               defaultValue: MINIMAX_H3_VFX_DEFAULT_LORA_STRENGTH,
               nullable: false,
-              hidingCondition: (settings) => isVfxModeSelected(settings, "none")
+              hidingCondition: (settings) =>
+                isVfxModeSelected(settings, "none") ||
+                isVfxModeSelected(settings, "crossview")
+            },
+            {
+              key: "crossview_lora_strength",
+              type: "number",
+              label: "VFX LoRA strength",
+              tooltip:
+                "How strongly the camera LoRA applies. 0.8 is the author's recommended strength; 0 renders without it.",
+              ui: "SliderAndNumberInputFullWidth",
+              min: MINIMAX_H3_VFX_LORA_STRENGTH_RANGE.min,
+              max: MINIMAX_H3_VFX_LORA_STRENGTH_RANGE.max,
+              step: 0.05,
+              defaultValue: MINIMAX_H3_CROSSVIEW_DEFAULT_LORA_STRENGTH,
+              nullable: false,
+              hidingCondition: (settings) =>
+                !isVfxModeSelected(settings, "crossview")
             },
             {
               key: "aspect_ratio",

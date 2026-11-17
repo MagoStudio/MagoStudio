@@ -20,6 +20,7 @@ import {
   QWEN3_VL_HERETIC_MODEL_SOURCE
 } from "../vlm/vlmModelFiles";
 
+import { MINIMAX_H3_CROSSVIEW_MODEL_FILES } from "./minimaxH3VfxLoraFiles";
 import type { ModelFile } from "./probeScriptSetup";
 
 type OptionalSetup = {
@@ -213,5 +214,16 @@ export const optionalScriptSetups = (
     files: FLUX2_KLEIN_MODEL_FILES["flux2-klein-9b-q8"],
     unetRepo: "unsloth/FLUX.2-klein-9B-GGUF",
     textEncoderRepo: "Comfy-Org/vae-text-encorder-for-flux-klein-9b"
-  })
+  }),
+  {
+    id: "minimax-h3-new-camera-angle",
+    title: "MiniMax H3 — New camera angle",
+    nodes: [
+      "MiniMaxH3AddGuide",
+      "LoadMoGeModel",
+      "MoGeInference",
+      "CrossViewWarp"
+    ],
+    files: MINIMAX_H3_CROSSVIEW_MODEL_FILES
+  }
 ];

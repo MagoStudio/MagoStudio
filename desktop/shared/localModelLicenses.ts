@@ -55,6 +55,20 @@ export const LOCAL_MODEL_LICENSES: LocalModelLicense[] = [
     licenseUrl: MINIMAX_H3_LICENSE_URL,
     isPermissiveLicense: false
   },
+  {
+    modelName: "MiniMax H3 New camera angle LoRA",
+    huggingFaceRepo: "Cseti/MiniMax-H3_Ref2VA-LoRA-CrossView-Warp_v1",
+    licenseName: "MiniMax H3 Community License",
+    licenseUrl: MINIMAX_H3_LICENSE_URL,
+    isPermissiveLicense: false
+  },
+  {
+    modelName: "MoGe 2 depth model",
+    huggingFaceRepo: "Comfy-Org/MoGe",
+    licenseName: "MIT",
+    licenseUrl: huggingFaceRepoPage("Comfy-Org/MoGe"),
+    isPermissiveLicense: true
+  },
   apacheLicensedModel(
     "Qwen3-VL 4B Heretic",
     "ethanfel/Qwen3-VL-4B-Heretic-ComfyUI-ConvRot-INT8"
