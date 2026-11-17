@@ -163,7 +163,8 @@ describe("ComfyMiniMaxH3Client", () => {
         useReferenceVideoAudio: true,
         vfxMode: "none",
         isEditedFrameProvided: false,
-        vfxLoraStrength: 1
+        vfxLoraStrength: 1,
+        crossviewCamera: { azimuthDegrees: 30, elevationDegrees: 0 }
       })
     ).rejects.toThrow("MiniMax H3 needs a source video or a reference image");
   });
@@ -181,19 +182,42 @@ describe("ComfyMiniMaxH3Client", () => {
         useReferenceVideoAudio: true,
         vfxMode: "head_swap",
         isEditedFrameProvided: false,
-        vfxLoraStrength: 1
+        vfxLoraStrength: 1,
+        crossviewCamera: { azimuthDegrees: 30, elevationDegrees: 0 }
       })
     ).rejects.toThrow("This VFX mode needs a reference image");
+  });
+
+  it("refuses a new camera angle without the source video", async () => {
+    await expect(
+      new ComfyMiniMaxH3Client("http://127.0.0.1:8188").submitMiniMaxH3({
+        prompt: "",
+        width: 720,
+        height: 1280,
+        durationSeconds: 5,
+        quality: "high",
+        referenceImagePaths: ["/library/reference.png"],
+        useReferenceVideoAudio: true,
+        vfxMode: "crossview",
+        isEditedFrameProvided: false,
+        vfxLoraStrength: 0.8,
+        crossviewCamera: { azimuthDegrees: 30, elevationDegrees: 0 }
+      })
+    ).rejects.toThrow("MiniMax H3 VFX modes need the source video");
   });
 });
 
 describe("buildMiniMaxH3LocalGraph with a VFX LoRA", () => {
   const vfxGraphInput = (
-    mode: "vfx_edit" | "character_swap",
+    mode: "vfx_edit" | "character_swap" | "crossview",
     overrides: Partial<MiniMaxH3LocalGraphInput> = {}
   ) =>
     graphInput({
-      vfxLora: { lora: resolveMiniMaxH3VfxLora(mode, false)!, strength: 0.7 },
+      vfxLora: {
+        lora: resolveMiniMaxH3VfxLora(mode, false)!,
+        strength: 0.7,
+        crossviewCamera: { azimuthDegrees: -60, elevationDegrees: 10 }
+      },
       ...overrides
     });
 
@@ -259,6 +283,39 @@ describe("buildMiniMaxH3LocalGraph with a VFX LoRA", () => {
     expect(graph["8"]?.inputs["ref_videos.ref_video_0"]).toEqual(["40", 0]);
     expect(graph["18"]).toBeUndefined();
     expect(graph["10"]?.inputs.conditioning).toEqual(["8", 0]);
+  });
+
+  it("warps the source clip into the guide and keeps it as <Video 1> for crossview", () => {
+    const graph = buildMiniMaxH3LocalGraph(vfxGraphInput("crossview"));
+
+    expect(graph["8"]?.inputs["ref_videos.ref_video_0"]).toEqual(["40", 0]);
+    expect(graph["41"]).toMatchObject({
+      class_type: "LoadMoGeModel",
+      inputs: { model_name: "moge_2_vitl_normal_fp16.safetensors" }
+    });
+    expect(graph["42"]).toMatchObject({
+      class_type: "MoGeInference",
+      inputs: { moge_model: ["41", 0], image: ["40", 0] }
+    });
+    expect(graph["43"]).toMatchObject({
+      class_type: "CrossViewWarp",
+      inputs: {
+        frames: ["40", 0],
+        moge_geometry: ["42", 0],
+        azimuth: -60,
+        elevation: 10,
+        pivot_override: false
+      }
+    });
+    expect(graph["18"]).toMatchObject({
+      class_type: "MiniMaxH3AddGuide",
+      inputs: { image: ["43", 0], frame_idx: 0 }
+    });
+    expect(graph["18"]?.inputs.audio).toBeUndefined();
+    expect(graph["10"]?.inputs.conditioning).toEqual(["18", 0]);
+    expect(graph["17"]?.inputs.lora_name).toBe(
+      "MiniMax-H3_Ref2VA-LoRA-CrossView-Warp_v1_3500.safetensors"
+    );
   });
 
   it("adds no VFX nodes without a VFX LoRA", () => {

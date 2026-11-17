@@ -1,5 +1,6 @@
 import { describe, expect, it } from "vitest";
 
+import { extractDefaultVideoSettings } from "./extractDefaultVideoSettings";
 import { minimaxH3LocalModel } from "./minimaxH3LocalModel";
 import { VideoEngine, VideoSettings } from "./types";
 
@@ -98,7 +99,8 @@ describe("minimaxH3LocalModel", () => {
         "vfx_edit",
         "head_swap",
         "character_swap",
-        "style_transfer"
+        "style_transfer",
+        "crossview"
       ]);
     });
 
@@ -120,6 +122,44 @@ describe("minimaxH3LocalModel", () => {
       );
     });
 
+    it("shows crossview its camera view and own strength, and hides the prompt", () => {
+      const crossview = { vfx_mode: "crossview" };
+      expect(isHiddenIn("crossview_azimuth", crossview)).toBe(false);
+      expect(isHiddenIn("crossview_lora_strength", crossview)).toBe(false);
+      expect(isHiddenIn("vfx_lora_strength", crossview)).toBe(true);
+      expect(isHiddenIn("prompt", crossview)).toBe(true);
+      expect(isHiddenIn("image_ids", crossview)).toBe(true);
+      expect(isHiddenIn("aspect_ratio", crossview)).toBe(true);
+      expect(isHiddenIn("use_video_audio", crossview)).toBe(true);
+      expect(isHiddenIn("use_video_audio", { vfx_mode: "head_swap" })).toBe(
+        false
+      );
+      expect(isHiddenIn("crossview_azimuth", { vfx_mode: "head_swap" })).toBe(
+        true
+      );
+      expect(settingByKey("crossview_lora_strength")?.defaultValue).toBe(0.8);
+    });
+
+    it("gives the camera view both camera angles as one setting's two values", () => {
+      expect(settingByKey("crossview_azimuth")).toMatchObject({
+        ui: "CrossviewCameraView",
+        secondKey: "crossview_elevation",
+        defaultValue: 30,
+        secondDefaultValue: 0
+      });
+      expect(extractDefaultVideoSettings(minimaxH3LocalModel)).toMatchObject({
+        crossview_azimuth: 30,
+        crossview_elevation: 0
+      });
+    });
+
+    it("requires a prompt in every mode but crossview", () => {
+      const validatePrompt = settingByKey("prompt")?.customValidation;
+      expect(validatePrompt?.("", { vfx_mode: "none" })).toBe(
+        "You need to add a prompt"
+      );
+      expect(validatePrompt?.("", { vfx_mode: "crossview" })).toBeNull();
+    });
     it("requires a reference image for the swaps", () => {
       const validateImages = settingByKey("image_ids")?.customValidation;
       expect(validateImages?.([], { vfx_mode: "head_swap" }, [])).toBe(
@@ -283,11 +323,13 @@ describe("default prompt per task", () => {
     ).toMatch(/^This is a prompt example:\nReplace the girl in/);
   });
 
-  it("loads an example prompt for every task", () => {
-    enumOptionValues("vfx_mode").forEach((task) => {
-      expect(promptAfterSwitchingTask(task, "")).toMatch(
-        /^This is a prompt example:\n/
-      );
-    });
+  it("loads an example prompt for every task but crossview, which hides the prompt", () => {
+    enumOptionValues("vfx_mode")
+      .filter((task) => task !== "crossview")
+      .forEach((task) => {
+        expect(promptAfterSwitchingTask(task, "")).toMatch(
+          /^This is a prompt example:\n/
+        );
+      });
   });
 });

@@ -24,6 +24,7 @@ export const buildMiniMaxH3VfxPrompt = ({
   lora: MiniMaxH3VfxLora;
   isSourceAudioGuided: boolean;
 }): string => {
+  if (lora.fixedPrompt) return lora.fixedPrompt;
   const isSourceClipGuided = lora.sourceClipPlacement === "guide";
   const promptWithSourceNamed = isSourceClipGuided
     ? nameSourceTagAndRenumberLaterTags(

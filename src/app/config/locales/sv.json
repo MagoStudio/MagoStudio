@@ -4048,6 +4048,20 @@
     }
   },
   "renderSettings": {
+    "crossviewCameraView": {
+      "left": "{{ degrees }}° vänster",
+      "right": "{{ degrees }}° höger",
+      "up": "{{ degrees }}° upp",
+      "down": "{{ degrees }}° ned",
+      "straightOn": "rakt framifrån",
+      "level": "i nivå",
+      "ariaLabel": "Ny kamera {{ horizontal }} och {{ vertical }} från källkameran",
+      "checkedZone": "Kontrollerade vinklar",
+      "trainedZone": "Tränad, mindre pålitlig",
+      "newCamera": "Ny kamera",
+      "sourceCamera": "Källkamera",
+      "roleDescription": "Kamerans position. Dra, eller använd piltangenterna, för att flytta den nya kameran"
+    },
     "minimaxH3EditedFrame": {
       "notAtRangeStart": "Din redigerade bildruta kommer från en annan bildruta än intervallets start. Låt intervallet börja på bildrutan du redigerade."
     },

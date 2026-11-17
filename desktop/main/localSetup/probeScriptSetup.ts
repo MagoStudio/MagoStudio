@@ -34,6 +34,7 @@ const NODE_URLS: Record<string, string> = {
   MagoQwen3VLLoader: "https://github.com/MagoStudio/ComfyUI-MagoNodes",
   MagoQwen3VLCaption: "https://github.com/MagoStudio/ComfyUI-MagoNodes",
   SimpleQwenVLggufV2: "https://github.com/KLL535/ComfyUI_Simple_Qwen3-VL-gguf",
+  CrossViewWarp: "https://github.com/cseti007/ComfyUI-CrossViewWarp",
   MiniMaxChunkFeedForward: "https://github.com/kijai/ComfyUI-KJNodes",
   VHS_LoadVideo: "https://github.com/Kosinkadink/ComfyUI-VideoHelperSuite",
   MiniMaxH3PDDAccApply: PDD_URL

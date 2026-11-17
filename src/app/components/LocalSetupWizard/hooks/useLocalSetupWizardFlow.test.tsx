@@ -48,7 +48,8 @@ beforeEach(() => {
     "Comfy-Org/MiniMax-H3",
     "alibaba-pai/MiniMax-H3-Acc-LoRAs",
     "Alissonerdx/Minimax-H3-ComfyUI",
-    "akatz-ai/MiniMax-H3-Character-Swap-LoRA"
+    "akatz-ai/MiniMax-H3-Character-Swap-LoRA",
+    "Cseti/MiniMax-H3_Ref2VA-LoRA-CrossView-Warp_v1"
   ]);
   acceptModelLicenses.mockResolvedValue(undefined);
   pauseInstaller.mockImplementation(async () => {
@@ -316,7 +317,8 @@ describe("model licenses step", () => {
         { huggingFaceRepo: "Comfy-Org/MiniMax-H3" },
         { huggingFaceRepo: "alibaba-pai/MiniMax-H3-Acc-LoRAs" },
         { huggingFaceRepo: "Alissonerdx/Minimax-H3-ComfyUI" },
-        { huggingFaceRepo: "akatz-ai/MiniMax-H3-Character-Swap-LoRA" }
+        { huggingFaceRepo: "akatz-ai/MiniMax-H3-Character-Swap-LoRA" },
+        { huggingFaceRepo: "Cseti/MiniMax-H3_Ref2VA-LoRA-CrossView-Warp_v1" }
       ]
     });
     expect(startInstaller).not.toHaveBeenCalled();
@@ -329,7 +331,8 @@ describe("model licenses step", () => {
       "Comfy-Org/MiniMax-H3",
       "alibaba-pai/MiniMax-H3-Acc-LoRAs",
       "Alissonerdx/Minimax-H3-ComfyUI",
-      "akatz-ai/MiniMax-H3-Character-Swap-LoRA"
+      "akatz-ai/MiniMax-H3-Character-Swap-LoRA",
+      "Cseti/MiniMax-H3_Ref2VA-LoRA-CrossView-Warp_v1"
     ]);
     expect(startInstaller).toHaveBeenCalledTimes(1);
     expect(hook.result.current.state.step).toBe("download");
@@ -353,7 +356,8 @@ describe("model licenses step", () => {
       licensesAwaitingAcceptance: [
         { huggingFaceRepo: "alibaba-pai/MiniMax-H3-Acc-LoRAs" },
         { huggingFaceRepo: "Alissonerdx/Minimax-H3-ComfyUI" },
-        { huggingFaceRepo: "akatz-ai/MiniMax-H3-Character-Swap-LoRA" }
+        { huggingFaceRepo: "akatz-ai/MiniMax-H3-Character-Swap-LoRA" },
+        { huggingFaceRepo: "Cseti/MiniMax-H3_Ref2VA-LoRA-CrossView-Warp_v1" }
       ]
     });
   });

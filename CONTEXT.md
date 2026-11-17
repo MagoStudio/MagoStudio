@@ -48,7 +48,7 @@ a single render rather than an engine for every Shot in a Script project.
 
 ### VFX mode
 
-A setting on MiniMax H3 (Local) that loads one community LoRA, turning the render into a specific edit of the source video: VFX edit, Head swap, Character swap or Style transfer. `none` renders a plain reference render. Each mode fixes its LoRA file, its prompt trigger, whether the source video is a **guide** (pinned frame for frame to the output through `MiniMaxH3AddGuide`) or a **reference** (`<Video 1>`), and whether a reference image is required. The mode table lives in `desktop/shared/minimaxH3VfxModes.ts`, shared by the settings panel and the ComfyUI graph builder. Sharpen is not a mode, and crossview is parked on its own branch.
+A setting on MiniMax H3 (Local) that loads one community LoRA, turning the render into a specific edit of the source video: VFX edit, Head swap, Character swap, Style transfer or New camera angle (crossview). `none` renders a plain reference render. Each mode fixes its LoRA file, its prompt trigger, whether the source video is a **guide** (pinned frame for frame to the output through `MiniMaxH3AddGuide`) or a **reference** (`<Video 1>`) or both, warped to a new viewpoint as the guide (crossview), and whether a reference image is required. The mode table lives in `desktop/shared/minimaxH3VfxModes.ts`, shared by the settings panel and the ComfyUI graph builder. Sharpen is not a mode.
 
 ### Shot lock (locked scene)
 

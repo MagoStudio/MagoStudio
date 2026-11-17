@@ -89,7 +89,8 @@ describe("optional local models", () => {
       expect.stringContaining("Qwen3-VL"),
       expect.stringContaining("Qwen3.8 27B"),
       "Flux 2 Klein 4B — sheet generation",
-      "Flux 2 Klein 9B — sheet generation"
+      "Flux 2 Klein 9B — sheet generation",
+      "MiniMax H3 — New camera angle"
     ]);
     expect(result.optional[0].requirements).toEqual(
       expect.arrayContaining([
@@ -169,18 +170,26 @@ describe("optional local models", () => {
 
 describe("MiniMax H3 VFX LoRAs", () => {
   it("lists every VFX LoRA with its pinned download, without blocking readiness", () => {
-    const result = evaluateScriptSetup(installed());
+    const info = installed();
+    info.LoadMoGeModel = { input: { required: { model_name: [[]] } } };
+    const result = evaluateScriptSetup(info);
     expect(result.ready).toBe(true);
     expect(result.vfxLoras.map((item) => item.name)).toEqual([
       "minimax_h3_vfx_edit_v1.0_r128.safetensors",
       "minimax_h3_vfx_edit_v1.0_r128_ffp.safetensors",
       "minimax_h3_head_swap_v1.0_r32.safetensors",
       "h3_character_swap_pro4500_1000.safetensors",
-      "minimax_h3_style_transfer_v1.0_r64.safetensors"
+      "minimax_h3_style_transfer_v1.0_r64.safetensors",
+      "MiniMax-H3_Ref2VA-LoRA-CrossView-Warp_v1_3500.safetensors",
+      "moge_2_vitl_normal_fp16.safetensors"
     ]);
     for (const lora of result.vfxLoras) {
       expect(lora.status).toBe("missing");
-      expect(lora.folder).toBe("models/loras/");
+      expect(lora.folder).toBe(
+        lora.name.startsWith("moge_")
+          ? "models/geometry_estimation/"
+          : "models/loras/"
+      );
       expect(lora.url).toContain(`/resolve/main/`);
       expect(lora.downloadSha256).toMatch(/^[0-9a-f]{64}$/);
     }
@@ -214,7 +223,43 @@ describe("MiniMax H3 VFX LoRAs", () => {
       "vlm-captioning",
       "script-text",
       "flux-klein-4b-sheet",
-      "flux-klein-9b-sheet"
+      "flux-klein-9b-sheet",
+      "minimax-h3-new-camera-angle"
     ]);
+  });
+
+  it("finds the crossview depth model under the MoGe loader, not as a LoRA", () => {
+    const info = installed();
+    info.LoadMoGeModel = {
+      input: {
+        required: { model_name: [["moge_2_vitl_normal_fp16.safetensors"]] }
+      }
+    };
+    const depthModel = evaluateScriptSetup(info).vfxLoras.find(
+      (item) => item.name === "moge_2_vitl_normal_fp16.safetensors"
+    );
+    expect(depthModel?.status).toBe("installed");
+  });
+});
+
+describe("MiniMax H3 new camera angle setup", () => {
+  it("offers the CrossViewWarp pack from its pin and treats MoGe as core", () => {
+    const result = evaluateScriptSetup({});
+    const cameraGroup = result.optional.find(
+      (group) => group.title === "MiniMax H3 — New camera angle"
+    );
+    expect(cameraGroup).toBeDefined();
+    const warpNode = cameraGroup?.requirements.find(
+      (requirement) => requirement.name === "CrossViewWarp"
+    );
+    expect(warpNode).toMatchObject({
+      url: "https://github.com/cseti007/ComfyUI-CrossViewWarp"
+    });
+    const depthNode = cameraGroup?.requirements.find(
+      (requirement) => requirement.name === "MoGeInference"
+    );
+    expect(depthNode).toMatchObject({
+      url: "https://github.com/Comfy-Org/ComfyUI"
+    });
   });
 });

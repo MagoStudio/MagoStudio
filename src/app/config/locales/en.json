@@ -4044,6 +4044,20 @@
     }
   },
   "renderSettings": {
+    "crossviewCameraView": {
+      "left": "{{ degrees }}° left",
+      "right": "{{ degrees }}° right",
+      "up": "{{ degrees }}° up",
+      "down": "{{ degrees }}° down",
+      "straightOn": "straight on",
+      "level": "level",
+      "ariaLabel": "New camera {{ horizontal }} and {{ vertical }} from the source camera",
+      "checkedZone": "Checked angles",
+      "trainedZone": "Trained, less reliable",
+      "newCamera": "New camera",
+      "sourceCamera": "Source camera",
+      "roleDescription": "Camera position. Drag, or use the arrow keys, to move the new camera"
+    },
     "minimaxH3EditedFrame": {
       "notAtRangeStart": "Your edited frame comes from a different frame than the start of the range. Start the range on the frame you edited."
     },

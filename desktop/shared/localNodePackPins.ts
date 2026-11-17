@@ -46,6 +46,13 @@ export const LOCAL_NODE_PACK_PINS: Readonly<Record<string, LocalNodePackPin>> =
         "b106b37d7e7e9b8ee1773a7387b623065e7e5dd0747de75610ce820004893dab",
       stripRoot: true
     },
+    "https://github.com/cseti007/ComfyUI-CrossViewWarp": {
+      revision: "3266a83a84eaa6833a9ebc38ac7cdd8789e44f5b",
+      url: "https://github.com/cseti007/ComfyUI-CrossViewWarp/archive/3266a83a84eaa6833a9ebc38ac7cdd8789e44f5b.zip",
+      sha256:
+        "ccd8297bb19b0fc19750cb4dd0a3f036846d74ed53ed2b67d40198dd55e3ae68",
+      stripRoot: true
+    },
     "https://github.com/KLL535/ComfyUI_Simple_Qwen3-VL-gguf": {
       revision: "85b92359595a450d6c37f0eccf210a8a1069f72e",
       url: "https://github.com/KLL535/ComfyUI_Simple_Qwen3-VL-gguf/archive/85b92359595a450d6c37f0eccf210a8a1069f72e.zip",
