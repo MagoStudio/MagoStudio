@@ -15,7 +15,10 @@ import { DatabaseManager } from "../database/databaseManager";
 import { ProjectRepository } from "../database/projectRepository";
 import { ScriptChatMessageRepository } from "../database/scriptChatMessageRepository";
 
-import { LocalScriptChatService } from "./localScriptChatService";
+import {
+  LocalScriptChatService,
+  type ScriptChatRun
+} from "./localScriptChatService";
 
 const TOOLS = [
   {
@@ -69,15 +72,17 @@ const setup = async () => {
 /** A model run the test resolves by hand. */
 const deferredRuns = () => {
   const prompts: string[] = [];
+  const chatRuns: ScriptChatRun[] = [];
   const resolvers: Array<(answer: string) => void> = [];
   const rejecters: Array<(error: Error) => void> = [];
-  const run = (prompt: string) =>
+  const run = (chatRun: ScriptChatRun) =>
     new Promise<string>((resolve, reject) => {
-      prompts.push(prompt);
+      prompts.push(chatRun.localPrompt);
+      chatRuns.push(chatRun);
       resolvers.push(resolve);
       rejecters.push(reject);
     });
-  return { run, prompts, resolvers, rejecters };
+  return { run, prompts, chatRuns, resolvers, rejecters };
 };
 
 const waitFor = async (check: () => Promise<boolean>) => {
@@ -198,6 +203,28 @@ describe("LocalScriptChatService", () => {
     expect(runs.prompts[1]).toContain("SYSTEM INSTRUCTIONS:\nStored prompt.");
     expect(runs.prompts[1]).toContain("USER: first");
     expect(runs.prompts[1]).toContain(`ASSISTANT: ${REPLY}`);
+  });
+
+  test("hands the cloud the project, the system prompt, the tools and only the new message", async () => {
+    const { projectId, messages } = await setup();
+    const runs = deferredRuns();
+    const chat = new LocalScriptChatService(messages, async () => {}, runs.run);
+
+    await chat.post({
+      projectId,
+      message: "first",
+      systemPrompt: "Stored prompt.",
+      tools: TOOLS
+    });
+    runs.resolvers[0]!(REPLY);
+    await waitFor(async () => !(await chat.list(projectId)).pending);
+    await chat.post({ projectId, message: "second", tools: TOOLS });
+
+    const secondRun = runs.chatRuns[1]!;
+    expect(secondRun.projectId).toBe(projectId);
+    expect(secondRun.cloudChatBody.system_prompt).toBe("Stored prompt.");
+    expect(secondRun.cloudChatBody.tools).toEqual(TOOLS);
+    expect(secondRun.cloudChatBody.message).toBe("second");
   });
 
   test("fails a reply an earlier session left PENDING, so the chat stays answerable", async () => {

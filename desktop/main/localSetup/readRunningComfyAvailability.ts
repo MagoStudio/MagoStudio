@@ -15,7 +15,8 @@ const NODE_PACK_NODES: Record<string, string[]> = {
   "comfyui-videohelpersuite": ["VHS_LoadVideo"],
   "comfyui-minimax-h3-pdd-acc": ["MiniMaxH3PDDAccApply"],
   "comfyui-gguf": ["UnetLoaderGGUF"],
-  "comfyui_simple_qwen3-vl-gguf": ["SimpleQwenVLggufV2"]
+  "comfyui_simple_qwen3-vl-gguf": ["SimpleQwenVLggufV2"],
+  "comfyui-crossviewwarp": ["CrossViewWarp"]
 };
 
 const MODEL_LOADERS: Record<string, [string, string]> = {
@@ -25,7 +26,8 @@ const MODEL_LOADERS: Record<string, [string, string]> = {
   vae: ["VAELoader", "vae_name"],
   latent_upscale_models: ["LatentUpscaleModelLoader", "model_name"],
   loras: ["LoraLoaderModelOnly", "lora_name"],
-  pdd_acc: ["MiniMaxH3PDDAccApply", "pdd_file"]
+  pdd_acc: ["MiniMaxH3PDDAccApply", "pdd_file"],
+  geometry_estimation: ["LoadMoGeModel", "model_name"]
 };
 
 const basename = (name: string): string =>

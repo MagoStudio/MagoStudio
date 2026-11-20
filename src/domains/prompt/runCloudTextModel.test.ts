@@ -1,5 +1,7 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
+import type { TextModelRequest } from "../../../desktop/shared/textModelRequest";
+
 import { runCloudTextModel } from "./runCloudTextModel";
 
 const mocks = vi.hoisted(() => ({
@@ -7,7 +9,19 @@ const mocks = vi.hoisted(() => ({
   post: vi.fn(),
   settings: vi.fn(),
   active: vi.fn(),
-  preferences: vi.fn()
+  preferences: vi.fn(),
+  ensureMirror: vi.fn(),
+  runChat: vi.fn()
+}));
+vi.mock("@domains/cloud/backendCloudApi", () => ({
+  backendCloudApi: () => "cloud-api"
+}));
+vi.mock("@domains/cloud/ensureCloudMirrorOfLocalProject", () => ({
+  ensureCloudMirrorOfLocalProject: mocks.ensureMirror
+}));
+vi.mock("@domains/cloud/describeSheetImageInCloud", () => ({}));
+vi.mock("./runCloudScriptChat", () => ({
+  runCloudScriptChat: mocks.runChat
 }));
 vi.mock("@/lib/backend-api-client", () => ({
   backendApiClient: { get: mocks.get, post: mocks.post }
@@ -27,8 +41,10 @@ const request = {
   operation: "casting" as const,
   body: { script: "A story", atomic_shots: true }
 };
-const run = (input = request, signal = new AbortController().signal) =>
-  runCloudTextModel(input, signal);
+const run = (
+  input: TextModelRequest = request,
+  signal = new AbortController().signal
+) => runCloudTextModel(input, signal);
 
 beforeEach(() => {
   vi.useFakeTimers();
@@ -172,23 +188,66 @@ describe("desktop cloud text routing", () => {
     await result;
   });
 
-  it("runs chat without creating or looking up a cloud project", async () => {
-    mocks.post.mockResolvedValue({ data: { content: '{"text":"Hello"}' } });
+  it("mirrors the local project before a cloud casting run", async () => {
+    mocks.post.mockResolvedValue({
+      status: 202,
+      data: { job_id: "job", status: "PENDING" }
+    });
+    mocks.get.mockResolvedValue({
+      data: { status: "COMPLETED", casting: { title: "A story" } }
+    });
+    const pending = run({ ...request, localProjectId: "local-project" });
+    await vi.advanceTimersByTimeAsync(2000);
+    await pending;
+    expect(mocks.ensureMirror).toHaveBeenCalledExactlyOnceWith(
+      "cloud-api",
+      "local-project"
+    );
+    expect(mocks.ensureMirror.mock.invocationCallOrder[0]).toBeLessThan(
+      mocks.post.mock.invocationCallOrder[0]!
+    );
+  });
+
+  it("runs chat through the mirrored project's chat", async () => {
+    mocks.runChat.mockResolvedValue({ content: '{"text":"Hello"}' });
+    const body = { message: "Hi", system_prompt: "Be brief", tools: [] };
+    const signal = new AbortController().signal;
+
+    expect(
+      await runCloudTextModel(
+        { ...request, operation: "chat", body, localProjectId: "local" },
+        signal
+      )
+    ).toEqual({ content: '{"text":"Hello"}' });
+    expect(mocks.runChat).toHaveBeenCalledExactlyOnceWith(
+      "local",
+      body,
+      signal
+    );
+    expect(mocks.post).not.toHaveBeenCalled();
+  });
+
+  it("refuses a cloud chat that names no local project", async () => {
+    await expect(
+      runCloudTextModel(
+        { ...request, operation: "chat", body: { message: "Hi" } },
+        new AbortController().signal
+      )
+    ).rejects.toThrow("needs its local project");
+    expect(mocks.runChat).not.toHaveBeenCalled();
+  });
+
+  it("leaves sheet image descriptions to the local model", async () => {
     expect(
       await runCloudTextModel(
         {
           ...request,
-          operation: "chat",
-          body: { prompt: "Local history and tool declarations" }
+          operation: "describe-sheet-image",
+          localProjectId: "local",
+          body: { asset_id: "image" }
         },
         new AbortController().signal
       )
-    ).toEqual({ content: '{"text":"Hello"}' });
-    expect(mocks.post).toHaveBeenCalledExactlyOnceWith(
-      "/chat/completionv3",
-      { apiRequestData: { userInput: "Local history and tool declarations" } },
-      expect.any(Object)
-    );
-    expect(mocks.get).not.toHaveBeenCalled();
+    ).toBeNull();
   });
 });

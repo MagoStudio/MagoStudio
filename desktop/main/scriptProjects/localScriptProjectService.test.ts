@@ -413,6 +413,175 @@ describe("local script-sheet image descriptions", () => {
       ]
     });
   });
+
+  const singleImageSheetService = (
+    runCloudTextModel: (...args: unknown[]) => Promise<unknown>,
+    describeLocally: () => Promise<string> = async () => "local caption"
+  ) => {
+    const sheetState: { current: Record<string, unknown> } = {
+      current: {
+        sheets_timeline_id: "sheets-1",
+        keys: [
+          {
+            token: "pilot",
+            name: "Pilot",
+            kind: "character",
+            enabled: true,
+            effective_asset_id: "image-1",
+            images: [{ asset_id: "image-1", source: "upload" }]
+          }
+        ],
+        shots: []
+      }
+    };
+    const describeImage = vi.fn(describeLocally);
+    const service = new LocalScriptProjectService(
+      {
+        get: async () => ({
+          id: "project-1",
+          origin: "local",
+          type: "script_to_shots"
+        }),
+        resolveMediaPath: async (_kind: string, assetId: string) =>
+          `C:/uploads/${assetId}.png`
+      } as never,
+      {
+        get: async () => ({ state: sheetState.current }),
+        resolveMediaPath: async () => null,
+        put: async (input: { state?: Record<string, unknown> }) => {
+          if (input.state) sheetState.current = input.state;
+        }
+      } as never,
+      async () => "http://127.0.0.1:8188",
+      async () => "qwen38-27b-q5",
+      describeImage,
+      runCloudTextModel as never
+    );
+    return { service, sheetState, describeImage };
+  };
+
+  const localVlmUnavailable = async (): Promise<string> => {
+    throw new Error("Qwen3-VL is not installed");
+  };
+
+  it("captions on the local Qwen3-VL on the local route", async () => {
+    const runCloudTextModel = vi.fn(async () => null);
+    const { service, sheetState, describeImage } =
+      singleImageSheetService(runCloudTextModel);
+
+    await service.update({
+      projectId: "project-1",
+      operation: "describe-sheet",
+      payload: { token: "pilot", assetId: "image-1" }
+    });
+
+    expect(runCloudTextModel).toHaveBeenCalledOnce();
+    expect(describeImage).toHaveBeenCalledExactlyOnceWith(
+      "C:/uploads/image-1.png",
+      "character"
+    );
+    expect(sheetState.current).toMatchObject({
+      keys: [
+        {
+          images: [expect.objectContaining({ description: "local caption" })]
+        }
+      ]
+    });
+  });
+
+  it("describes through the mirrored cloud sheet on the cloud route", async () => {
+    const runCloudTextModel = vi.fn(async () => ({
+      description: "cloud caption"
+    }));
+    const { service, sheetState, describeImage } =
+      singleImageSheetService(runCloudTextModel);
+
+    await service.update({
+      projectId: "project-1",
+      operation: "describe-sheet",
+      payload: { token: "pilot", assetId: "image-1" }
+    });
+
+    expect(runCloudTextModel).toHaveBeenCalledExactlyOnceWith(
+      "describe-sheet-image",
+      {
+        sheets_timeline_id: "sheets-1",
+        asset_id: "image-1",
+        token: "pilot",
+        name: "Pilot",
+        kind: "character",
+        overwrite: false
+      },
+      { localProjectId: "project-1" }
+    );
+    expect(describeImage).not.toHaveBeenCalled();
+    expect(sheetState.current).toMatchObject({
+      keys: [
+        {
+          images: [
+            expect.objectContaining({
+              description: "cloud caption",
+              has_description: true
+            })
+          ]
+        }
+      ]
+    });
+  });
+
+  it("fails an explicit describe with the cloud's reason", async () => {
+    const { service, describeImage } = singleImageSheetService(async () => {
+      throw new Error("Mago Cloud returned no description for this image");
+    });
+
+    await expect(
+      service.update({
+        projectId: "project-1",
+        operation: "describe-sheet",
+        payload: { token: "pilot", assetId: "image-1" }
+      })
+    ).rejects.toThrow("Mago Cloud returned no description");
+    expect(describeImage).not.toHaveBeenCalled();
+  });
+
+  it("fails an explicit describe when the local caption fails on the local route", async () => {
+    const { service } = singleImageSheetService(
+      async () => null,
+      localVlmUnavailable
+    );
+
+    await expect(
+      service.update({
+        projectId: "project-1",
+        operation: "describe-sheet",
+        payload: { token: "pilot", assetId: "image-1" }
+      })
+    ).rejects.toThrow("Could not describe this image");
+  });
+
+  it("files an upload without waiting for its description", async () => {
+    const runCloudTextModel = vi.fn(async () => null);
+    const { service, describeImage } =
+      singleImageSheetService(runCloudTextModel);
+
+    const key = await service.update({
+      projectId: "project-1",
+      operation: "add-sheet-image",
+      payload: { token: "pilot", assetId: "upload-2" }
+    });
+
+    expect(key).toMatchObject({
+      effective_asset_id: "upload-2",
+      images: expect.arrayContaining([
+        expect.objectContaining({
+          asset_id: "upload-2",
+          has_description: false
+        })
+      ])
+    });
+    expect(runCloudTextModel).not.toHaveBeenCalled();
+    expect(describeImage).not.toHaveBeenCalled();
+  });
 });
 
 describe("local project visual style", () => {
@@ -613,7 +782,7 @@ describe("local casting through the backend pipeline", () => {
           separate_style: separateStyle ?? true,
           separate_camera: false
         },
-        expect.any(Function)
+        { isCancelled: expect.any(Function), localProjectId: "p" }
       );
       expect(projectSettings.visual_style).toBe("Cloud ink");
       expect(comfy).not.toHaveBeenCalled();

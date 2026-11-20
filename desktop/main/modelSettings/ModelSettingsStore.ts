@@ -1,12 +1,12 @@
 import { randomUUID } from "node:crypto";
 import { mkdir, readFile, rename, unlink, writeFile } from "node:fs/promises";
 import path from "node:path";
-import { setTimeout as delay } from "node:timers/promises";
 
 import type {
   EndpointModelSettings,
   ModelOperationResult
 } from "../../shared/modelSettings";
+import { retryWhileFileIsLocked } from "../storage/retryWhileFileIsLocked";
 
 export interface CachedModelHost {
   lastSeenAt: string;
@@ -29,28 +29,8 @@ interface ModelSettingsDocument {
 }
 
 const fileOperations = new Map<string, Promise<void>>();
-const RENAME_ATTEMPTS = 6;
-const RENAME_RETRY_DELAY_MS = 50;
-
-const replaceSettingsFile = async (temporary: string, destination: string) => {
-  for (let attempt = 0; ; attempt++) {
-    try {
-      await rename(temporary, destination);
-      return;
-    } catch (error) {
-      const code = (error as NodeJS.ErrnoException).code;
-      if (
-        process.platform !== "win32" ||
-        !["EPERM", "EACCES", "EBUSY"].includes(code ?? "") ||
-        attempt >= RENAME_ATTEMPTS - 1
-      )
-        throw error;
-      // Antivirus/indexers can briefly hold the destination open on Windows.
-      // Keep the previous file intact until the atomic replacement succeeds.
-      await delay(RENAME_RETRY_DELAY_MS * (attempt + 1));
-    }
-  }
-};
+const replaceSettingsFile = (temporary: string, destination: string) =>
+  retryWhileFileIsLocked(() => rename(temporary, destination));
 
 export class ModelSettingsStore {
   constructor(private readonly filename: string) {}

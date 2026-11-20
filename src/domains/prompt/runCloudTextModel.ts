@@ -1,9 +1,15 @@
+import { backendCloudApi } from "@domains/cloud/backendCloudApi";
+import { ensureCloudMirrorOfLocalProject } from "@domains/cloud/ensureCloudMirrorOfLocalProject";
+
 import { backendApiClient } from "@/lib/backend-api-client";
 import { isCloudAccountActive } from "@/platform/cloudAccount";
 import { getLocalDesktopApi } from "@/platform/localDesktop";
 
 import type { TextModelRequest } from "../../../desktop/shared/textModelRequest";
 import { resolveTextModelRoute } from "../../../desktop/shared/textModelRoute";
+
+import { runCloudScriptChat } from "./runCloudScriptChat";
+import { pauseUnlessAborted } from "./utils/pauseUnlessAborted";
 
 const POLL_INTERVAL_MS = 2_000;
 const REQUEST_TIMEOUT_MS = 30_000;
@@ -20,21 +26,12 @@ const failure = (body: Record<string, unknown>): string => {
     : "Cloud text model request failed";
 };
 
-const pause = (signal: AbortSignal): Promise<void> =>
-  new Promise((resolve, reject) => {
-    signal.throwIfAborted();
-    const abort = () => {
-      clearTimeout(timer);
-      reject(signal.reason);
-    };
-    const timer = setTimeout(() => {
-      signal.removeEventListener("abort", abort);
-      resolve();
-    }, POLL_INTERVAL_MS);
-    signal.addEventListener("abort", abort, { once: true });
-  });
+const requireLocalProjectId = (request: TextModelRequest): string => {
+  if (!request.localProjectId)
+    throw new Error(`Cloud ${request.operation} needs its local project`);
+  return request.localProjectId;
+};
 
-/** Standalone text calls only: no cloud project, media upload or plan is created. */
 export const runCloudTextModel = async (
   request: TextModelRequest,
   signal: AbortSignal
@@ -47,22 +44,22 @@ export const runCloudTextModel = async (
   signal.throwIfAborted();
   if (route === "local") return null;
 
-  const config = { signal, timeout: REQUEST_TIMEOUT_MS };
-  if (request.operation === "chat") {
-    // The local prompt includes the transcript, tool declarations, guardrails
-    // and JSON answer format. Keep the local validation and tool application.
-    const { data } = await backendApiClient.post<Record<string, unknown>>(
-      "/chat/completionv3",
-      {
-        apiRequestData: { userInput: request.body.prompt }
-      },
-      config
+  if (request.operation === "chat")
+    return runCloudScriptChat(
+      requireLocalProjectId(request),
+      request.body,
+      signal
     );
-    if (data.error || typeof data.content !== "string" || !data.content.trim())
-      throw new Error(failure(data));
-    return data;
-  }
 
+  if (request.operation === "describe-sheet-image") return null;
+
+  if (request.operation === "casting" && request.localProjectId)
+    await ensureCloudMirrorOfLocalProject(
+      backendCloudApi(),
+      request.localProjectId
+    );
+
+  const config = { signal, timeout: REQUEST_TIMEOUT_MS };
   const path =
     request.operation === "casting" ? "/script/casting" : "/chat/video-prompt";
   const { data: submitted, status } = await backendApiClient.post<
@@ -78,7 +75,7 @@ export const runCloudTextModel = async (
     throw new Error(failure(submitted));
   const deadline = Date.now() + JOB_TIMEOUT_MS;
   while (Date.now() < deadline) {
-    await pause(signal);
+    await pauseUnlessAborted(POLL_INTERVAL_MS, signal);
     const { data } = await backendApiClient.get<Record<string, unknown>>(
       `${path}/jobs/${encodeURIComponent(submitted.job_id)}`,
       config

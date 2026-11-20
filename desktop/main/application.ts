@@ -110,13 +110,15 @@ const localScriptProjectService = new LocalScriptProjectService(
 const localScriptChatService = new LocalScriptChatService(
   new ScriptChatMessageRepository(databaseManager),
   (projectId) => localScriptProjectService.assertLocalProject(projectId),
-  async (prompt) => {
-    const cloud = await textModelBridge.run("chat", { prompt });
+  async ({ projectId, localPrompt, cloudChatBody }) => {
+    const cloud = await textModelBridge.run("chat", cloudChatBody, {
+      localProjectId: projectId
+    });
     if (cloud) return { content: String(cloud.content), model: "cloud" };
     return new ComfyScriptProjectClient(
       await librarySettings.getComfyEndpoint(),
       await librarySettings.getScriptTextModel()
-    ).runScriptChat(prompt);
+    ).runScriptChat(localPrompt);
   }
 );
 const cloudLinkRepository = new CloudLinkRepository(databaseManager);

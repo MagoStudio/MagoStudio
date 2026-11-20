@@ -1,9 +1,14 @@
-export type TextModelOperation = "casting" | "video-prompt" | "chat";
+export type TextModelOperation =
+  | "casting"
+  | "video-prompt"
+  | "chat"
+  | "describe-sheet-image";
 
 export interface TextModelRequest {
   id: string;
   operation: TextModelOperation;
   body: Record<string, unknown>;
+  localProjectId?: string;
 }
 
 export interface TextModelResponse {
@@ -13,8 +18,13 @@ export interface TextModelResponse {
   error?: string;
 }
 
+export type RunCloudTextModelOptions = {
+  isCancelled?: () => boolean;
+  localProjectId?: string;
+};
+
 export type RunCloudTextModel = (
   operation: TextModelOperation,
   body: Record<string, unknown>,
-  isCancelled?: () => boolean
+  options?: RunCloudTextModelOptions
 ) => Promise<Record<string, unknown> | null>;

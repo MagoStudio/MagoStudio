@@ -1129,17 +1129,7 @@ export class LocalScriptProjectService {
         projectId: input.projectId,
         state: this.refreshReferences(state)
       });
-      try {
-        return await this.requestSheetDescription(
-          input.projectId,
-          String(key.token),
-          assetId,
-          false,
-          false
-        );
-      } catch {
-        return key;
-      }
+      return key;
     }
     if (input.operation === "edit-image-description") {
       // PUT /assets/<id> {description}: a version's own text. Presence, not
@@ -1349,11 +1339,39 @@ export class LocalScriptProjectService {
         await this.describeEntityImage(sourcePath, kind)
       ).trim();
       return description || null;
-    } catch {
+    } catch (error) {
       // A caption improves a later MiniMax prompt, but must never turn an
       // otherwise successful image render/upload into a failure.
+      console.error("Local image caption failed", error);
       return null;
     }
+  }
+
+  private async describeSheetImage(input: {
+    projectId: string;
+    sheetsTimelineId: string;
+    key: JsonRecord;
+    assetId: string;
+    overwrite: boolean;
+  }): Promise<string | null> {
+    const kind = textValue(input.key.kind, "");
+    const cloud = await this.runCloudTextModel(
+      "describe-sheet-image",
+      {
+        sheets_timeline_id: input.sheetsTimelineId,
+        asset_id: input.assetId,
+        token: textValue(input.key.token, ""),
+        name: textValue(input.key.name, ""),
+        kind,
+        overwrite: input.overwrite
+      },
+      { localProjectId: input.projectId }
+    );
+    if (cloud) return textValue(cloud.description, "").trim() || null;
+    const sourcePath =
+      (await this.snapshots.resolveMediaPath(input.assetId)) ??
+      (await this.projects.resolveMediaPath("asset", input.assetId));
+    return sourcePath ? this.tryDescribeEntityImage(sourcePath, kind) : null;
   }
 
   private async describeSheetVersion(
@@ -1375,12 +1393,17 @@ export class LocalScriptProjectService {
     if (!image) throw new Error("This entity has no image to describe yet");
     if (hasOwnSheetDescription(key, image) && !overwrite) return key;
 
-    const sourcePath =
-      (await this.snapshots.resolveMediaPath(assetId)) ??
-      (await this.projects.resolveMediaPath("asset", assetId));
-    const description = sourcePath
-      ? await this.tryDescribeEntityImage(sourcePath, textValue(key.kind, ""))
-      : null;
+    const description = await this.describeSheetImage({
+      projectId,
+      sheetsTimelineId: textValue(snapshot.state?.sheets_timeline_id, ""),
+      key,
+      assetId,
+      overwrite
+    }).catch((error: unknown) => {
+      if (required) throw error;
+      console.error("Could not describe the sheet image", error);
+      return null;
+    });
     if (!description) {
       if (required) throw new Error("Could not describe this image");
       return key;
@@ -2860,7 +2883,7 @@ export class LocalScriptProjectService {
               ...body,
               prompt_version: "minimax_h3_ref"
             },
-            () => control.cancelled
+            { isCancelled: () => control.cancelled }
           );
           const composed =
             cloud ??
@@ -3198,7 +3221,10 @@ export class LocalScriptProjectService {
             separate_style: options.isSeparateStyleRequested ?? true,
             separate_camera: !!options.isSeparateCameraRequested
           },
-          () => control.cancelled
+          {
+            isCancelled: () => control.cancelled,
+            localProjectId: input.projectId
+          }
         );
         if (cloud) scriptTextModelFile = textValue(cloud.model, "cloud");
         casting = cloud

@@ -1,8 +1,13 @@
 import {
+  type MiniMaxH3CrossviewCamera,
   type MiniMaxH3VfxLora,
   type MiniMaxH3VfxMode,
   resolveMiniMaxH3VfxLora
 } from "../../shared/minimaxH3VfxModes";
+import {
+  buildCrossviewWarpNodes,
+  CROSSVIEW_WARP_NODE_IDS
+} from "../comfy/buildCrossviewWarpNodes";
 import { buildMiniMaxH3VfxPrompt } from "../comfy/buildMiniMaxH3VfxPrompt";
 import type { ComfyGraph } from "../comfy/comfyGraph";
 import { mergeComfyGraphParts } from "../comfy/mergeComfyGraphParts";
@@ -54,6 +59,7 @@ export const isMiniMaxH3PddAcceleratorQuality = (
 export type MiniMaxH3VfxLoraApplication = {
   lora: MiniMaxH3VfxLora;
   strength: number;
+  crossviewCamera: MiniMaxH3CrossviewCamera;
 };
 
 export type MiniMaxH3LocalGraphInput = {
@@ -71,6 +77,9 @@ export type MiniMaxH3LocalGraphInput = {
 
 const isSourceClipGuidedInGraph = (input: MiniMaxH3LocalGraphInput): boolean =>
   !!input.referenceVideo && input.vfxLora?.lora.sourceClipPlacement === "guide";
+
+const isSourceClipWarpedInGraph = (input: MiniMaxH3LocalGraphInput): boolean =>
+  !!input.referenceVideo && input.vfxLora?.lora.sourceClipPlacement === "warp";
 
 const buildReferenceNodes = (
   input: MiniMaxH3LocalGraphInput
@@ -162,9 +171,33 @@ const buildVfxLoraNodes = (
       }
     : {};
 
+const buildWarpedSourceClipGuideNodes = (
+  camera: MiniMaxH3CrossviewCamera
+): ComfyGraph =>
+  mergeComfyGraphParts([
+    buildCrossviewWarpNodes({
+      sourceFrames: [REFERENCE_VIDEO_NODE_ID, 0],
+      camera
+    }),
+    {
+      [SOURCE_CLIP_GUIDE_NODE_ID]: {
+        class_type: "MiniMaxH3AddGuide",
+        inputs: {
+          positive: ["8", 0],
+          latent: ["8", 1],
+          vae: ["6", 0],
+          image: [CROSSVIEW_WARP_NODE_IDS.warp, 0],
+          frame_idx: 0
+        }
+      }
+    }
+  ]);
+
 const buildSourceClipGuideNodes = (
   input: MiniMaxH3LocalGraphInput
 ): ComfyGraph => {
+  if (isSourceClipWarpedInGraph(input) && input.vfxLora)
+    return buildWarpedSourceClipGuideNodes(input.vfxLora.crossviewCamera);
   if (!isSourceClipGuidedInGraph(input)) return {};
   const sourceAudioGuideInputs = input.useReferenceVideoAudio
     ? {
@@ -195,9 +228,10 @@ export const buildMiniMaxH3LocalGraph = (
   const shiftedModel: ComfyNodeOutputLink = input.vfxLora
     ? [VFX_LORA_NODE_ID, 0]
     : ["4", 0];
-  const conditioning: ComfyNodeOutputLink = isSourceClipGuidedInGraph(input)
-    ? [SOURCE_CLIP_GUIDE_NODE_ID, 0]
-    : ["8", 0];
+  const conditioning: ComfyNodeOutputLink =
+    isSourceClipGuidedInGraph(input) || isSourceClipWarpedInGraph(input)
+      ? [SOURCE_CLIP_GUIDE_NODE_ID, 0]
+      : ["8", 0];
   return mergeComfyGraphParts([
     referenceNodes,
     buildVfxLoraNodes(input.vfxLora),
@@ -320,6 +354,7 @@ export type MiniMaxH3RenderRequest = {
   vfxMode: MiniMaxH3VfxMode;
   isEditedFrameProvided: boolean;
   vfxLoraStrength: number;
+  crossviewCamera: MiniMaxH3CrossviewCamera;
 };
 
 export type MiniMaxH3RenderPlan = {
@@ -381,7 +416,11 @@ export const planMiniMaxH3Render = (
     ),
     referenceVideoPath: request.referenceVideoPath,
     vfxLora: vfxLora
-      ? { lora: vfxLora, strength: request.vfxLoraStrength }
+      ? {
+          lora: vfxLora,
+          strength: request.vfxLoraStrength,
+          crossviewCamera: request.crossviewCamera
+        }
       : undefined
   };
 };

@@ -22,6 +22,7 @@ const everyRestrictiveRepo = [
   "alibaba-pai/MiniMax-H3-Acc-LoRAs",
   "Alissonerdx/Minimax-H3-ComfyUI",
   "akatz-ai/MiniMax-H3-Character-Swap-LoRA",
+  "Cseti/MiniMax-H3_Ref2VA-LoRA-CrossView-Warp_v1",
   "unsloth/FLUX.2-klein-9B-GGUF",
   "Comfy-Org/vae-text-encorder-for-flux-klein-9b"
 ];
@@ -258,7 +259,7 @@ describe("model license notice on a ComfyUI model download", () => {
     expect(downloadRequirement).not.toHaveBeenCalled();
     expect(
       screen.getAllByRole("link", { name: "MiniMax H3 Community License" })
-    ).toHaveLength(4);
+    ).toHaveLength(5);
     expect(
       screen.getAllByRole("link", { name: "FLUX Non-Commercial License" })
     ).toHaveLength(2);

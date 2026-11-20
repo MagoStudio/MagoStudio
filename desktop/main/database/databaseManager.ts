@@ -18,7 +18,7 @@ import {
   DatabaseCorruptionError,
   finishPendingRestore,
   listBackups,
-  restoreLibraryBackup
+  stageLibraryRestore
 } from "./libraryBackups";
 import * as schema from "./schema";
 import { createDrizzleDatabase } from "./sqliteProxy";
@@ -46,10 +46,38 @@ export class DatabaseManager {
   private backupRunning = false;
   private backupTask: Promise<void> | null = null;
   private unsafe = false;
+  private isLibraryRestorePending = false;
+  private queuedOpens: Promise<void> = Promise.resolve();
 
-  async open(libraryRoot: string): Promise<void> {
+  open(libraryRoot: string): Promise<void> {
+    return this.runAfterQueuedOpens(() => this.openNow(libraryRoot));
+  }
+
+  openIfClosed(libraryRoot: string): Promise<void> {
+    return this.runAfterQueuedOpens(async () => {
+      if (this.isOpen()) return;
+      await this.openNow(libraryRoot);
+    });
+  }
+
+  private runAfterQueuedOpens(openStep: () => Promise<void>): Promise<void> {
+    const queuedOpen = this.queuedOpens.then(() => {
+      this.throwIfLibraryRestoreIsPending();
+      return openStep();
+    });
+    this.queuedOpens = queuedOpen.catch(() => {});
+    return queuedOpen;
+  }
+
+  private throwIfLibraryRestoreIsPending(): void {
+    if (this.isLibraryRestorePending)
+      throw new Error("Mago is restoring a library backup and will restart.");
+  }
+
+  private async openNow(libraryRoot: string): Promise<void> {
     this.close();
     await this.backupTask;
+    this.throwIfLibraryRestoreIsPending();
     this.unsafe = false;
     await finishPendingRestore(libraryRoot);
     await Promise.all([
@@ -80,6 +108,7 @@ export class DatabaseManager {
       )
         await this.backupLibrary(libraryRoot);
 
+      this.throwIfLibraryRestoreIsPending();
       if (this.unsafe)
         throw new DatabaseCorruptionError(
           "The library became unreadable while backing it up."
@@ -111,6 +140,7 @@ export class DatabaseManager {
         { migrationsFolder: this.getMigrationsPath() }
       );
 
+      this.throwIfLibraryRestoreIsPending();
       this.sqlite = sqlite;
       this.database = database;
       this.unsafe = false;
@@ -167,10 +197,19 @@ export class DatabaseManager {
   }
 
   listBackups = listBackups;
-  restoreBackup = restoreLibraryBackup;
+  async restoreBackup(libraryRoot: string, backup: string): Promise<string> {
+    try {
+      return await stageLibraryRestore(libraryRoot, backup);
+    } catch (error) {
+      this.isLibraryRestorePending = false;
+      throw error;
+    }
+  }
 
   async suspendForRecovery(): Promise<void> {
+    this.isLibraryRestorePending = true;
     this.unsafe = true;
+    await this.queuedOpens;
     this.close();
     await this.backupTask;
   }
@@ -205,7 +244,8 @@ export class DatabaseManager {
     this.unsafe = true;
     reportLibraryIssue({
       id: "database",
-      kind: "service",
+      kind: "database",
+      isFixableByDatabaseRestore: true,
       message: `Library access paused: ${String(error)}. Restart Mago to recover a backup.`
     });
   }

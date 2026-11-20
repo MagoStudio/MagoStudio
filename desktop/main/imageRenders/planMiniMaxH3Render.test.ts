@@ -25,7 +25,8 @@ const plannedPrompt = ({
     seed: 1,
     vfxMode,
     isEditedFrameProvided: false,
-    vfxLoraStrength: 1
+    vfxLoraStrength: 1,
+    crossviewCamera: { azimuthDegrees: 30, elevationDegrees: 0 }
   }).prompt;
 
 describe("planMiniMaxH3Render audio tags", () => {
@@ -76,7 +77,8 @@ const planRequest = {
   seed: 1,
   vfxMode: "vfx_edit" as const,
   isEditedFrameProvided: true,
-  vfxLoraStrength: 1
+  vfxLoraStrength: 1,
+  crossviewCamera: { azimuthDegrees: 30, elevationDegrees: 0 }
 };
 
 describe("planMiniMaxH3Render missing inputs", () => {

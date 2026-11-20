@@ -85,6 +85,10 @@
         "flux-image": {
           "name": "Flux Image",
           "description": "Flux 2 Klein 4B for sheets and stills."
+        },
+        "minimax-h3-crossview": {
+          "name": "MiniMax H3 — New camera angle",
+          "description": "Crossview LoRA, depth model and nodes for the New camera angle VFX mode."
         }
       },
       "size": "{{gigabytes}} GB",
@@ -2707,6 +2711,9 @@
     "upload_entity_image_failed": {
       "description": "Could not upload that image. Try again."
     },
+    "upload_entity_image_caption_failed": {
+      "description": "Captioning failed. Edit the image description manually."
+    },
     "script_input": {
       "label": "Your script",
       "placeholder": "Paste your script here."
@@ -4044,6 +4051,20 @@
     }
   },
   "renderSettings": {
+    "crossviewCameraView": {
+      "left": "{{ degrees }}° left",
+      "right": "{{ degrees }}° right",
+      "up": "{{ degrees }}° up",
+      "down": "{{ degrees }}° down",
+      "straightOn": "straight on",
+      "level": "level",
+      "ariaLabel": "New camera {{ horizontal }} and {{ vertical }} from the source camera",
+      "checkedZone": "Checked angles",
+      "trainedZone": "Trained, less reliable",
+      "newCamera": "New camera",
+      "sourceCamera": "Source camera",
+      "roleDescription": "Camera position. Drag, or use the arrow keys, to move the new camera"
+    },
     "minimaxH3EditedFrame": {
       "notAtRangeStart": "Your edited frame comes from a different frame than the start of the range. Start the range on the frame you edited."
     },
@@ -5670,6 +5691,24 @@
     "keepWaiting": "Keep waiting",
     "connectCloud": "Connect Mago cloud",
     "description": "The models for local rendering are still downloading, so this render cannot run on your graphics card yet. You can connect the cloud version and render there in the meantime."
+  },
+  "libraryHealth": {
+    "title": "Library needs attention ({{count}})",
+    "kinds": {
+      "database": "Database",
+      "projectData": "Project data",
+      "fileOrRender": "File or render",
+      "service": "Service"
+    },
+    "openLogs": "Open logs",
+    "restoreBackup": "Restore database backup",
+    "copyDetails": "Copy details",
+    "detailsCopied": "Details copied.",
+    "copyFailed": "Could not copy the details.",
+    "openLogsFailed": "Could not open the logs folder.",
+    "restoreFailed": "Could not restore the backup.",
+    "statusUnavailable": "Unable to check library status. Restart Mago if library operations are failing.",
+    "projectDataWarning": "Saved project data could not be read. The original data has been kept. Use “Library needs attention” to view details or restore a database backup."
   },
   "authPage": {
     "continueOffline": "Skip and continue offline"

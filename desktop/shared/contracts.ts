@@ -22,8 +22,9 @@ export interface LibraryInfo {
 
 export interface LibraryIssue {
   id: string;
-  kind: "service" | "project" | "asset";
+  kind: "database" | "service" | "project" | "asset";
   message: string;
+  isFixableByDatabaseRestore?: boolean;
   projectId?: string;
   assetId?: string;
 }
@@ -208,7 +209,8 @@ export type OptionalScriptSetupId =
   | "vlm-captioning"
   | "script-text"
   | "flux-klein-4b-sheet"
-  | "flux-klein-9b-sheet";
+  | "flux-klein-9b-sheet"
+  | "minimax-h3-new-camera-angle";
 
 export interface ScriptSetupStatus {
   comfyRoot?: string;
