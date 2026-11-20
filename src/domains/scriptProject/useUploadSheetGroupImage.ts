@@ -4,6 +4,7 @@ import { useState } from "react";
 import { useTranslation } from "react-i18next";
 
 import { useAddSheetGroupImage } from "./data/useAddSheetGroupImage";
+import { useDescribeUploadedSheetImage } from "./useDescribeUploadedSheetImage";
 import { useReportScriptProjectFailure } from "./useReportScriptProjectFailure";
 import { readUploadRejectionMessage } from "./utils/readUploadRejectionMessage";
 
@@ -14,6 +15,7 @@ export const useUploadSheetGroupImage = (projectId: string) => {
   const { mutateAsync: uploadReferenceImage } = useUploadReferenceImage();
   const { mutateAsync: addSheetGroupImage, isPending: isFilingImage } =
     useAddSheetGroupImage(projectId);
+  const describeUploadedSheetImage = useDescribeUploadedSheetImage(projectId);
   const [uploadingSheetGroupTokens, setUploadingSheetGroupTokens] = useState<
     string[]
   >([]);
@@ -54,6 +56,7 @@ export const useUploadSheetGroupImage = (projectId: string) => {
         name: nameForNewSheetGroup,
         kind: kindForNewSheetGroup
       });
+      void describeUploadedSheetImage({ timelineId, token, assetId });
       return true;
     } catch (error) {
       reportScriptProjectFailure(

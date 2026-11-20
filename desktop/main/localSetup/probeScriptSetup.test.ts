@@ -89,7 +89,8 @@ describe("optional local models", () => {
       expect.stringContaining("Qwen3-VL"),
       expect.stringContaining("Qwen3.8 27B"),
       "Flux 2 Klein 4B — sheet generation",
-      "Flux 2 Klein 9B — sheet generation"
+      "Flux 2 Klein 9B — sheet generation",
+      "MiniMax H3 — New camera angle"
     ]);
     expect(result.optional[0].requirements).toEqual(
       expect.arrayContaining([
@@ -214,7 +215,66 @@ describe("MiniMax H3 VFX LoRAs", () => {
       "vlm-captioning",
       "script-text",
       "flux-klein-4b-sheet",
-      "flux-klein-9b-sheet"
+      "flux-klein-9b-sheet",
+      "minimax-h3-new-camera-angle"
     ]);
+  });
+});
+
+describe("MiniMax H3 new camera angle setup", () => {
+  it("offers the CrossViewWarp pack from its pin and treats MoGe as core", () => {
+    const result = evaluateScriptSetup({});
+    const cameraGroup = result.optional.find(
+      (group) => group.title === "MiniMax H3 — New camera angle"
+    );
+    expect(cameraGroup).toBeDefined();
+    const warpNode = cameraGroup?.requirements.find(
+      (requirement) => requirement.name === "CrossViewWarp"
+    );
+    expect(warpNode).toMatchObject({
+      url: "https://github.com/cseti007/ComfyUI-CrossViewWarp"
+    });
+    const depthNode = cameraGroup?.requirements.find(
+      (requirement) => requirement.name === "MoGeInference"
+    );
+    expect(depthNode).toMatchObject({
+      url: "https://github.com/Comfy-Org/ComfyUI"
+    });
+  });
+
+  it("offers the crossview LoRA and depth model as pinned on-demand downloads", () => {
+    const cameraGroup = evaluateScriptSetup({}).optional.find(
+      (group) => group.id === "minimax-h3-new-camera-angle"
+    );
+    const crossviewFiles = cameraGroup?.requirements.filter((requirement) =>
+      [
+        "moge_2_vitl_normal_fp16.safetensors",
+        "MiniMax-H3_Ref2VA-LoRA-CrossView-Warp_v1_3500.safetensors"
+      ].includes(requirement.name)
+    );
+    expect(crossviewFiles).toHaveLength(2);
+    for (const file of crossviewFiles ?? []) {
+      expect(file.url).toContain("/resolve/main/");
+      expect(file.downloadSha256).toMatch(/^[0-9a-f]{64}$/);
+    }
+  });
+
+  it("finds the crossview depth model under the MoGe loader, not as a LoRA", () => {
+    const info = installed();
+    info.LoadMoGeModel = {
+      input: {
+        required: { model_name: [["moge_2_vitl_normal_fp16.safetensors"]] }
+      }
+    };
+    const depthModel = evaluateScriptSetup(info)
+      .optional.find((group) => group.id === "minimax-h3-new-camera-angle")
+      ?.requirements.find(
+        (requirement) =>
+          requirement.name === "moge_2_vitl_normal_fp16.safetensors"
+      );
+    expect(depthModel).toMatchObject({
+      status: "installed",
+      folder: "models/geometry_estimation/"
+    });
   });
 });

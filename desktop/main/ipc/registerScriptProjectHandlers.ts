@@ -78,7 +78,7 @@ export const registerScriptProjectHandlers = ({
 }): void => {
   const ensureDatabase = async (): Promise<void> => {
     if (databaseManager.isOpen()) return;
-    await databaseManager.open(await settings.getLibraryRoot());
+    await databaseManager.openIfClosed(await settings.getLibraryRoot());
   };
 
   ipcMain.handle(

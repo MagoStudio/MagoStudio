@@ -40,7 +40,8 @@ export class TextModelBridge {
     );
   }
 
-  run: RunCloudTextModel = (operation, body, isCancelled) => {
+  run: RunCloudTextModel = (operation, body, options) => {
+    const isCancelled = options?.isCancelled;
     if (isCancelled?.())
       return Promise.reject(new Error("Text model request cancelled"));
     const renderer = this.renderer;
@@ -83,7 +84,14 @@ export class TextModelBridge {
       }, CANCELLATION_INTERVAL_MS);
       this.pending.set(id, { sender: renderer, finish });
       renderer.once("destroyed", destroyed);
-      renderer.send(IPC_CHANNELS.textModelRequest, { id, operation, body });
+      renderer.send(IPC_CHANNELS.textModelRequest, {
+        id,
+        operation,
+        body,
+        ...(options?.localProjectId
+          ? { localProjectId: options.localProjectId }
+          : {})
+      });
     });
   };
 }

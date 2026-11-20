@@ -13,7 +13,7 @@ export const storedObject = (
     clearLibraryIssue(issue.id);
     return parsed as Record<string, unknown>;
   } catch {
-    reportLibraryIssue(issue);
+    reportLibraryIssue({ ...issue, isFixableByDatabaseRestore: true });
     if (!allowFallback) throw new Error(issue.message);
     return {};
   }

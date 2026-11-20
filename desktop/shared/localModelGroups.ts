@@ -1,6 +1,8 @@
 import { LOCAL_MODEL_DEFINITIONS } from "./localModelDefinitions";
 import {
   LOCAL_MODEL_BUNDLES,
+  MINIMAX_H3_CROSSVIEW_BUNDLE_ID,
+  MINIMAX_H3_VFX_LORA_BUNDLE_ID,
   type LocalModelBundle
 } from "./localModelManifest";
 
@@ -61,7 +63,7 @@ const LOCAL_MODEL_GROUP_DEFINITIONS = [
       "qwen-vl",
       "minimax-h3",
       "minimax-h3-high-quality",
-      "minimax-h3-vfx-loras"
+      MINIMAX_H3_VFX_LORA_BUNDLE_ID
     ]
   },
   {
@@ -107,6 +109,17 @@ const LOCAL_MODEL_GROUP_DEFINITIONS = [
     isAlwaysInstalled: false,
     nodePacks: [GGUF_NODE_PACK],
     bundleIds: ["flux2-klein-4b"]
+  },
+  {
+    id: "minimax-h3-crossview",
+    isAlwaysInstalled: false,
+    nodePacks: [
+      {
+        repositoryUrl: "https://github.com/cseti007/ComfyUI-CrossViewWarp",
+        customNodesFolderName: "ComfyUI-CrossViewWarp"
+      }
+    ],
+    bundleIds: [MINIMAX_H3_CROSSVIEW_BUNDLE_ID]
   }
 ] as const satisfies readonly LocalModelGroupDefinition[];
 

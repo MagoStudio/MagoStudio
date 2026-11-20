@@ -2,6 +2,7 @@ import { AppliedMaskTile } from "@home/components/renderSettingsComponents/Appli
 import { CheckboxInput } from "@home/components/renderSettingsComponents/CheckboxInput";
 import { CheckboxOrNumberInput } from "@home/components/renderSettingsComponents/CheckboxOrNumberInput";
 import { ControlNetTypeSelector } from "@home/components/renderSettingsComponents/ControlNetTypeSelector";
+import { CrossviewCameraView } from "@home/components/renderSettingsComponents/CrossviewCameraView";
 import { EditFirstFrameInput } from "@home/components/renderSettingsComponents/EditFirstFrameInput/EditFirstFrameInput";
 import { FileUploaderWithStylizeButton } from "@home/components/renderSettingsComponents/FileUploaderWithStylizeButton";
 import { FrameAndMaskInput } from "@home/components/renderSettingsComponents/FrameAndMaskInput/FrameAndMaskInput";
@@ -30,6 +31,7 @@ import { TwoAngleImageUploader } from "@home/components/renderSettingsComponents
 import { VisualMaskSelection } from "@home/components/renderSettingsComponents/VisualMaskSelection";
 
 export const availableUiComponents = {
+  CrossviewCameraView: CrossviewCameraView,
   FileUploaderWithStylizeButton: FileUploaderWithStylizeButton,
   EditFirstFrameInput: EditFirstFrameInput,
   FrameAndMaskInput: FrameAndMaskInput,

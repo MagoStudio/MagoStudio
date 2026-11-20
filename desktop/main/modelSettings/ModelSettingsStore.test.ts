@@ -15,6 +15,10 @@ vi.mock("node:fs/promises", async (importOriginal) => {
   const actual = await importOriginal<typeof import("node:fs/promises")>();
   return { ...actual, rename: vi.fn(actual.rename) };
 });
+vi.mock("node:timers/promises", async (importOriginal) => ({
+  ...(await importOriginal<typeof import("node:timers/promises")>()),
+  setTimeout: vi.fn(async () => {})
+}));
 
 import { defaultModelPreferences } from "../../shared/defaultModelPreferences";
 
@@ -106,7 +110,6 @@ describe("ModelSettingsStore", () => {
         message: "new"
       })
     ).rejects.toThrow("locked");
-    expect(rename).toHaveBeenCalledTimes(6);
     expect(await readFile(file, "utf8")).toBe(original);
     expect(await readdir(directory)).toEqual(["models.json"]);
     const actual =

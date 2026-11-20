@@ -23,6 +23,16 @@ describe("licensesForModelGroups", () => {
     );
   });
 
+  it("asks for the crossview LoRA license only when New camera angle is chosen", () => {
+    const crossviewRepo = "Cseti/MiniMax-H3_Ref2VA-LoRA-CrossView-Warp_v1";
+    expect(reposOf(licensesForModelGroups(["minimal"]))).not.toContain(
+      crossviewRepo
+    );
+    expect(
+      reposOf(licensesForModelGroups(["minimal", "minimax-h3-crossview"]))
+    ).toContain(crossviewRepo);
+  });
+
   it("leaves out licenses of groups that were not chosen", () => {
     expect(reposOf(licensesForModelGroups(["qwen-image"]))).not.toContain(
       "Comfy-Org/MiniMax-H3"

@@ -1,6 +1,14 @@
 import { randomUUID } from "node:crypto";
 import { constants } from "node:fs";
-import { copyFile, mkdir, readFile, readdir, rm, stat } from "node:fs/promises";
+import {
+  copyFile,
+  mkdir,
+  readFile,
+  readdir,
+  rename,
+  rm,
+  stat
+} from "node:fs/promises";
 import path from "node:path";
 import { backup, DatabaseSync } from "node:sqlite";
 
@@ -11,6 +19,7 @@ import {
   syncFile,
   temporaryFile
 } from "../storage/atomicFile";
+import { retryWhileFileIsLocked } from "../storage/retryWhileFileIsLocked";
 
 const MAX_BACKUPS = 5;
 
@@ -75,6 +84,17 @@ const missing = (error: unknown): boolean =>
   (error as NodeJS.ErrnoException).code === "ENOENT";
 const pendingPath = (root: string): string =>
   path.join(root, ".mago-restore.json");
+export const JOURNAL_AT_RESTORE_DIRECTORY = "journal-at-restore";
+const moveIfPresent = async (
+  source: string,
+  destination: string
+): Promise<void> => {
+  try {
+    await rename(source, destination);
+  } catch (error) {
+    if (!missing(error)) throw error;
+  }
+};
 
 /** Finish an explicitly requested restore even if power failed during replacement. */
 export const finishPendingRestore = async (root: string): Promise<void> => {
@@ -104,10 +124,23 @@ export const finishPendingRestore = async (root: string): Promise<void> => {
     } finally {
       check.close();
     }
-    // Originals are already preserved in the recovery directory before the marker is written.
+    const journalAtRestore = path.join(
+      root,
+      "backups",
+      directory,
+      JOURNAL_AT_RESTORE_DIRECTORY
+    );
+    await mkdir(journalAtRestore, { recursive: true });
     for (const suffix of ["-wal", "-shm"])
-      await rm(path.join(root, `mago.sqlite3${suffix}`), { force: true });
-    await publishFile(staged, path.join(root, "mago.sqlite3"));
+      await retryWhileFileIsLocked(() =>
+        moveIfPresent(
+          path.join(root, `mago.sqlite3${suffix}`),
+          path.join(journalAtRestore, `mago.sqlite3${suffix}`)
+        )
+      );
+    await retryWhileFileIsLocked(() =>
+      publishFile(staged, path.join(root, "mago.sqlite3"))
+    );
   } else {
     const check = new DatabaseSync(path.join(root, "mago.sqlite3"), {
       readOnly: true
@@ -121,7 +154,7 @@ export const finishPendingRestore = async (root: string): Promise<void> => {
   await rm(pendingPath(root));
 };
 
-export const restoreLibraryBackup = async (
+export const stageLibraryRestore = async (
   root: string,
   selected: string
 ): Promise<string> => {
@@ -151,6 +184,5 @@ export const restoreLibraryBackup = async (
   }
   await atomicCopyFile(selected, path.join(preserved, "restore.sqlite3"));
   await atomicWriteFile(pendingPath(root), JSON.stringify(directory));
-  await finishPendingRestore(root);
   return preserved;
 };

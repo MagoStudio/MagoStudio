@@ -104,7 +104,7 @@ export const registerProjectHandlers = (
       if (required) throw new Error("Choose a Mago library folder first");
       return false;
     }
-    await databaseManager.open(libraryRoot);
+    await databaseManager.openIfClosed(libraryRoot);
     return true;
   };
 

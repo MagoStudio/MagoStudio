@@ -1,10 +1,15 @@
 import type { LibraryIssue } from "../shared/contracts";
 
+import { logStartup } from "./startupDiagnostics";
+
 const MAX_ISSUES = 200;
 const issues = new Map<string, LibraryIssue>();
 export const reportLibraryIssue = (issue: LibraryIssue): void => {
-  if (issues.get(issue.id)?.message !== issue.message)
+  const isNewOrChangedIssue = issues.get(issue.id)?.message !== issue.message;
+  if (isNewOrChangedIssue) {
     console.error("Library issue", issue);
+    logStartup(`Library issue [${issue.kind}] ${issue.id}: ${issue.message}`);
+  }
   issues.set(issue.id, issue);
   if (issues.size > MAX_ISSUES) issues.delete(issues.keys().next().value!);
 };

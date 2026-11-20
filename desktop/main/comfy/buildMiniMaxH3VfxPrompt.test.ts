@@ -55,4 +55,10 @@ describe("buildMiniMaxH3VfxPrompt", () => {
   it("keeps <Video 1> when the source stays a reference video", () => {
     expect(buildPrompt("character_swap", "<Video 1>")).toBe("<Video 1>");
   });
+
+  it("sends crossview's one-word training caption, whatever the prompt", () => {
+    expect(buildPrompt("crossview", "a different view of the lake")).toBe(
+      "crossview"
+    );
+  });
 });

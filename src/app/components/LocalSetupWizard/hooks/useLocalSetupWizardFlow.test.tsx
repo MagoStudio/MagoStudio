@@ -48,7 +48,8 @@ beforeEach(() => {
     "Comfy-Org/MiniMax-H3",
     "alibaba-pai/MiniMax-H3-Acc-LoRAs",
     "Alissonerdx/Minimax-H3-ComfyUI",
-    "akatz-ai/MiniMax-H3-Character-Swap-LoRA"
+    "akatz-ai/MiniMax-H3-Character-Swap-LoRA",
+    "Cseti/MiniMax-H3_Ref2VA-LoRA-CrossView-Warp_v1"
   ]);
   acceptModelLicenses.mockResolvedValue(undefined);
   pauseInstaller.mockImplementation(async () => {

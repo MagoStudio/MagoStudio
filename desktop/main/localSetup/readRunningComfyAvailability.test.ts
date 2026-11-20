@@ -103,6 +103,44 @@ describe("running ComfyUI availability", () => {
       expect(isModelGroupItemAvailable!(item)).toBe(false);
   });
 
+  it("recognizes a running ComfyUI that already has everything for New camera angle", async () => {
+    const items = listModelGroupItems({
+      groupId: "minimax-h3-crossview",
+      selectedModelGroupVariants: {},
+      localModelsRoot: path.resolve("selected-install")
+    });
+    const modelFileNames = items
+      .filter((item) => item.kind === "model-file")
+      .map((item) => `shared\\${item.name}`);
+    vi.stubGlobal(
+      "fetch",
+      vi.fn(async (url: string) => {
+        if (url.endsWith("/models/clip_gguf")) return Response.json([]);
+        const node = url.split("/").at(-1)!;
+        return Response.json({
+          [node]: {
+            input: {
+              required: {
+                lora_name: [modelFileNames],
+                model_name: [modelFileNames]
+              }
+            }
+          }
+        });
+      })
+    );
+    const isModelGroupItemAvailable = await readRunningComfyAvailability(
+      "http://running-comfy:8188"
+    );
+    expect(isModelGroupItemAvailable).not.toBeNull();
+    expect(items.map((item) => item.kind)).toContain("node-pack");
+    for (const item of items)
+      expect(
+        isModelGroupItemAvailable!(item, "minimax-h3-crossview"),
+        item.name
+      ).toBe(true);
+  });
+
   it("returns no runtime snapshot when the server cannot be queried", async () => {
     vi.stubGlobal(
       "fetch",

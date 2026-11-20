@@ -45,11 +45,23 @@ it("accepts only the requesting renderer's response, including the local route",
   expect(vi.getTimerCount()).toBe(0);
 });
 
+it("sends the local project with the request", () => {
+  const { bridge, sender } = setup();
+  void bridge
+    .run("chat", { message: "Hi" }, { localProjectId: "project-1" })
+    .catch(() => undefined);
+  expect(sender.send.mock.calls[0]![1]).toMatchObject({
+    operation: "chat",
+    body: { message: "Hi" },
+    localProjectId: "project-1"
+  });
+});
+
 it("cancels waiting and ignores late replies", async () => {
   const { bridge, sender } = setup();
   let cancelled = false;
   const result = expect(
-    bridge.run("video-prompt", {}, () => cancelled)
+    bridge.run("video-prompt", {}, { isCancelled: () => cancelled })
   ).rejects.toThrow("cancelled");
   const request = sender.send.mock.calls[0]![1];
   cancelled = true;

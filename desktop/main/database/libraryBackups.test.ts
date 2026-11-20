@@ -16,8 +16,9 @@ import { afterEach, expect, it } from "vitest";
 import {
   createLibraryBackup,
   finishPendingRestore,
+  JOURNAL_AT_RESTORE_DIRECTORY,
   listBackups,
-  restoreLibraryBackup
+  stageLibraryRestore
 } from "./libraryBackups";
 
 const roots: string[] = [];
@@ -60,7 +61,11 @@ it("preserves damaged database and sidecars before restoring", async () => {
   await writeFile(path.join(root, "mago.sqlite3"), "damaged original");
   await writeFile(path.join(root, "mago.sqlite3-wal"), "original journal");
   await writeFile(path.join(root, "mago.sqlite3-shm"), "original index");
-  const preserved = await restoreLibraryBackup(root, selected);
+  const preserved = await stageLibraryRestore(root, selected);
+  expect(await readFile(path.join(root, "mago.sqlite3"), "utf8")).toBe(
+    "damaged original"
+  );
+  await finishPendingRestore(root);
   expect(await readFile(path.join(preserved, "mago.sqlite3"), "utf8")).toBe(
     "damaged original"
   );
@@ -78,7 +83,27 @@ it("preserves damaged database and sidecars before restoring", async () => {
   } finally {
     restored.close();
   }
+});
+it("moves the journal into the recovery folder instead of deleting it", async () => {
+  const { root, database } = await library();
+  const selected = await createLibraryBackup(root);
+  database.close();
+  await writeFile(path.join(root, "mago.sqlite3-wal"), "journal at staging");
+  const preserved = await stageLibraryRestore(root, selected);
+  await writeFile(path.join(root, "mago.sqlite3-wal"), "journal at restore");
+
   await finishPendingRestore(root);
+
+  expect(await readdir(root)).not.toContain("mago.sqlite3-wal");
+  expect(
+    await readFile(
+      path.join(preserved, JOURNAL_AT_RESTORE_DIRECTORY, "mago.sqlite3-wal"),
+      "utf8"
+    )
+  ).toBe("journal at restore");
+  expect(await readFile(path.join(preserved, "mago.sqlite3-wal"), "utf8")).toBe(
+    "journal at staging"
+  );
 });
 it("refuses an invalid backup without touching the original", async () => {
   const { root, database } = await library();
@@ -86,7 +111,7 @@ it("refuses an invalid backup without touching the original", async () => {
   database.close();
   const original = await readFile(path.join(root, "mago.sqlite3"));
   await writeFile(selected, "bad backup");
-  await expect(restoreLibraryBackup(root, selected)).rejects.toThrow();
+  await expect(stageLibraryRestore(root, selected)).rejects.toThrow();
   expect(await readFile(path.join(root, "mago.sqlite3"))).toEqual(original);
 });
 it("finishes a restore interrupted after staging without losing the preserved original", async () => {
@@ -120,4 +145,32 @@ it("finishes a restore interrupted after staging without losing the preserved or
     restored.close();
   }
   expect(await readdir(root)).not.toContain(".mago-restore.json");
+});
+it("stages a restore while another connection holds the database, leaving live files untouched", async () => {
+  const { root, database } = await library();
+  const selected = await createLibraryBackup(root);
+  database.exec("INSERT INTO work VALUES ('after backup')");
+  const liveDatabaseBefore = await readFile(path.join(root, "mago.sqlite3"));
+  const liveJournalBefore = await readFile(path.join(root, "mago.sqlite3-wal"));
+  try {
+    await stageLibraryRestore(root, selected);
+    expect(await readdir(root)).toContain(".mago-restore.json");
+    expect(await readFile(path.join(root, "mago.sqlite3"))).toEqual(
+      liveDatabaseBefore
+    );
+    expect(await readFile(path.join(root, "mago.sqlite3-wal"))).toEqual(
+      liveJournalBefore
+    );
+  } finally {
+    database.close();
+  }
+  await finishPendingRestore(root);
+  const restored = new DatabaseSync(path.join(root, "mago.sqlite3"));
+  try {
+    expect(restored.prepare("SELECT value FROM work").all()).toEqual([
+      { value: "saved work" }
+    ]);
+  } finally {
+    restored.close();
+  }
 });

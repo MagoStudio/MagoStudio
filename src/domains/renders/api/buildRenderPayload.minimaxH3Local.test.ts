@@ -87,4 +87,24 @@ describe("MiniMax H3 (Local) — images the desktop receives", () => {
     expect(reusedRender.referenceImageIds).toEqual(["edited"]);
     expect(reusedRender.wireSettings.vfx_edited_frame_id).toBe("edited");
   });
+
+  it("sends crossview's camera and strength to the desktop", () => {
+    const { wireSettings, referenceImageIds } = desktopReferenceImageIds(
+      {
+        vfx_mode: "crossview",
+        crossview_azimuth: -45,
+        crossview_elevation: 15,
+        crossview_lora_strength: 0.9
+      },
+      []
+    );
+
+    expect(wireSettings).toMatchObject({
+      vfx_mode: "crossview",
+      crossview_azimuth: -45,
+      crossview_elevation: 15,
+      crossview_lora_strength: 0.9
+    });
+    expect(referenceImageIds).toEqual([]);
+  });
 });

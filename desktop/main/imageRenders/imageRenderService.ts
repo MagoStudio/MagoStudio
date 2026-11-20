@@ -2381,6 +2381,7 @@ export class ImageRenderService {
           reportLibraryIssue({
             id: `clip:${clip.id}`,
             kind: "asset",
+            isFixableByDatabaseRestore: true,
             assetId,
             message: `Saved clip ${clip.id} is damaged. Original data has been kept.`
           });

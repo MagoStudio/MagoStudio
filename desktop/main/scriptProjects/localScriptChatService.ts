@@ -30,6 +30,16 @@ const ORPHANED_ERROR =
 const errorMessage = (error: unknown): string =>
   error instanceof Error ? error.message : "the reply failed";
 
+export type ScriptChatRun = {
+  projectId: string;
+  localPrompt: string;
+  cloudChatBody: {
+    message: string;
+    system_prompt: string | null;
+    tools: { function_declarations: ScriptChatToolDeclaration[] }[];
+  };
+};
+
 const toWireMessage = (message: ScriptChatMessage) => {
   const error = message.data.error;
   return {
@@ -69,7 +79,7 @@ export class LocalScriptChatService {
     private readonly messages: ScriptChatMessageRepository,
     private readonly assertLocalProject: (projectId: string) => Promise<void>,
     private readonly runChat: (
-      prompt: string
+      run: ScriptChatRun
     ) => Promise<string | { content: string; model: string }>
   ) {}
 
@@ -141,7 +151,20 @@ export class LocalScriptChatService {
     void runBackgroundTask("Script chat", () =>
       this.answer(
         answer.id,
-        buildScriptChatPrompt({ systemPrompt, tools, history, message }),
+        {
+          projectId: input.projectId,
+          localPrompt: buildScriptChatPrompt({
+            systemPrompt,
+            tools,
+            history,
+            message
+          }),
+          cloudChatBody: {
+            message,
+            system_prompt: systemPrompt,
+            tools: tools.length ? [{ function_declarations: tools }] : []
+          }
+        },
         tools
       ).finally(() => this.running.delete(answer.id))
     );
@@ -159,14 +182,25 @@ export class LocalScriptChatService {
   /** One model run, plus one repair when the answer is unusable. */
   private async answer(
     answerId: string,
-    prompt: string,
+    chatRun: ScriptChatRun,
     tools: ScriptChatToolDeclaration[]
   ): Promise<void> {
     try {
       let reply: ScriptChatReply;
       let model = "local";
-      const run = async (input: string) => {
-        const result = await this.runChat(input);
+      const run = async (localPrompt: string, repairFeedback?: string) => {
+        const result = await this.runChat({
+          ...chatRun,
+          localPrompt,
+          cloudChatBody: repairFeedback
+            ? {
+                ...chatRun.cloudChatBody,
+                message: `${chatRun.cloudChatBody.message}
+
+Your previous answer was unusable: ${repairFeedback}. Answer again in the required format.`
+              }
+            : chatRun.cloudChatBody
+        });
         if (typeof result === "string") {
           model = "local";
           return result;
@@ -175,11 +209,15 @@ export class LocalScriptChatService {
         return result.content;
       };
       try {
-        reply = parseScriptChatReply(await run(prompt), tools);
+        reply = parseScriptChatReply(await run(chatRun.localPrompt), tools);
       } catch (firstError) {
         reply = parseScriptChatReply(
           await run(
-            buildScriptChatRepairPrompt(prompt, errorMessage(firstError))
+            buildScriptChatRepairPrompt(
+              chatRun.localPrompt,
+              errorMessage(firstError)
+            ),
+            errorMessage(firstError)
           ),
           tools
         );

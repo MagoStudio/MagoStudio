@@ -7,6 +7,7 @@ import {
   resolveMiniMaxH3VfxLora,
   resolveMiniMaxH3VfxMode
 } from "../../shared/minimaxH3VfxModes";
+import { CROSSVIEW_DEPTH_MODEL_FILE } from "../comfy/buildCrossviewWarpNodes";
 import { normalizeComfyEndpoint } from "../comfy/normalizeComfyEndpoint";
 import { prepareModelRequirements } from "../modelSettings/prepareModelRequirements";
 
@@ -248,6 +249,7 @@ const requirementsFor = (
       isMiniMaxH3VfxEditedFrameProvided(settings)
     );
     const isSourceClipGuided = vfxLora?.sourceClipPlacement === "guide";
+    const isSourceClipWarped = vfxLora?.sourceClipPlacement === "warp";
     return {
       nodes: [
         "MiniMaxChunkFeedForward",
@@ -265,7 +267,15 @@ const requirementsFor = (
         "VHS_LoadVideo",
         ...(usesPddAccelerator ? [] : ["BasicScheduler"]),
         ...(vfxLora ? ["LoraLoaderModelOnly"] : []),
-        ...(isSourceClipGuided ? ["MiniMaxH3AddGuide"] : [])
+        ...(isSourceClipGuided ? ["MiniMaxH3AddGuide"] : []),
+        ...(isSourceClipWarped
+          ? [
+              "MiniMaxH3AddGuide",
+              "LoadMoGeModel",
+              "MoGeInference",
+              "CrossViewWarp"
+            ]
+          : [])
       ],
       files: [
         loaderFile(
@@ -301,6 +311,15 @@ const requirementsFor = (
             ),
         ...(vfxLora
           ? [loaderFile("LoraLoaderModelOnly", "lora_name", vfxLora.loraFile)]
+          : []),
+        ...(isSourceClipWarped
+          ? [
+              loaderFile(
+                "LoadMoGeModel",
+                "model_name",
+                CROSSVIEW_DEPTH_MODEL_FILE
+              )
+            ]
           : [])
       ]
     };

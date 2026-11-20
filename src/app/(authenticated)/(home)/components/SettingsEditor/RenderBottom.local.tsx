@@ -1,7 +1,10 @@
 import { useShouldOfferComfyLaunch } from "@app/components/ComfyLaunchDialog/hooks/useShouldOfferComfyLaunch";
 import { useLocalVideoReady } from "@app/components/LocalSetupWizard/hooks/useLocalRenderReady";
 import { useOpenLocalSetupWizard } from "@app/components/LocalSetupWizard/hooks/useOpenLocalSetupWizard";
+import { useOptionalLocalInstallGate } from "@app/components/LocalSetupWizard/hooks/useOptionalLocalInstallGate";
 import { LocalSetupWarningTooltip } from "@app/components/LocalSetupWizard/LocalSetupWarningTooltip";
+import { SetupMagoStudioButton } from "@app/components/LocalSetupWizard/SetupMagoStudioButton";
+import { NEW_CAMERA_ANGLE_INSTALL_REQUIREMENT } from "@app/components/LocalSetupWizard/utils/newCameraAngleInstallRequirement";
 import { toFixed } from "@app/utils/priceHelper";
 import { Alert } from "@components/Alert";
 import { MainButton } from "@components/MainButton";
@@ -43,7 +46,7 @@ import { PaymentUnlimitedAlert } from "@home/components/PaymentUnlimitedAlert";
 import { useRelaxedAllowedModels } from "@hooks/payment/useRelaxedAllowedModels";
 import { useFloatingRefCallbacks } from "@hooks/useFloatingRefCallbacks";
 import { useTimeoutAlert } from "@hooks/useTimeoutAlert";
-import { VideoSettings } from "@models/video/types";
+import { VideoEngine, VideoSettings } from "@models/video/types";
 import { activeHotkeyAtom, useInputTrackIdAtom } from "@store/atoms";
 import { areRenderSettingsErrorsRevealedAtom } from "@store/atoms/areRenderSettingsErrorsRevealedAtom";
 import { comfyLaunchDialogOpenAtom } from "@store/atoms/comfyLaunchDialogOpenAtom";
@@ -62,6 +65,8 @@ import { useGetTrackById } from "@/domains/track/useGetTrackById";
 import { useSetSelectedTrackIds } from "@/domains/track/useSetSelectedTrackIds";
 import { resolveRenderProvider } from "@/platform/renderTarget";
 import { queryKeys } from "@/queryKeys";
+
+import { resolveMiniMaxH3VfxMode } from "../../../../../../desktop/shared/minimaxH3VfxModes";
 
 import { GenerateButtonCostLabel } from "./GenerateButtonCostLabel";
 import { useEnsureLocalVideoRenderPreconditions } from "./hooks/useEnsureLocalVideoRenderPreconditions";
@@ -115,7 +120,15 @@ export const RenderBottom: React.FC = () => {
   const { shouldOfferComfyLaunch } = useShouldOfferComfyLaunch();
   const openLocalSetupWizard = useOpenLocalSetupWizard();
   const setIsComfyLaunchDialogOpen = useSetAtom(comfyLaunchDialogOpenAtom);
+  const isNewCameraAngleSelected =
+    selectedModel.name === VideoEngine.minimax_h3_local &&
+    resolveMiniMaxH3VfxMode(renderSettingsValues.vfx_mode) === "crossview";
+  const newCameraAngleInstall = useOptionalLocalInstallGate(
+    isNewCameraAngleSelected ? NEW_CAMERA_ANGLE_INSTALL_REQUIREMENT : null
+  );
   const isLocalRenderBlocked = !localReady;
+  const isNewCameraAngleInstallMissing =
+    localReady && !newCameraAngleInstall.isOptionalLocalInstallComplete;
   const localRenderBlockedMessage = shouldOfferComfyLaunch
     ? t("localSetup.localRenderBlocked.comfyStopped")
     : t("localSetup.localRenderBlocked.setupUnfinished");
@@ -379,6 +392,7 @@ export const RenderBottom: React.FC = () => {
   );
   const isGenerateButtonDisabled =
     !localReady ||
+    isNewCameraAngleInstallMissing ||
     (!drivingSubmission.canSubmit &&
       !drivingSubmission.isBlockedByCreditPaywall);
   const isGenerateActionUnavailable = isGenerateButtonDisabled || isGenerating;
@@ -510,6 +524,17 @@ export const RenderBottom: React.FC = () => {
                       {t("actions.generate.label")}
                     </MainButton>
                   </LocalSetupWarningTooltip>
+                ) : isNewCameraAngleInstallMissing ? (
+                  <SetupMagoStudioButton
+                    requiredLocalInstall={
+                      newCameraAngleInstall.requiredLocalInstall
+                    }
+                    lockedRenderButton={
+                      <MainButton fullWidth isDisabled>
+                        {t("actions.generate.label")}
+                      </MainButton>
+                    }
+                  />
                 ) : (
                   <MainButton
                     isDisabled={isGenerateActionUnavailable}

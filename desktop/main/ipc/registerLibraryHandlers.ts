@@ -75,7 +75,7 @@ export const registerLibraryHandlers = ({
         backups[selected]
       );
       logStartup(
-        `Restored library backup; original files preserved at ${preserved}`
+        `Staged library backup restore; it finishes when the library next opens. Original files preserved at ${preserved}`
       );
       app.relaunch();
       app.exit(0);
